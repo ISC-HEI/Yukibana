@@ -7,5 +7,6 @@ lib
 plugins
 !*-app/scripts
 !*-app/resources
+!*-app/tests
 !electron-app/electron-builder.yml
 .DS_Store
