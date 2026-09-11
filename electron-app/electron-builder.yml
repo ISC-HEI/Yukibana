@@ -1,0 +1,85 @@
+appId: isc.yukibana
+productName: Yukibana
+copyright: Copyright © 2026-2026 ISC, HES-SO Valais/Wallis
+electronDist: ../node_modules/electron/dist
+electronVersion: 42.8.1
+asar: true
+asarUnpack:
+  - "**/lib/backend/native/**"
+  - "**/lib/backend/shell-integrations/**"
+  - "**/lib/prebuilds/**"
+nodeGypRebuild: false
+npmRebuild: false
+
+directories:
+  buildResources: resources
+
+# node_modules and package.json are copied automatically
+# Exclude node_modules manually because electron is copied by electron-builder and we are using a bundled backend
+files:
+  - src-gen
+  - lib
+  - resources/icons/WindowIcon/512-512.png
+  - resources/YukibanaSplash.svg
+  - scripts
+  - "!**node_modules/**"
+extraResources:
+  - from: ../plugins
+    to: app/plugins
+
+# win:
+#   icon: resources/icons/WindowsLauncherIcons/Yukibana.ico
+#   target:
+#     - nsis
+#   publish:
+#     provider: generic
+#     url: "https://download.eclipse.org/theia/ide/${version}/windows"
+#     useMultipleRangeRequest: false
+# mac:
+#   icon: resources/icons/MacLauncherIcons/icon.icns
+#   category: public.app-category.developer-tools
+#   protocols:
+#     - name: theia
+#       schemes:
+#         - theia
+#   darkModeSupport: true
+#   target:
+#     - dmg
+#     - zip
+#   publish:
+#     provider: generic
+#     url: "https://download.eclipse.org/theia/ide/latest/macos"
+linux:
+  icon: resources/icons/LinuxLauncherIcons
+  category: Development
+  mimeTypes:
+    - inode/directory
+  vendor: ISC, HES-SO Valais/Wallis
+  target:
+    # - deb
+    - AppImage
+  publish:
+    provider: generic
+    url: "https://yukibana.isc-vs.ch/download/latest/linux"
+
+# nsis:
+#   menuCategory: true
+#   oneClick: false
+#   perMachine: false
+#   installerHeaderIcon: resources/icons/WindowsLauncherIcons/TheiaIDE.ico
+#   installerIcon: resources/icons/WindowsLauncherIcons/TheiaIDE.ico
+#   uninstallerIcon: resources/icons/WindowsLauncherIcons/TheiaIDE.ico
+#   installerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
+#   uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
+#   allowToChangeInstallationDirectory: true
+#   runAfterFinish: false
+#   artifactName: ${productName}Setup.${ext}
+#   license: LICENSE
+dmg:
+  artifactName: ${productName}.${ext}
+deb:
+  artifactName: ${productName}.${ext}
+appImage:
+  artifactName: ${productName}.${ext}
+
+afterPack: ./scripts/after-pack.js

@@ -1,0 +1,39 @@
+{
+  "private": true,
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "scripts": {
+    "build:browser": "npm --prefix browser-app run bundle",
+    "build:electron": "npm --prefix electron-app run bundle",
+    "prepare": "lerna run prepare",
+    "postinstall": "theia check:theia-version",
+    "start:browser": "npm --prefix browser-app start",
+    "start:electron": "npm --prefix electron-app start",
+    "watch:browser": "lerna run --parallel watch --ignore electron-app",
+    "watch:electron": "lerna run --parallel watch --ignore browser-app",
+    "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false && yarn permissions:writeable",
+    "permissions:writeable": "ts-node scripts/make-files-writeable.ts plugins"
+  },
+  "devDependencies": {
+    "lerna": "^8.2.4",
+    "ts-node": "^10.9.2"
+  },
+  "theiaPlugins": {
+    "vscode-builtin-extensions": "https://github.com/eclipse-theia/vscode-builtin-extensions/releases/download/1.108.2/vscode-builtin-extensions-1.108.2.tar.gz",
+    "vscjava.vscode-java-pack": "https://open-vsx.org/api/vscjava/vscode-java-pack/0.30.5/file/vscjava.vscode-java-pack-0.30.5.vsix",
+    "vscjava.vscode-java-dependency": "https://open-vsx.org/api/vscjava/vscode-java-dependency/0.27.0/file/vscjava.vscode-java-dependency-0.27.0.vsix",
+    "scalameta.metals": "https://open-vsx.org/api/scalameta/metals/1.70.0/file/scalameta.metals-1.70.0.vsix"
+  },
+  "theiaPluginsExcludeIds": [
+    "ms-vscode.js-debug-companion",
+    "vscode.extension-editing",
+    "vscode.microsoft-authentication"
+  ],
+  "workspaces": [
+    "yukibana",
+    "browser-app",
+    "electron-app"
+  ]
+}

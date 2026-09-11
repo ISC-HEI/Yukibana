@@ -1,0 +1,11 @@
+node_modules
+.browser_modules
+lib
+*.log
+*-app/*
+!*-app/package.json
+plugins
+!*-app/scripts
+!*-app/resources
+!electron-app/electron-builder.yml
+.DS_Store
