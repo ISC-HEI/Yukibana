@@ -1,0 +1,8 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": ["electron-app/package.json", "browser-app/package.json"],
+            "url": "./theia-package-schema.json"
+        }
+    ]
+}

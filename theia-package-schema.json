@@ -1,0 +1,230 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://theia-ide.org/schemas/theia-package.schema.json",
+  "title": "Theia application package.json properties",
+  "description": "Schema for the 'theia', 'theiaPlugins', 'theiaPluginsDir', and 'theiaPluginsExcludeIds' fields used to configure a Theia-based application. Generated from dev-packages/application-package/src/application-props.ts (eclipse-theia/theia, master branch).",
+  "type": "object",
+  "properties": {
+    "theia": {
+      "type": "object",
+      "description": "Base configuration for the Theia application.",
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "Whether the extension/application targets the browser or electron.",
+          "enum": ["browser", "electron", "browser-only"],
+          "default": "browser"
+        },
+        "next": {
+          "type": "boolean",
+          "description": "If true, Theia will prefer 'next' over 'latest' as the npm dist-tag when resolving dependencies.",
+          "default": false
+        },
+        "registry": {
+          "type": "string",
+          "description": "The npm registry to use.",
+          "format": "uri",
+          "default": "https://registry.npmjs.org/"
+        },
+        "frontend": {
+          "type": "object",
+          "description": "Frontend related properties. These are injected into index.html.",
+          "properties": {
+            "config": {
+              "$ref": "#/definitions/frontendApplicationConfig"
+            }
+          },
+          "additionalProperties": false
+        },
+        "backend": {
+          "type": "object",
+          "description": "Backend specific properties.",
+          "properties": {
+            "config": {
+              "$ref": "#/definitions/backendApplicationConfig"
+            }
+          },
+          "additionalProperties": false
+        },
+        "generator": {
+          "type": "object",
+          "description": "Generator specific properties.",
+          "properties": {
+            "config": {
+              "$ref": "#/definitions/generatorConfig"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "theiaPluginsDir": {
+      "type": "string",
+      "description": "Location (relative to package.json) to store downloaded VS Code/Open VSX plugins.",
+      "default": "plugins"
+    },
+    "theiaPlugins": {
+      "type": "object",
+      "description": "Map of plugin id to download URL (typically an Open VSX .vsix URL). Resolved by 'theia download:plugins'.",
+      "additionalProperties": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "theiaPluginsExcludeIds": {
+      "type": "array",
+      "description": "Plugin ids to exclude from deployment, e.g. when pulled in transitively via an extension pack but known to misbehave.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "definitions": {
+    "frontendApplicationConfig": {
+      "type": "object",
+      "properties": {
+        "applicationName": {
+          "type": "string",
+          "description": "The name of the application.",
+          "default": "Eclipse Theia"
+        },
+        "defaultTheme": {
+          "description": "The default color theme for the application. Either a single theme id, or a light/dark pair.",
+          "default": { "light": "light", "dark": "dark" },
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "properties": {
+                "light": { "type": "string" },
+                "dark": { "type": "string" }
+              },
+              "required": ["light", "dark"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "defaultIconTheme": {
+          "type": "string",
+          "description": "The default file icon theme id for the application.",
+          "default": "theia-file-icons"
+        },
+        "defaultLocale": {
+          "type": "string",
+          "description": "The default locale for the application.",
+          "default": ""
+        },
+        "validatePreferencesSchema": {
+          "type": "boolean",
+          "description": "When true, validates the JSON schema of preferences on start and logs warnings if invalid.",
+          "default": true
+        },
+        "reloadOnReconnect": {
+          "type": "boolean",
+          "description": "When true, the window will reload if the frontend reconnects to a backend that no longer has a connection context for it.",
+          "default": false
+        },
+        "electron": {
+          "$ref": "#/definitions/electronFrontendApplicationConfig"
+        }
+      },
+      "additionalProperties": true
+    },
+    "electronFrontendApplicationConfig": {
+      "type": "object",
+      "description": "Electron-specific frontend configuration.",
+      "properties": {
+        "windowOptions": {
+          "type": "object",
+          "description": "Overrides/additions to Electron's BrowserWindow constructor options (e.g. width, height, frame, titleBarStyle).",
+          "default": {}
+        },
+        "showWindowEarly": {
+          "type": "boolean",
+          "description": "Whether to show an empty Electron window as early as possible.",
+          "default": true
+        },
+        "splashScreenOptions": {
+          "type": "object",
+          "description": "Configuration for a splash screen shown while the app loads. Defaults to {} which means no splash screen.",
+          "properties": {
+            "width": {
+              "type": "number",
+              "description": "Initial width of the splash screen.",
+              "default": 640
+            },
+            "height": {
+              "type": "number",
+              "description": "Initial height of the splash screen.",
+              "default": 480
+            },
+            "minDuration": {
+              "type": "number",
+              "description": "Minimum time in ms to show the splash screen before the main window is shown.",
+              "default": 0
+            },
+            "maxDuration": {
+              "type": "number",
+              "description": "Maximum time in ms before the splash screen is removed and the main window is shown regardless.",
+              "default": 30000
+            },
+            "content": {
+              "type": "string",
+              "description": "Path (resolved from application root) to the content to load in the splash screen. Mandatory if you want a splash screen at all."
+            }
+          },
+          "additionalProperties": false
+        },
+        "appUserModelId": {
+          "type": "string",
+          "description": "Id for the Jump List in the Windows taskbar. MUST match the 'appId' field in your electron-builder config.",
+          "default": ""
+        },
+        "uriScheme": {
+          "type": "string",
+          "description": "The custom URI scheme the application registers with the OS.",
+          "default": "theia"
+        }
+      },
+      "additionalProperties": false
+    },
+    "backendApplicationConfig": {
+      "type": "object",
+      "properties": {
+        "singleInstance": {
+          "type": "boolean",
+          "description": "If true and running in Electron mode, only one instance of the application is allowed to run at a time.",
+          "default": false
+        },
+        "frontendConnectionTimeout": {
+          "type": "number",
+          "description": "Time in ms the connection context is preserved for reconnection after a frontend disconnects.",
+          "default": 0
+        },
+        "configurationFolder": {
+          "type": "string",
+          "description": "Configuration folder name within the user's home folder.",
+          "default": ".theia"
+        },
+        "configureProxyFromPreferences": {
+          "type": "boolean",
+          "description": "When true, proxy-related preferences (http.proxy, http.proxyStrictSSL, http.proxyAuthorization) are read from the backend PreferenceService and applied. When false, proxy config only comes from CLI flags or HTTP_PROXY/HTTPS_PROXY env vars. Enable for trusted desktop/Electron deployments; leave disabled for cloud deployments.",
+          "default": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "generatorConfig": {
+      "type": "object",
+      "properties": {
+        "preloadTemplate": {
+          "type": "string",
+          "description": "File path or raw HTML template used for extra preload content markup.",
+          "default": ""
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
