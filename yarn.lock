@@ -3020,6 +3020,20 @@ ajv@^8.0.0, ajv@^8.0.1, ajv@^8.17.1, ajv@^8.18.0, ajv@^8.6.3:
     json-schema-traverse "^1.0.0"
     require-from-string "^2.0.2"
 
+allure-js-commons@3.12.1:
+  version "3.12.1"
+  resolved "https://registry.npmjs.org/allure-js-commons/-/allure-js-commons-3.12.1.tgz"
+  integrity sha512-w5G2CVNNwe/aEZxQwHGtRXnXXdvXr/tJCKY4kn3ZmVkpsp/6YCtJL6qV/PqLtNtyrS0WgWbxYdNvFitCB35mHw==
+  dependencies:
+    md5 "^2.3.0"
+
+allure-playwright@^3.12.1:
+  version "3.12.1"
+  resolved "https://registry.npmjs.org/allure-playwright/-/allure-playwright-3.12.1.tgz"
+  integrity sha512-6s4795fiFVbF/HsNqY8r5660Nx2KwBcR7kHAXN+hQ0aqcLAKPE0qBs/YdiGhegOx0A2/Ic+KBaVILRSw+pSQOw==
+  dependencies:
+    allure-js-commons "3.12.1"
+
 anser@^2.3.5:
   version "2.3.5"
   resolved "https://registry.npmjs.org/anser/-/anser-2.3.5.tgz"
@@ -3955,6 +3969,11 @@ chardet@^2.1.1:
   resolved "https://registry.npmjs.org/chardet/-/chardet-2.2.0.tgz"
   integrity sha512-rddelWYNPRrXq6PtNEN2S3f6t9ILzvqaN5pVgi4kqt9jHQaXIial9PznB5iSPVlQSLNaaH22ItWz3EJtQ10+OA==
 
+charenc@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/charenc/-/charenc-0.0.2.tgz"
+  integrity sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==
+
 check-error@^1.0.3:
   version "1.0.3"
   resolved "https://registry.npmjs.org/check-error/-/check-error-1.0.3.tgz"
@@ -4444,6 +4463,11 @@ cross-spawn@^7.0.0, cross-spawn@^7.0.1, cross-spawn@^7.0.2, cross-spawn@^7.0.3, 
     path-key "^3.1.0"
     shebang-command "^2.0.0"
     which "^2.0.1"
+
+crypt@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/crypt/-/crypt-0.0.2.tgz"
+  integrity sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==
 
 css-shorthand-properties@^1.1.1:
   version "1.1.2"
@@ -6936,6 +6960,11 @@ is-boolean-object@^1.2.1:
     call-bound "^1.0.3"
     has-tostringtag "^1.0.2"
 
+is-buffer@~1.1.6:
+  version "1.1.6"
+  resolved "https://registry.npmjs.org/is-buffer/-/is-buffer-1.1.6.tgz"
+  integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
+
 is-callable@^1.2.7:
   version "1.2.7"
   resolved "https://registry.npmjs.org/is-callable/-/is-callable-1.2.7.tgz"
@@ -8066,6 +8095,15 @@ math-intrinsics@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz"
   integrity sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==
+
+md5@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.npmjs.org/md5/-/md5-2.3.0.tgz"
+  integrity sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==
+  dependencies:
+    charenc "0.0.2"
+    crypt "0.0.2"
+    is-buffer "~1.1.6"
 
 mdurl@^2.0.0:
   version "2.1.0"

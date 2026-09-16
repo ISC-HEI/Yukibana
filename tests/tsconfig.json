@@ -1,0 +1,20 @@
+{
+  "extends": "../configs/base.tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "lib",
+    "baseUrl": ".",
+    "rootDir": "."
+  },
+  "references": [],
+  "include": [
+    "e2e/**/*"
+  ]
+}
