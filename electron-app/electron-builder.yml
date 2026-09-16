@@ -56,7 +56,7 @@ linux:
     - inode/directory
   vendor: ISC, HES-SO Valais/Wallis
   target:
-    # - deb
+    - deb
     - AppImage
   publish:
     provider: generic
