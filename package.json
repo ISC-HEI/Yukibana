@@ -14,11 +14,28 @@
     "watch:browser": "lerna run --parallel watch --ignore electron-app",
     "watch:electron": "lerna run --parallel watch --ignore browser-app",
     "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false && yarn permissions:writeable",
-    "permissions:writeable": "ts-node scripts/make-files-writeable.ts plugins"
+    "permissions:writeable": "ts-node scripts/make-files-writeable.ts plugins",
+    "lint": "eslint --ext js,jsx,ts,tsx scripts && lerna run lint",
+    "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix && lerna run lint:fix",
+    "test": "lerna run test"
   },
   "devDependencies": {
+    "@eclipse-dash/nodejs-wrapper": "^0.0.1",
+    "@theia/cli": "1.75.0",
+    "@types/yargs": "^17.0.35",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-deprecation": "1.2.1",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-no-null": "^1.0.2",
+    "eslint-plugin-no-unsanitized": "^3.2.0",
+    "eslint-plugin-react": "^7.37.5",
     "lerna": "^8.2.4",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tslint": "^5.20.1",
+    "yargs": "^17.7.3"
   },
   "theiaPlugins": {
     "vscode-builtin-extensions": "https://github.com/eclipse-theia/vscode-builtin-extensions/releases/download/1.108.2/vscode-builtin-extensions-1.108.2.tar.gz",

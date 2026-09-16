@@ -94,7 +94,7 @@ describe('Theia App', function () {
       capabilities: {
         browserName: 'chrome',
         'goog:chromeOptions': {
-        //'wdio:chromedriverOptions': {
+        // 'wdio:chromedriverOptions': {
           // Path to built and packaged theia
           binary: binary,
           // Hand in workspace to load as runtime parameter
