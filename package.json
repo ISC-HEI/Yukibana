@@ -28,6 +28,7 @@
     "test": "lerna run test",
     "electron": "yarn --cwd electron-app",
     "browser": "yarn --cwd browser-app",
+    "tests": "yarn --cwd tests",
     "dep:all": "ts-node scripts/dep-all.ts"
   },
   "devDependencies": {
@@ -63,6 +64,7 @@
   "workspaces": [
     "theia-extensions/*",
     "browser-app",
-    "electron-app"
+    "electron-app",
+    "tests"
   ]
 }

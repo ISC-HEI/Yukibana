@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@playwright/test@^1.62.1", "@playwright/test@^1.63.0", "@playwright/test@>=1.62.0":
+"@playwright/test@^1.62.1", "@playwright/test@^1.63.0":
   version "1.63.0"
   resolved "https://registry.npmjs.org/@playwright/test/-/test-1.63.0.tgz"
   integrity sha512-oxMK4vllB9RK5NQ2l1pq1IfOf2AvnEuj/vYGDj0H2nMtmtZpKtCwt/l00GEO6xjGfpBNAvjovvYdCm50dRQkpQ==
@@ -42,7 +42,7 @@ allure-js-commons@3.12.1:
   dependencies:
     md5 "^2.3.0"
 
-allure-playwright@^3.12.1, allure-playwright@3.12.1:
+allure-playwright@^3.12.1:
   version "3.12.1"
   resolved "https://registry.npmjs.org/allure-playwright/-/allure-playwright-3.12.1.tgz"
   integrity sha512-6s4795fiFVbF/HsNqY8r5660Nx2KwBcR7kHAXN+hQ0aqcLAKPE0qBs/YdiGhegOx0A2/Ic+KBaVILRSw+pSQOw==
@@ -329,7 +329,7 @@ strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   dependencies:
     ansi-regex "^5.0.1"
 
-through@~2.3, through@~2.3.1, through@2:
+through@2, through@~2.3, through@~2.3.1:
   version "2.3.8"
   resolved "https://registry.npmjs.org/through/-/through-2.3.8.tgz"
   integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
