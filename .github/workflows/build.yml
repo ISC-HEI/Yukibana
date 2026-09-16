@@ -21,44 +21,44 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows:2022, ubuntu-22.04, macos-15, macos15-intel]
+        os: [windows-2022, ubuntu-22.04, macos-15, macos-15-intel]
         node: ["24.x"]
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
 
-    premissions:
+    permissions:
       contents: read
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      
+
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
           registry-url: "https://registry.npmjs.org"
-      
+
       - name: Use Python 3.13
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
-      
+
       - name: Install dependencies
         shell: bash
         run: yarn --skip-integrity-check --network-timeout 100000
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Lint
         shell: bash
         run: yarn lint
         env:
           NODE_OPTIONS: --max_old_space_size=4096
-      
+
       - name: Build dev package (Windows, Linux)
         if: (runner.os == 'Windows' || runner.os == 'Linux') && github.event_name == 'pull_request'
         shell: bash
@@ -69,7 +69,7 @@ jobs:
         env:
           NODE_OPTIONS: --max_old_space_size=4096
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Build prod package (Windows, Linux)
         if: (runner.os == 'Windows' || runner.os == 'Linux') && github.event_name != 'pull_request'
         shell: bash
@@ -85,7 +85,7 @@ jobs:
         if: matrix.os == 'macos-15'
         run: |
           sed -i '' 's|https://download.eclipse.org/theia/ide/latest/macos|https://download.eclipse.org/theia/ide/latest/macos-arm|g' electron-app/electron-builder.yml
-      
+
       - name: Build prod package (Mac)
         if: runner.os == 'macOS'
         shell: bash
@@ -96,7 +96,7 @@ jobs:
         env:
           NODE_OPTIONS: --max_old_space_size=4096
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Upload Mac Dist Files
         if: runner.os == 'macOS'
         uses: actions/upload-artifact@v6
@@ -107,7 +107,7 @@ jobs:
             !electron-app/dist/mac/**
             !electron-app/dist/mac-arm64/**
           retention-days: 1
-      
+
       - name: Upload Windows Dist Files
         if: runner.os == 'Windows' && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v6
@@ -116,7 +116,7 @@ jobs:
           path: |
             electron-app/dist/**
           retention-days: 1
-      
+
       - name: Upload Linux Dist Files
         if: runner.os == 'Linux' && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v6
@@ -125,20 +125,20 @@ jobs:
           path: |
             electron-app/dist/**
           retention-days: 1
-      
+
       - name: Test (Linux)
-        if: runner-os == 'Linux'
+        if: runner.os == 'Linux'
         run: |
           xvfb-run -a yarn electron test
-      
+
       - name: Test (Windows)
-        if: runner-os == 'Windows'
+        if: runner.os == 'Windows'
         shell: bash
         run: |
           yarn electron test
 
       - name: Test (macOS)
-        if: runner-os == 'macOS'
+        if: runner.os == 'macOS'
         shell: bash
         run: |
           yarn electron test
@@ -148,6 +148,6 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: test-screenshots-${{ matrix.os }}
-          path: electron-app/test-screenshots
+          path: electron-app/test-screenshots/
           if-no-files-found: ignore
           retention-days: 5
