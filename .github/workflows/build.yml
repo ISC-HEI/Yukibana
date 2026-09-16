@@ -129,25 +129,25 @@ jobs:
       - name: Test (Linux)
         if: runner.os == 'Linux'
         run: |
-          xvfb-run -a yarn electron test
+          xvfb-run -a yarn tests ui-tests-ci-electron
 
       - name: Test (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          yarn electron test
+          yarn tests ui-tests-ci-electron
 
       - name: Test (macOS)
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          yarn electron test
+          yarn tests ui-tests-ci-electron
 
-      - name: Upload test screenshots
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: test-screenshots-${{ matrix.os }}
-          path: electron-app/test-screenshots/
+          name: test-results-${{ matrix.os }}
+          path: test-results/
           if-no-files-found: ignore
           retention-days: 5

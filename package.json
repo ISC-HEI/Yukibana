@@ -27,8 +27,9 @@
     "lint": "eslint --ext js,jsx,ts,tsx scripts && lerna run lint",
     "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix && lerna run lint:fix",
     "test": "lerna run test",
-    "electron": "yarn --cwd applications/electron",
-    "browser": "yarn --cwd applications/browser"
+    "electron": "yarn --cwd electron-app",
+    "browser": "yarn --cwd browser-app",
+    "tests": "yarn --cwd tests"
   },
   "devDependencies": {
     "@eclipse-dash/nodejs-wrapper": "^0.0.1",
@@ -63,6 +64,7 @@
   "workspaces": [
     "yukibana",
     "browser-app",
-    "electron-app"
+    "electron-app",
+    "tests"
   ]
 }
