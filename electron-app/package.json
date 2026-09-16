@@ -86,6 +86,9 @@
             "width": 256,
             "minDuration": 2000
           }
+        },
+        "preferences": {
+          "security.workspace.trust.enabled": false
         }
       }
     },
