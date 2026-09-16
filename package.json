@@ -7,6 +7,15 @@
   "scripts": {
     "build:browser": "npm --prefix browser-app run bundle",
     "build:electron": "npm --prefix electron-app run bundle",
+    "build": "yarn build:extensions && yarn build:applications",
+    "build:dev": "yarn build:extensions && yarn build:applications:dev",
+    "build:applications": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" build:prod --concurrency 1",
+    "build:applications:dev": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" build --concurrency 1",
+    "_build:extensions": "lerna run --scope=\"yukibana*ext\" build",
+    "build:extensions": ":",
+    "package:applications": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" package --concurrency 1",
+    "package:applications:preview": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" package:preview --concurrency 1",
+    "package:applications:prod": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" package:prod --concurrency 1",
     "prepare": "lerna run prepare",
     "postinstall": "theia check:theia-version",
     "start:browser": "npm --prefix browser-app start",
@@ -17,7 +26,9 @@
     "permissions:writeable": "ts-node scripts/make-files-writeable.ts plugins",
     "lint": "eslint --ext js,jsx,ts,tsx scripts && lerna run lint",
     "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix && lerna run lint:fix",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "electron": "yarn --cwd applications/electron",
+    "browser": "yarn --cwd applications/browser"
   },
   "devDependencies": {
     "@eclipse-dash/nodejs-wrapper": "^0.0.1",
