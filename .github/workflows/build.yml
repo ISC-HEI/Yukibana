@@ -148,6 +148,8 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: test-results-${{ matrix.os }}
-          path: test-results/
+          path: |
+            test-results/
+            tests/allure-results/
           if-no-files-found: ignore
           retention-days: 5
