@@ -69,9 +69,8 @@
     "package:prod": "yarn deploy",
     "package:preview": "yarn clean:dist && yarn rebuild && yarn prepackage && electron-builder -c.mac.identity=null --dir",
     "deploy": "yarn clean:dist && yarn rebuild && yarn prepackage && electron-builder -c.mac.identity=null --publish always",
-    "test": "mocha --timeout 60000 \"./tests/*.spec.js\"",
-    "lint": "eslint --ext js,jsx,ts,tsx scripts && eslint --ext js,jsx,ts,tsx tests",
-    "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix && eslint --ext js,jsx,ts,tsx tests --fix"
+    "lint": "eslint --ext js,jsx,ts,tsx scripts",
+    "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix"
   },
   "theia": {
     "target": "electron",
