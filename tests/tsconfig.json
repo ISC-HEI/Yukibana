@@ -15,6 +15,7 @@
   },
   "references": [],
   "include": [
+    "src/**/*",
     "e2e/**/*"
   ]
 }
