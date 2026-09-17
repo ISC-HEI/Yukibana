@@ -32,7 +32,7 @@
     "@theia/workspace": "1.75.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "yukibana": "0.0.0"
+    "yukibana-ext": "0.0.0"
   },
   "devDependencies": {
     "@theia/bundle-plugin": "^1.75.0",
@@ -79,6 +79,8 @@
       "config": {
         "applicationName": "Yukibana",
         "reloadOnReconnect": true,
+        "defaultTheme": "dark",
+        "defaultIconTheme": "theia-file-icons",
         "electron": {
           "appUserModelId": "isc.yukibana",
           "splashScreenOptions": {
