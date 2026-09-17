@@ -1,14 +1,16 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
+import { FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { bindContribution, CommandContribution, FilterContribution, MenuContribution } from '@theia/core/lib/common';
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { YukibanaFilterContribution } from './yukibana-filter-contribution';
+import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
 import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
-import { FrontendApplicationContribution } from '@theia/core/lib/browser';
+import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
+import { YukibanaFilterContribution } from './yukibana-filter-contribution';
+import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
 
-export default new ContainerModule(bind => {
+export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(CommandContribution).to(YukibanaCommandContribution);
     bind(MenuContribution).to(YukibanaMenuContribution);
 
@@ -17,4 +19,10 @@ export default new ContainerModule(bind => {
 
     bind(CleanupFrontendContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(CleanupFrontendContribution);
+
+    if (isBound(ToolbarDefaultsFactory)) {
+        rebind(ToolbarDefaultsFactory).toConstantValue(YukibanaToolbarDefaults);
+    } else {
+        bind(ToolbarDefaultsFactory).toConstantValue(YukibanaToolbarDefaults);
+    }
 });
