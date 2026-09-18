@@ -10,6 +10,7 @@ import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukiban
 import { YukibanaFilterContribution } from './yukibana-filter-contribution';
 import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
 import { SuggestionsContribution } from './yukibana-suggestions-contribution';
+import { bindConfig } from './config/config-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(CommandContribution).to(YukibanaCommandContribution);
@@ -29,4 +30,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     bind(SuggestionsContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(SuggestionsContribution);
+
+    bindConfig(bind);
 });
