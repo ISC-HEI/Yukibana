@@ -10,6 +10,7 @@
   ],
   "dependencies": {
     "@theia/core": "1.75.0",
+    "@theia/monaco-editor-core": "^1.108.201",
     "@theia/toolbar": "^1.75.0"
   },
   "devDependencies": {

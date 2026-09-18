@@ -9,6 +9,7 @@ import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
 import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
 import { YukibanaFilterContribution } from './yukibana-filter-contribution';
 import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
+import { SuggestionsContribution } from './yukibana-suggestions-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(CommandContribution).to(YukibanaCommandContribution);
@@ -25,4 +26,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     } else {
         bind(ToolbarDefaultsFactory).toConstantValue(YukibanaToolbarDefaults);
     }
+
+    bind(SuggestionsContribution).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(SuggestionsContribution);
 });
