@@ -27,28 +27,28 @@ extraResources:
   - from: ../plugins
     to: app/plugins
 
-# win:
-#   icon: resources/icons/WindowsLauncherIcons/Yukibana.ico
-#   target:
-#     - nsis
-#   publish:
-#     provider: generic
-#     url: "https://download.eclipse.org/theia/ide/${version}/windows"
-#     useMultipleRangeRequest: false
-# mac:
-#   icon: resources/icons/MacLauncherIcons/icon.icns
-#   category: public.app-category.developer-tools
-#   protocols:
-#     - name: theia
-#       schemes:
-#         - theia
-#   darkModeSupport: true
-#   target:
-#     - dmg
-#     - zip
-#   publish:
-#     provider: generic
-#     url: "https://download.eclipse.org/theia/ide/latest/macos"
+win:
+  icon: resources/icons/WindowsLauncherIcons/Yukibana.ico
+  target:
+    - nsis
+  publish:
+    provider: generic
+    url: "https://yukibana.isc-vs.ch/download/${version}/windows"
+    useMultipleRangeRequest: false
+mac:
+  icon: resources/icons/MacLauncherIcons/icon.icns
+  category: public.app-category.developer-tools
+  protocols:
+    - name: theia
+      schemes:
+        - theia
+  darkModeSupport: true
+  target:
+    - dmg
+    - zip
+  publish:
+    provider: generic
+    url: "https://yukibana.isc-vs.ch/download/latest/macos"
 linux:
   icon: resources/icons/LinuxLauncherIcons
   category: Development
@@ -62,19 +62,19 @@ linux:
     provider: generic
     url: "https://yukibana.isc-vs.ch/download/latest/linux"
 
-# nsis:
-#   menuCategory: true
-#   oneClick: false
-#   perMachine: false
-#   installerHeaderIcon: resources/icons/WindowsLauncherIcons/TheiaIDE.ico
-#   installerIcon: resources/icons/WindowsLauncherIcons/TheiaIDE.ico
-#   uninstallerIcon: resources/icons/WindowsLauncherIcons/TheiaIDE.ico
-#   installerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
-#   uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
-#   allowToChangeInstallationDirectory: true
-#   runAfterFinish: false
-#   artifactName: ${productName}Setup.${ext}
-#   license: LICENSE
+nsis:
+  menuCategory: true
+  oneClick: false
+  perMachine: false
+  installerHeaderIcon: resources/icons/WindowsLauncherIcons/Yukibana.ico
+  installerIcon: resources/icons/WindowsLauncherIcons/Yukibana.ico
+  uninstallerIcon: resources/icons/WindowsLauncherIcons/Yukibana.ico
+  installerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
+  uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
+  allowToChangeInstallationDirectory: true
+  runAfterFinish: false
+  artifactName: ${productName}Setup.${ext}
+  license: LICENSE
 dmg:
   artifactName: ${productName}.${ext}
 deb:

@@ -84,7 +84,7 @@ jobs:
       - name: Update electron-builder.yml for macos-15
         if: matrix.os == 'macos-15'
         run: |
-          sed -i '' 's|https://download.eclipse.org/theia/ide/latest/macos|https://download.eclipse.org/theia/ide/latest/macos-arm|g' electron-app/electron-builder.yml
+          sed -i '' 's|https://yukibana.isc-vs.ch/download/latest/macos|https://yukibana.isc-vs.ch/download/latest/macos-arm|g' electron-app/electron-builder.yml
 
       - name: Build prod package (Mac)
         if: runner.os == 'macOS'
