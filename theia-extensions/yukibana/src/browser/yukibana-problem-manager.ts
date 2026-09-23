@@ -19,7 +19,7 @@ export class YukibanaProblemManager extends ProblemManager {
     ) {
         super();
         configProvider.ready.then(config => {
-        logger.info(`${(config.features.squiggles !== false) ? 'Enabling' : 'Disabling'} problem markers`);
+            logger.info(`${(config.features.squiggles !== false) ? 'Enabling' : 'Disabling'} problem markers`);
         });
     }
 

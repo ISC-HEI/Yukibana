@@ -1,8 +1,8 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { Disposable, DisposableCollection, ILogger, URI } from '@theia/core';
-import { FrontendApplication, FrontendApplicationContribution } from '@theia/core/lib/browser';
+import { Disposable, DisposableCollection, Emitter, ILogger, URI } from '@theia/core';
+import { FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model';
@@ -17,6 +17,9 @@ import { DEFAULT_YUKIBANA_CONFIG, UserConfigURI } from './config-constants';
 export class ConfigProvider implements FrontendApplicationContribution, Disposable {
     protected model: MonacoEditorModel | undefined;
     protected toDispose = new DisposableCollection();
+
+    private readonly onConfigChangeEmitter = new Emitter<YukibanaConfig>();
+    readonly onConfigChanged = this.onConfigChangeEmitter.event;
 
     private _config: YukibanaConfig = DEFAULT_YUKIBANA_CONFIG;
 
@@ -33,6 +36,7 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
         this.toDispose.push(reference);
         this.toDispose.push(Disposable.create(() => this.model = undefined));
         this.readConfiguration();
+        this.model.onDidChangeContent(e => this.readConfiguration());
         this._ready.resolve(this._config);
     }
 
@@ -62,6 +66,7 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
             this.logger.error(`Failed to load Yukibana configuration from '${this.USER_CONFIG_URI}'.`, e);
         } finally {
             this.logger.debug('Configuration loaded');
+            this.onConfigChangeEmitter.fire(this._config);
         }
     }
 
