@@ -15,6 +15,8 @@ import { SuggestionsContribution } from './yukibana-suggestions-contribution';
 import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
+    bindConfig(bind);
+
     bind(CommandContribution).to(YukibanaCommandContribution);
     bind(MenuContribution).to(YukibanaMenuContribution);
 
@@ -35,6 +37,4 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     bind(YukibanaProblemManager).toSelf().inSingletonScope();
     rebind(ProblemManager).toService(YukibanaProblemManager);
-
-    bindConfig(bind);
 });

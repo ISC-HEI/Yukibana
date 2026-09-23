@@ -1,11 +1,10 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { MaybePromise } from '@theia/core';
 import { FrontendApplication, FrontendApplicationContribution, Widget } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { ConfigStorageProvider } from './config/config-storage-provider';
 import { YukibanaConfig } from '../common/yukibana-config';
+import { ConfigProvider } from './config/config-provider';
 
 type WidgetFilter = (id: string, config: YukibanaConfig) => boolean;
 
@@ -21,18 +20,17 @@ export class CleanupFrontendContribution implements FrontendApplicationContribut
     ];
 
     constructor(
-        @inject(ConfigStorageProvider) protected readonly configProvider: ConfigStorageProvider
+        @inject(ConfigProvider) protected readonly configProvider: ConfigProvider
     ) { }
 
-    onDidInitializeLayout(app: FrontendApplication): MaybePromise<void> {
-        return this.configProvider.ready.then(config => {
-            app.shell.widgets.forEach((widget: Widget) => {
-                for (const filter of this._widgetsToRemove) {
-                    if (filter(widget.id, config)) {
-                        widget.dispose();
-                    }
+    onDidInitializeLayout(app: FrontendApplication): void {
+        const config = this.configProvider.config;
+        return app.shell.widgets.forEach((widget: Widget) => {
+            for (const filter of this._widgetsToRemove) {
+                if (filter(widget.id, config)) {
+                    widget.dispose();
                 }
-            });
+            }
         });
     }
 }

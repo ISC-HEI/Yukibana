@@ -6,7 +6,7 @@ import { FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
 import * as monaco from '@theia/monaco-editor-core';
 import { YukibanaConfig } from '../common/yukibana-config';
-import { ConfigStorageProvider } from './config/config-storage-provider';
+import { ConfigProvider } from './config/config-provider';
 
 /**
  * Contribution which manages registration of completion providers (inline suggestions)
@@ -14,7 +14,7 @@ import { ConfigStorageProvider } from './config/config-storage-provider';
 @injectable()
 export class SuggestionsContribution implements FrontendApplicationContribution {
     constructor(
-        @inject(ConfigStorageProvider) protected readonly configProvider: ConfigStorageProvider,
+        @inject(ConfigProvider) protected readonly configProvider: ConfigProvider,
         @inject(ILogger) @named('yukibana:SuggestioisContribution') protected readonly logger: ILogger
     ) { }
 
