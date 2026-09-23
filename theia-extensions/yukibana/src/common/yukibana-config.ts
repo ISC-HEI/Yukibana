@@ -5,7 +5,8 @@ import { z, ZodError } from 'zod';
 
 const ConfigSchema = z.object({
     features: z.object({
-        codeSuggestions: z.boolean()
+        codeSuggestions: z.boolean().default(true).optional(),
+        squiggles: z.boolean().default(true).optional(),
     })
 });
 

@@ -10,5 +10,6 @@ export const USER_CONFIG_URI = new URI().withScheme(UserStorageUri.scheme).withP
 export const DEFAULT_YUKIBANA_CONFIG: YukibanaConfig = {
     features: {
         codeSuggestions: true,
+        squiggles: true,
     }
 };

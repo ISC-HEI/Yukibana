@@ -4,13 +4,15 @@
 import { FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { bindContribution, CommandContribution, FilterContribution, MenuContribution } from '@theia/core/lib/common';
 import { ContainerModule } from '@theia/core/shared/inversify';
+import { ProblemManager } from '@theia/markers/lib/browser/problem/problem-manager';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
+import { bindConfig } from './config/config-contribution';
 import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
 import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
 import { YukibanaFilterContribution } from './yukibana-filter-contribution';
-import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
+import { YukibanaProblemManager } from './yukibana-problem-manager';
 import { SuggestionsContribution } from './yukibana-suggestions-contribution';
-import { bindConfig } from './config/config-contribution';
+import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(CommandContribution).to(YukibanaCommandContribution);
@@ -30,6 +32,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     bind(SuggestionsContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(SuggestionsContribution);
+
+    bind(YukibanaProblemManager).toSelf().inSingletonScope();
+    rebind(ProblemManager).toService(YukibanaProblemManager);
 
     bindConfig(bind);
 });
