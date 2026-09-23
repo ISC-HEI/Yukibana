@@ -16,15 +16,15 @@ export class CleanupFrontendContribution implements FrontendApplicationContribut
     private _widgetsToRemove: Array<WidgetFilter> = [
         id => id.startsWith('terminal'),
         id => id.endsWith('metals-explorer'),
-        (id, config) => config.features.squiggles === false && (id.endsWith('problems') || id.endsWith('problem-marker-status'))
+        (id, config) => (config.features.squiggles === false) && (id.endsWith('problems') || id.endsWith('problem-marker-status'))
     ];
 
     constructor(
         @inject(ConfigProvider) protected readonly configProvider: ConfigProvider
     ) { }
 
-    onDidInitializeLayout(app: FrontendApplication): void {
-        const config = this.configProvider.config;
+    async onDidInitializeLayout(app: FrontendApplication): Promise<void> {
+        const config = await this.configProvider.ready;
         return app.shell.widgets.forEach((widget: Widget) => {
             for (const filter of this._widgetsToRemove) {
                 if (filter(widget.id, config)) {

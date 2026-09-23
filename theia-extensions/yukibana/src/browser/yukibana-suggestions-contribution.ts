@@ -15,7 +15,7 @@ import { ConfigProvider } from './config/config-provider';
 export class SuggestionsContribution implements FrontendApplicationContribution {
     constructor(
         @inject(ConfigProvider) protected readonly configProvider: ConfigProvider,
-        @inject(ILogger) @named('yukibana:SuggestioisContribution') protected readonly logger: ILogger
+        @inject(ILogger) @named('yukibana:SuggestionsContribution') protected readonly logger: ILogger
     ) { }
 
     private _pending: Array<{ selector: monaco.languages.LanguageSelector; provider: monaco.languages.CompletionItemProvider, disposable: Disposable }> = [];

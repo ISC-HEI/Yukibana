@@ -27,7 +27,7 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
         protected readonly logger: ILogger
     ) { }
 
-    async onStart(app: FrontendApplication): Promise<void> {
+    async onStart(): Promise<void> {
         const reference = await this.textModelService.createModelReference(this.USER_CONFIG_URI);
         this.model = reference.object;
         this.toDispose.push(reference);
@@ -47,6 +47,7 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
     protected readonly _ready = new Deferred<YukibanaConfig>();
 
     protected readConfiguration(): void {
+        this.logger.debug('Loading configuration');
         if (!this.model || this.model.dirty) {
             return;
         }
@@ -59,6 +60,8 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
             }
         } catch (e) {
             this.logger.error(`Failed to load Yukibana configuration from '${this.USER_CONFIG_URI}'.`, e);
+        } finally {
+            this.logger.debug('Configuration loaded');
         }
     }
 

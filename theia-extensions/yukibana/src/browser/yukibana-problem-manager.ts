@@ -18,8 +18,9 @@ export class YukibanaProblemManager extends ProblemManager {
         @inject(ILogger) @named("yukibana:ProblemManager") protected readonly logger: ILogger
     ) {
         super();
-        const config = configProvider.config;
+        configProvider.ready.then(config => {
         logger.info(`${(config.features.squiggles !== false) ? 'Enabling' : 'Disabling'} problem markers`);
+        });
     }
 
     override setMarkers(uri: URI, owner: string, data: Diagnostic[]): Marker<Diagnostic>[] {
