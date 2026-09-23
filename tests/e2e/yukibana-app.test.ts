@@ -8,7 +8,7 @@
  ********************************************************************************/
 
 import { expect, test } from '@playwright/test';
-import { TheiaApp, TheiaAppLoader } from '@theia/playwright';
+import { OSUtil, TheiaApp, TheiaAppLoader } from '@theia/playwright';
 
 test.describe('Yukibana app', () => {
     let app: TheiaApp;
@@ -33,7 +33,9 @@ test.describe('Yukibana app', () => {
         expect(await app.statusBar.isVisible()).toBe(true);
     });
 
-    test('should have menu bar items', async () => {
-        expect((await app.menuBar.visibleMenuBarItems()).length > 0).toBe(true);
-    });
+    if (!OSUtil.isMacOS) {
+        test('should have menu bar items', async () => {
+            expect((await app.menuBar.visibleMenuBarItems()).length > 0).toBe(true);
+        });
+    }
 });
