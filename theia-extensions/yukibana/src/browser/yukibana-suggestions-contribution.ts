@@ -1,12 +1,12 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { Disposable, MaybePromise } from '@theia/core';
+import { Disposable, ILogger, MaybePromise } from '@theia/core';
 import { FrontendApplicationContribution } from '@theia/core/lib/browser';
-import { inject, injectable } from '@theia/core/shared/inversify';
+import { inject, injectable, named } from '@theia/core/shared/inversify';
 import * as monaco from '@theia/monaco-editor-core';
 import { YukibanaConfig } from '../common/yukibana-config';
-import { ConfigStorageProvider } from './config/config-storage-provider';
+import { ConfigProvider } from './config/config-provider';
 
 /**
  * Contribution which manages registration of completion providers (inline suggestions)
@@ -14,7 +14,8 @@ import { ConfigStorageProvider } from './config/config-storage-provider';
 @injectable()
 export class SuggestionsContribution implements FrontendApplicationContribution {
     constructor(
-        @inject(ConfigStorageProvider) protected readonly configProvider: ConfigStorageProvider
+        @inject(ConfigProvider) protected readonly configProvider: ConfigProvider,
+        @inject(ILogger) @named('yukibana:SuggestionsContribution') protected readonly logger: ILogger
     ) { }
 
     private _pending: Array<{ selector: monaco.languages.LanguageSelector; provider: monaco.languages.CompletionItemProvider, disposable: Disposable }> = [];
@@ -36,8 +37,10 @@ export class SuggestionsContribution implements FrontendApplicationContribution 
      */
     private flush(config: YukibanaConfig): void {
         if (config.features.codeSuggestions === false) {
+            this.logger.info('Disabling completion item providers');
             monaco.languages.registerCompletionItemProvider = (selector, provider) => Disposable.NULL;
         } else {
+            this.logger.info('Enabling completion item providers');
             monaco.languages.registerCompletionItemProvider = this._originalRegister;
             for (const { selector, provider, disposable } of this._pending) {
                 const newDisposable = this._originalRegister(selector, provider);

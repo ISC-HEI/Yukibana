@@ -12,7 +12,7 @@ export class YukibanaFilterContribution implements FilterContribution {
     registerContributionFilters(registry: ContributionFilterRegistry): void {
         registry.addFilters('*', [
             // https://github.com/eclipse-theia/theia/blob/master/packages/terminal/src/browser/terminal-frontend-contribution.ts
-            filterClassName(name => name !== 'TerminalFrontendContribution')
+            filterClassName(name => name !== 'TerminalFrontendContribution'),
         ]);
     }
 }
