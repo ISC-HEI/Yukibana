@@ -8,8 +8,9 @@
  ********************************************************************************/
 
 import { expect, test } from '@playwright/test';
-import { TheiaApp, TheiaAppLoader, TheiaTextEditor, TheiaWorkspace } from '@theia/playwright';
+import { TheiaApp, TheiaAppFactory, TheiaAppLoader, TheiaTextEditor, TheiaWorkspace } from '@theia/playwright';
 import * as path from "path";
+import { PatchedTheiaApp } from '../src/theia-explorer-patch';
 import { TheiaLanguageIndicator } from '../src/theia-language-indicator';
 
 
@@ -25,7 +26,7 @@ test.describe('Scala extension', () => {
                 electronAppPath: "../electron-app",
                 pluginsPath: "../plugins"
             }
-        }, ws);
+        }, ws, PatchedTheiaApp as TheiaAppFactory<PatchedTheiaApp>);
     });
     
     test.afterAll(async () => {
