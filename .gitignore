@@ -9,3 +9,5 @@
 **/tsconfig.tsbuildinfo
 *.log
 **/test-screenshots
+**/test-results
+**/allure-results

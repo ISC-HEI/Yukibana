@@ -84,7 +84,7 @@ jobs:
       - name: Update electron-builder.yml for macos-15
         if: matrix.os == 'macos-15'
         run: |
-          sed -i '' 's|https://download.eclipse.org/theia/ide/latest/macos|https://download.eclipse.org/theia/ide/latest/macos-arm|g' electron-app/electron-builder.yml
+          sed -i '' 's|https://yukibana.isc-vs.ch/download/latest/macos|https://yukibana.isc-vs.ch/download/latest/macos-arm|g' electron-app/electron-builder.yml
 
       - name: Build prod package (Mac)
         if: runner.os == 'macOS'
@@ -98,7 +98,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Mac Dist Files
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.os == 'macos-15-intel' && 'mac-x64' || matrix.os == 'macos-15' && 'mac-arm64'}}
@@ -129,25 +129,27 @@ jobs:
       - name: Test (Linux)
         if: runner.os == 'Linux'
         run: |
-          xvfb-run -a yarn electron test
+          xvfb-run -a yarn tests ui-tests-ci-electron
 
       - name: Test (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          yarn electron test
+          yarn tests ui-tests-ci-electron
 
       - name: Test (macOS)
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          yarn electron test
+          yarn tests ui-tests-ci-electron
 
-      - name: Upload test screenshots
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: test-screenshots-${{ matrix.os }}
-          path: electron-app/test-screenshots/
+          name: test-results-${{ matrix.os }}
+          path: |
+            test-results/
+            tests/allure-results/
           if-no-files-found: ignore
           retention-days: 5
