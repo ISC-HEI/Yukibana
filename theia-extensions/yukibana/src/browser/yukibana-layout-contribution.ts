@@ -4,8 +4,12 @@
 import { ILogger, MaybePromise } from '@theia/core';
 import { FrontendApplication, FrontendApplicationContribution, ShellLayoutRestorer, StorageService, WidgetManager } from '@theia/core/lib/browser';
 import { inject, injectable, interfaces, named } from '@theia/core/shared/inversify';
+import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
+import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
+import { ScmContribution } from '@theia/scm/lib/browser/scm-contribution';
 import { SearchInWorkspaceFrontendContribution } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
+import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { YukibanaConfig } from '../common/yukibana-config';
 import { DEFAULT_YUKIBANA_CONFIG } from './config/config-constants';
 import { ConfigProvider } from './config/config-provider';
@@ -16,9 +20,13 @@ interface WithLayout {
 
 type ConfigWidgetKey = keyof typeof DEFAULT_YUKIBANA_CONFIG.layout.widgets;
 
-const TOGGLEABLE_WIDGETS: Array<[interfaces.Newable<WithLayout>, ConfigWidgetKey]> = [
+const TOGGLEABLE_WIDGETS: Array<[interfaces.ServiceIdentifier<WithLayout>, ConfigWidgetKey]> = [
     [FileNavigatorContribution, 'files'],
     [SearchInWorkspaceFrontendContribution, 'search'],
+    [ScmContribution, 'vcs'],
+    [DebugFrontendApplicationContribution, 'debug'],
+    [TestViewContribution, 'testing'],
+    [OutlineViewContribution, 'outline'],
 ];
 
 @injectable()
@@ -52,7 +60,16 @@ export class YukibanaLayoutContribution implements FrontendApplicationContributi
     }
 }
 
-export function rebindWithLayoutToggle<T extends WithLayout>(rebind: interfaces.Rebind, id: interfaces.Newable<T>, isEnabled: (config: YukibanaConfig) => boolean): void {
+export function rebindWithLayoutToggle<T extends WithLayout>(
+    isBound: interfaces.IsBound,
+    rebind: interfaces.Rebind,
+    id: interfaces.ServiceIdentifier<T>,
+    isEnabled: (config: YukibanaConfig) => boolean
+): void {
+    if (!isBound(id)) {
+        console.log(`rebindWithLayoutToggle: ${String(id)} is not bound`);
+        return;
+    }
     rebind(id)
         .toSelf()
         .inSingletonScope()
@@ -71,12 +88,12 @@ export function rebindWithLayoutToggle<T extends WithLayout>(rebind: interfaces.
         });
 }
 
-export function bindLayout(bind: interfaces.Bind, rebind: interfaces.Rebind): void {
+export function bindLayout(bind: interfaces.Bind, rebind: interfaces.Rebind, isBound: interfaces.IsBound): void {
     bind(YukibanaLayoutContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(YukibanaLayoutContribution);
     rebind(ShellLayoutRestorer).to(YukibanaLayoutRestorer).inSingletonScope();
 
     for (const [contribution, widget] of TOGGLEABLE_WIDGETS) {
-        rebindWithLayoutToggle(rebind, contribution, config => config.layout.widgets[widget]);
+        rebindWithLayoutToggle(isBound, rebind, contribution, config => config.layout.widgets[widget]);
     }
 }

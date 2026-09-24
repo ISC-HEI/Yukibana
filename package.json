@@ -27,7 +27,8 @@
     "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix && lerna run lint:fix",
     "test": "lerna run test",
     "electron": "yarn --cwd electron-app",
-    "browser": "yarn --cwd browser-app"
+    "browser": "yarn --cwd browser-app",
+    "add:all": "ts-node scripts/add-dep-all.ts"
   },
   "devDependencies": {
     "@eclipse-dash/nodejs-wrapper": "^0.0.1",

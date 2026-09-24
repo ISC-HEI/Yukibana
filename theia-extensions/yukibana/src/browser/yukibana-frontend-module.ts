@@ -44,5 +44,5 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(YukibanaProblemContributioun).toSelf().inRequestScope();
     rebind(ProblemContribution).toService(YukibanaProblemContributioun);
 
-    bindLayout(bind, rebind);
+    bindLayout(bind, rebind, isBound);
 });
