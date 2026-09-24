@@ -7,20 +7,19 @@ import { inject, injectable, interfaces, named } from '@theia/core/shared/invers
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
 import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
+import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plugin-view-registry';
 import { ScmContribution } from '@theia/scm/lib/browser/scm-contribution';
 import { SearchInWorkspaceFrontendContribution } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
 import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { YukibanaConfig } from '../common/yukibana-config';
-import { DEFAULT_YUKIBANA_CONFIG } from './config/config-constants';
 import { ConfigProvider } from './config/config-provider';
-import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plugin-view-registry';
 import { YukibanaPluginViewRegistry } from './yukibana-plugin-view-registry';
 
 interface WithLayout {
     initializeLayout?(app: FrontendApplication): MaybePromise<void>;
 };
 
-type ConfigWidgetKey = keyof typeof DEFAULT_YUKIBANA_CONFIG.layout.widgets;
+type ConfigWidgetKey = keyof YukibanaConfig['layout']['widgets'];
 
 const TOGGLEABLE_WIDGETS: Array<[interfaces.ServiceIdentifier<WithLayout>, ConfigWidgetKey]> = [
     [FileNavigatorContribution, 'files'],

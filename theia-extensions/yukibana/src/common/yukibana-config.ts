@@ -24,15 +24,9 @@ const ConfigSchema = z.object({
 
 export type YukibanaConfig = z.infer<typeof ConfigSchema>;
 
-export function loadConfig(raw: string): YukibanaConfig {
-    let data;
+export function loadConfig(raw: object): YukibanaConfig {
     try {
-        data = JSON.parse(raw);
-    } catch (e) {
-        throw new Error(`Malformed JSON: ${e}`);
-    }
-    try {
-        return ConfigSchema.parse(data);
+        return ConfigSchema.parse(raw);
     } catch (e) {
         if (e instanceof z.ZodError) {
             throw new Error(`Invalid format: ${z.prettifyError(e)} got ${raw}`);
