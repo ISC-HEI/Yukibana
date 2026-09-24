@@ -13,6 +13,8 @@ import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-con
 import { YukibanaConfig } from '../common/yukibana-config';
 import { DEFAULT_YUKIBANA_CONFIG } from './config/config-constants';
 import { ConfigProvider } from './config/config-provider';
+import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plugin-view-registry';
+import { YukibanaPluginViewRegistry } from './yukibana-plugin-view-registry';
 
 interface WithLayout {
     initializeLayout?(app: FrontendApplication): MaybePromise<void>;
@@ -96,4 +98,6 @@ export function bindLayout(bind: interfaces.Bind, rebind: interfaces.Rebind, isB
     for (const [contribution, widget] of TOGGLEABLE_WIDGETS) {
         rebindWithLayoutToggle(isBound, rebind, contribution, config => config.layout.widgets[widget]);
     }
+
+    rebind(PluginViewRegistry).to(YukibanaPluginViewRegistry).inSingletonScope();
 }

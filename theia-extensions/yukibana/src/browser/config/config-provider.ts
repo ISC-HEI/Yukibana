@@ -63,7 +63,7 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
                 this.logger.debug('Model is invalid');
             }
         } catch (e) {
-            this.logger.error(`Failed to load Yukibana configuration from '${this.USER_CONFIG_URI}'.`, e);
+            this.logger.error(`Failed to load Yukibana configuration from '${this.USER_CONFIG_URI}': ${e}`, e);
         } finally {
             this.logger.debug('Configuration loaded');
             this.onConfigChangeEmitter.fire(this._config);

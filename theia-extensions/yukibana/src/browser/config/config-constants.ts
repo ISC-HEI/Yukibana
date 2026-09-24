@@ -15,11 +15,13 @@ export const DEFAULT_YUKIBANA_CONFIG: YukibanaConfig = {
     layout: {
         widgets: {
             files: true,
-            search: false,
-            vcs: false,
-            debug: false,
-            testing: false,
-            outline: false,
+            search: true,
+            vcs: true,
+            debug: true,
+            testing: true,
+            outline: true,
         },
+        containers: {},
+        views: {},
     }
 };
