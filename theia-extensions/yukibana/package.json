@@ -1,5 +1,5 @@
 {
-  "name": "yukibana",
+  "name": "yukibana-ext",
   "keywords": [
     "theia-extension"
   ],
@@ -9,7 +9,11 @@
     "src"
   ],
   "dependencies": {
-    "@theia/core": "1.75.0"
+    "@theia/core": "1.75.0",
+    "@theia/monaco": "^1.75.0",
+    "@theia/monaco-editor-core": "^1.108.201",
+    "@theia/toolbar": "^1.75.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "rimraf": "^5.0.0",

@@ -1,3 +1,6 @@
+/**
+ * SPDX-License-Identifier: MIT
+ */
 import { injectable, inject } from '@theia/core/shared/inversify';
 import { Command, CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, MessageService } from '@theia/core/lib/common';
 import { CommonMenus } from '@theia/core/lib/browser';
@@ -7,9 +10,12 @@ export const YukibanaCommand: Command = {
     label: 'Say Hello'
 };
 
+/**
+ * Simple demo command to show a 'Hello World!' message
+ */
 @injectable()
 export class YukibanaCommandContribution implements CommandContribution {
-    
+
     @inject(MessageService)
     protected readonly messageService!: MessageService;
 
@@ -20,6 +26,9 @@ export class YukibanaCommandContribution implements CommandContribution {
     }
 }
 
+/**
+ * Contribution to register a menu action for the 'Say Hello' command
+ */
 @injectable()
 export class YukibanaMenuContribution implements MenuContribution {
 

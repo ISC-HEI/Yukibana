@@ -11,8 +11,7 @@
     "build:dev": "yarn build:extensions && yarn build:applications:dev",
     "build:applications": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" build:prod --concurrency 1",
     "build:applications:dev": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" build --concurrency 1",
-    "_build:extensions": "lerna run --scope=\"yukibana*ext\" build",
-    "build:extensions": ":",
+    "build:extensions": "lerna run --scope=\"*-ext\" build",
     "package:applications": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" package --concurrency 1",
     "package:applications:preview": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" package:preview --concurrency 1",
     "package:applications:prod": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" package:prod --concurrency 1",
@@ -27,8 +26,8 @@
     "lint": "eslint --ext js,jsx,ts,tsx scripts && lerna run lint",
     "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix && lerna run lint:fix",
     "test": "lerna run test",
-    "electron": "yarn --cwd applications/electron",
-    "browser": "yarn --cwd applications/browser"
+    "electron": "yarn --cwd electron-app",
+    "browser": "yarn --cwd browser-app"
   },
   "devDependencies": {
     "@eclipse-dash/nodejs-wrapper": "^0.0.1",
@@ -60,7 +59,7 @@
     "vscode.microsoft-authentication"
   ],
   "workspaces": [
-    "yukibana",
+    "theia-extensions/*",
     "browser-app",
     "electron-app"
   ]

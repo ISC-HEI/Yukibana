@@ -29,10 +29,11 @@
     "@theia/process": "1.75.0",
     "@theia/search-in-workspace": "^1.75.0",
     "@theia/terminal": "1.75.0",
+    "@theia/toolbar": "^1.75.0",
     "@theia/workspace": "1.75.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "yukibana": "0.0.0"
+    "yukibana-ext": "0.0.0"
   },
   "devDependencies": {
     "@theia/bundle-plugin": "^1.75.0",
@@ -62,7 +63,7 @@
     "build": "yarn -s rebuild && theia build --app-target=\"electron\" --mode development",
     "build:prod": "yarn -s rebuild && theia build --app-target=\"electron\"",
     "rebuild": "theia rebuild:electron --cacheRoot ..",
-    "start": "theia start --log-level=debug --plugins=local-dir:../plugins",
+    "start": "theia start --plugins=local-dir:../plugins",
     "watch": "npm run rebuild && theia build --watch --mode development",
     "prepackage": "node scripts/patch-ripgrep-asar-path.mjs",
     "package": "yarn clean:dist && yarn rebuild && yarn prepackage && electron-builder -c.mac.identity=null --publish never",
@@ -79,6 +80,8 @@
       "config": {
         "applicationName": "Yukibana",
         "reloadOnReconnect": true,
+        "defaultTheme": "dark",
+        "defaultIconTheme": "theia-file-icons",
         "electron": {
           "appUserModelId": "isc.yukibana",
           "splashScreenOptions": {
