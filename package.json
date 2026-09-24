@@ -28,7 +28,7 @@
     "test": "lerna run test",
     "electron": "yarn --cwd electron-app",
     "browser": "yarn --cwd browser-app",
-    "add:all": "ts-node scripts/add-dep-all.ts"
+    "dep:all": "ts-node scripts/dep-all.ts"
   },
   "devDependencies": {
     "@eclipse-dash/nodejs-wrapper": "^0.0.1",
