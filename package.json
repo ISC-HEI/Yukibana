@@ -5,8 +5,8 @@
     "npm": ">=8"
   },
   "scripts": {
-    "build:browser": "npm --prefix browser-app run bundle",
-    "build:electron": "npm --prefix electron-app run bundle",
+    "build:browser": "yarn build:extensions && npm --prefix browser-app run bundle",
+    "build:electron": "yarn build:extensions && npm --prefix electron-app run bundle",
     "build": "yarn build:extensions && yarn build:applications",
     "build:dev": "yarn build:extensions && yarn build:applications:dev",
     "build:applications": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" build:prod --concurrency 1",
@@ -27,7 +27,8 @@
     "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix && lerna run lint:fix",
     "test": "lerna run test",
     "electron": "yarn --cwd electron-app",
-    "browser": "yarn --cwd browser-app"
+    "browser": "yarn --cwd browser-app",
+    "dep:all": "ts-node scripts/dep-all.ts"
   },
   "devDependencies": {
     "@eclipse-dash/nodejs-wrapper": "^0.0.1",

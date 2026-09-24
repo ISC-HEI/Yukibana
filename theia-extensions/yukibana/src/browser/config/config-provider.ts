@@ -8,7 +8,7 @@ import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model';
 import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
 import { loadConfig, YukibanaConfig } from '../../common/yukibana-config';
-import { DEFAULT_YUKIBANA_CONFIG, UserConfigURI } from './config-constants';
+import { UserConfigURI } from './config-constants';
 
 /**
  * Provider which handles reading and parsing the config file
@@ -21,7 +21,7 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
     private readonly onConfigChangeEmitter = new Emitter<YukibanaConfig>();
     readonly onConfigChanged = this.onConfigChangeEmitter.event;
 
-    private _config: YukibanaConfig = DEFAULT_YUKIBANA_CONFIG;
+    private _config: YukibanaConfig = loadConfig({});
 
     constructor(
         @inject(MonacoTextModelService) protected readonly textModelService: MonacoTextModelService,
@@ -63,7 +63,7 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
                 this.logger.debug('Model is invalid');
             }
         } catch (e) {
-            this.logger.error(`Failed to load Yukibana configuration from '${this.USER_CONFIG_URI}'.`, e);
+            this.logger.error(`Failed to load Yukibana configuration from '${this.USER_CONFIG_URI}': ${e}`, e);
         } finally {
             this.logger.debug('Configuration loaded');
             this.onConfigChangeEmitter.fire(this._config);
@@ -71,7 +71,13 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
     }
 
     protected parseContent(fileContent: string): YukibanaConfig {
-        return loadConfig(fileContent);
+        let data;
+        try {
+            data = JSON.parse(fileContent);
+        } catch (e) {
+            throw new Error(`Malformed JSON: ${e}`);
+        }
+        return loadConfig(data);
     }
 
     dispose(): void {

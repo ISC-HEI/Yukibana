@@ -11,6 +11,7 @@ import { bindConfig } from './config/config-contribution';
 import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
 import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
 import { YukibanaFilterContribution } from './yukibana-filter-contribution';
+import { bindLayout } from './yukibana-layout-contribution';
 import { YukibanaProblemContributioun } from './yukibana-problem-contribution';
 import { YukibanaProblemManager } from './yukibana-problem-manager';
 import { SuggestionsContribution } from './yukibana-suggestions-contribution';
@@ -42,4 +43,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     bind(YukibanaProblemContributioun).toSelf().inRequestScope();
     rebind(ProblemContribution).toService(YukibanaProblemContributioun);
+
+    bindLayout(bind, rebind, isBound);
 });
