@@ -13,6 +13,8 @@
     "@theia/markers": "^1.75.0",
     "@theia/monaco": "^1.75.0",
     "@theia/monaco-editor-core": "^1.108.201",
+    "@theia/navigator": "^1.75.0",
+    "@theia/search-in-workspace": "^1.75.0",
     "@theia/toolbar": "^1.75.0",
     "zod": "^3.25.76"
   },

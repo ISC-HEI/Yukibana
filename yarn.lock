@@ -1661,9 +1661,9 @@
     vscode-oniguruma "2.0.1"
     vscode-textmate "^9.3.2"
 
-"@theia/navigator@1.75.0":
+"@theia/navigator@1.75.0", "@theia/navigator@^1.75.0":
   version "1.75.0"
-  resolved "https://registry.npmjs.org/@theia/navigator/-/navigator-1.75.0.tgz"
+  resolved "https://registry.yarnpkg.com/@theia/navigator/-/navigator-1.75.0.tgz#47a2a817458d4975ad94cc354ca04975569966b0"
   integrity sha512-aAJfqaN8UjZlJLOIUVCSZSzV74gvyvTUxn9W939XLEM61511oHDTUDief7P+pq4sBxBi3/tue/wLk6QV9rhdgw==
   dependencies:
     "@theia/core" "1.75.0"

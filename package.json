@@ -5,8 +5,8 @@
     "npm": ">=8"
   },
   "scripts": {
-    "build:browser": "npm --prefix browser-app run bundle",
-    "build:electron": "npm --prefix electron-app run bundle",
+    "build:browser": "yarn build:extensions && npm --prefix browser-app run bundle",
+    "build:electron": "yarn build:extensions && npm --prefix electron-app run bundle",
     "build": "yarn build:extensions && yarn build:applications",
     "build:dev": "yarn build:extensions && yarn build:applications:dev",
     "build:applications": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" build:prod --concurrency 1",

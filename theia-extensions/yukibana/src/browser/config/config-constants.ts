@@ -11,5 +11,15 @@ export const DEFAULT_YUKIBANA_CONFIG: YukibanaConfig = {
     features: {
         codeSuggestions: true,
         squiggles: true,
+    },
+    layout: {
+        widgets: {
+            files: true,
+            search: false,
+            vcs: false,
+            debug: false,
+            testing: false,
+            outline: false,
+        },
     }
 };
