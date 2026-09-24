@@ -19,7 +19,8 @@ const ConfigSchema = z.object({
         }).prefault({}),
         containers: z.record(z.string(), z.boolean()).default({}),
         views: z.record(z.string(), z.boolean()).default({}),
-    }).prefault({})
+    }).prefault({}),
+    openFiles: z.array(z.string()).default([]),
 }).prefault({});
 
 export type YukibanaConfig = z.infer<typeof ConfigSchema>;
