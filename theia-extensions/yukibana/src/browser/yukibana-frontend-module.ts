@@ -43,7 +43,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(YukibanaProblemManager).toSelf().inSingletonScope();
     rebind(ProblemManager).toService(YukibanaProblemManager);
 
-    bind(YukibanaProblemContributioun).toSelf().inRequestScope();
+    bind(YukibanaProblemContributioun).toSelf().inSingletonScope();
     rebind(ProblemContribution).toService(YukibanaProblemContributioun);
 
     bindLayout(bind, rebind, isBound);
