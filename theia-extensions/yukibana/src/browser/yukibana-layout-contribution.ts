@@ -1,6 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
  */
+import { AIChatContribution } from '@theia/ai-chat-ui/lib/browser/ai-chat-ui-contribution';
 import { ILogger, MaybePromise, URI } from '@theia/core';
 import { FrontendApplication, FrontendApplicationContribution, OpenerService, ShellLayoutRestorer, StorageService, WidgetManager, WidgetOpenMode } from '@theia/core/lib/browser';
 import { inject, injectable, interfaces, named } from '@theia/core/shared/inversify';
@@ -31,6 +32,7 @@ const TOGGLEABLE_WIDGETS: Array<[interfaces.ServiceIdentifier<WithLayout>, Confi
     [DebugFrontendApplicationContribution, 'debug'],
     [TestViewContribution, 'testing'],
     [OutlineViewContribution, 'outline'],
+    [AIChatContribution, 'aiChat'],
 ];
 
 @injectable()

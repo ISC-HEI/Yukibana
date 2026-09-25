@@ -15,10 +15,15 @@ export class YukibanaAIIdeActivationService extends AIIdeActivationServiceImpl {
         super.updateEnableValue(value && this.configProvider.config.features.ai);
     }
 
+    protected refreshValue(): void {
+        this.updateEnableValue(this.preferenceService.get<boolean>(PREFERENCE_NAME_ENABLE_AI, false));
+    }
+
     override initialize(): MaybePromise<void> {
         super.initialize();
         this.configProvider.ready.then(() => {
-            this.configProvider.onConfigChanged(() => this.updateEnableValue(this.preferenceService.get<boolean>(PREFERENCE_NAME_ENABLE_AI, false)));
+            this.configProvider.onConfigChanged(() => this.refreshValue());
+            this.refreshValue();
         });
     }
 }

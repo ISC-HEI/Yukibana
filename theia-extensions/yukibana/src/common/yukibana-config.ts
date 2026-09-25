@@ -17,6 +17,7 @@ const ConfigSchema = z.object({
             debug: z.boolean().default(true),
             testing: z.boolean().default(true),
             outline: z.boolean().default(true),
+            aiChat: z.boolean().default(true),
         }).prefault({}),
         containers: z.record(z.string(), z.boolean()).default({}),
         views: z.record(z.string(), z.boolean()).default({}),
