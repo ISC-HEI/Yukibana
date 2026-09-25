@@ -7,6 +7,7 @@ const ConfigSchema = z.object({
     features: z.object({
         codeSuggestions: z.boolean().default(true),
         squiggles: z.boolean().default(true),
+        ai: z.boolean().default(true),
     }).prefault({}),
     layout: z.object({
         widgets: z.object({
