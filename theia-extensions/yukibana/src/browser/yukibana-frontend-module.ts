@@ -1,6 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
  */
+import { AIIdeActivationServiceImpl } from '@theia/ai-ide/lib/browser/ai-ide-activation-service';
 import { FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { bindContribution, CommandContribution, FilterContribution, MenuContribution } from '@theia/core/lib/common';
 import { ContainerModule } from '@theia/core/shared/inversify';
@@ -8,6 +9,7 @@ import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-
 import { ProblemManager } from '@theia/markers/lib/browser/problem/problem-manager';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
 import { bindConfig } from './config/config-contribution';
+import { YukibanaAIIdeActivationService } from './yukibana-ai-ide-activation-service';
 import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
 import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
 import { YukibanaFilterContribution } from './yukibana-filter-contribution';
@@ -45,4 +47,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(ProblemContribution).toService(YukibanaProblemContributioun);
 
     bindLayout(bind, rebind, isBound);
+
+    bind(YukibanaAIIdeActivationService).toSelf().inSingletonScope();
+    rebind(AIIdeActivationServiceImpl).toService(YukibanaAIIdeActivationService);
 });

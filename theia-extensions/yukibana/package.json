@@ -9,6 +9,7 @@
     "src"
   ],
   "dependencies": {
+    "@theia/ai-ide": "~1.75.0",
     "@theia/core": "1.75.0",
     "@theia/debug": "^1.75.0",
     "@theia/markers": "^1.75.0",
