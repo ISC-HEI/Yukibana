@@ -70,24 +70,13 @@ jobs:
           NODE_OPTIONS: --max_old_space_size=4096
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build prod package (Windows, Linux)
-        if: (runner.os == 'Windows' || runner.os == 'Linux') && github.event_name != 'pull_request'
-        shell: bash
-        run: |
-          yarn build
-          yarn download:plugins
-          yarn package:applications
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Update electron-builder.yml for macos-15
         if: matrix.os == 'macos-15'
         run: |
           sed -i '' 's|https://yukibana.isc-vs.ch/download/latest/macos|https://yukibana.isc-vs.ch/download/latest/macos-arm|g' electron-app/electron-builder.yml
 
-      - name: Build prod package (Mac)
-        if: runner.os == 'macOS'
+      - name: Build prod package
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           yarn build
@@ -125,6 +114,128 @@ jobs:
           path: |
             electron-app/dist/**
           retention-days: 1
+      
+      - name: Cache Build Result
+        uses: actions/cache@v5
+        id: build-result
+        with:
+          path: ./*
+          key: ${{ github.run_number }}-${{ matrix.os }}
+
+  browser-tests:
+    name: E2E Browser Tests on ${{ matrix.os }}, Node.js v${{ matrix.node }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, ubuntu-22.04, macos-15, macos-15-intel]
+        node: ["24.x"]
+
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    needs: [build]
+
+    steps:
+      - name: Restore Build Result (#${{ github.run_number }}-${{ matrix.os }}-node${{ matrix.node }})
+        uses: actions/cache/restore@v5
+        id: build-result
+        with:
+          path: ./*
+          key: ${{ github.run_number }}-${{ matrix.os }}
+          fail-on-cache-miss: true
+
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Use Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('tests/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: cd tests && npx playwright install chromium
+
+      - name: Run Yukibana
+        shell: bash
+        run: yarn browser start &
+
+      - name: Test (playwright browser)
+        shell: bash
+        run: yarn tests ui-tests-ci
+
+      - name: Upload test results (browser)
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: ui-tests-browser-${{ matrix.os }}
+          path: |
+            test-results/
+            tests/allure-results/
+          if-no-files-found: ignore
+          retention-days: 5
+
+  # Disabled because it doesn't work on Windows and MacOS at the moment
+  # TODO: investigate why openEditor times out
+  # See https://github.com/ISC-HEI/Yukibana/actions/runs/35966188269
+  electron-tests:
+    name: E2E Electron Tests on ${{ matrix.os }}, Node.js v${{ matrix.node }}
+    if: false
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, ubuntu-22.04, macos-15, macos-15-intel]
+        node: ["24.x"]
+
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    needs: [build]
+
+    steps:
+      - name: Restore Build Result (#${{ github.run_number }}-${{ matrix.os }}-node${{ matrix.node }})
+        uses: actions/cache/restore@v5
+        id: build-result
+        with:
+          path: ./*
+          key: ${{ github.run_number }}-${{ matrix.os }}
+          fail-on-cache-miss: true
+
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Use Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('tests/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: cd tests && npx playwright install chromium
 
       - name: Test (Linux)
         if: runner.os == 'Linux'
@@ -147,7 +258,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: test-results-${{ matrix.os }}
+          name: ui-tests-electron-${{ matrix.os }}
           path: |
             test-results/
             tests/allure-results/
