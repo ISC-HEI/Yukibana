@@ -1,0 +1,33 @@
+{
+  "name": "yukibana-launcher-ext",
+  "keywords": [
+    "theia-extension"
+  ],
+  "version": "0.0.0",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@theia/core": "~1.75.0",
+    "@vscode/sudo-prompt": "9.3.2",
+    "body-parser": "^1.20.8",
+    "fs-extra": "^4.0.3"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.0",
+    "typescript": "~5.4.5"
+  },
+  "scripts": {
+    "prepare": "npm run clean && npm run build",
+    "clean": "rimraf lib",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "theiaExtensions": [
+    {
+      "frontendElectron": "lib/browser/create-launcher-frontend-module",
+      "backend": "lib/node/launcher-backend-module"
+    }
+  ]
+}
