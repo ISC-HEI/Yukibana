@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**/*.md'
-      - '**/*.typ'
+      - "**/*.md"
+      - "**/*.typ"
   pull_request:
     branches:
       - main
     paths-ignore:
-      - '**/*.md'
-      - '**/*.typ'
+      - "**/*.md"
+      - "**/*.typ"
 
 jobs:
   build:
@@ -114,7 +114,7 @@ jobs:
           path: |
             electron-app/dist/**
           retention-days: 1
-      
+
       - name: Cache Build Result
         uses: actions/cache@v5
         id: build-result
@@ -128,7 +128,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022, ubuntu-22.04, macos-15, macos-15-intel]
+        # Disable MacOS because of connection refused error
+        # See https://github.com/ISC-HEI/Yukibana/actions/runs/36688863666/job/109803818086
+        #os: [windows-2022, ubuntu-22.04, macos-15, macos-15-intel]
+        os: [windows-2022, ubuntu-22.04]
         node: ["24.x"]
 
     runs-on: ${{ matrix.os }}
