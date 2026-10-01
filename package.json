@@ -4,6 +4,7 @@
     "node": ">=18",
     "npm": ">=8"
   },
+  "packageManager": "pnpm@12.8.1",
   "scripts": {
     "build:browser": "pnpm run build:extensions && pnpm run --filter yukibana-browser-app run bundle",
     "build:electron": "pnpm run build:extensions && pnpm run --filter yukibana-electron-app run bundle",

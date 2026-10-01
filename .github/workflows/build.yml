@@ -36,12 +36,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Use Node.js 24.x
-        uses: actions/setup-node@v6
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
         with:
-          node-version: "24.x"
-          registry-url: "https://registry.npmjs.org"
-          cache: yarn
+          runtime: node@24.x
+          cache: true
+          install: false
 
       - name: Use Python 3.13
         uses: actions/setup-python@v6
@@ -49,15 +49,15 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile --skip-integrity-check --network-timeout 100000
+        run: pnpm ci --fetch-timeout 100000
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Lint
-        run: yarn lint
+        run: pnpm run lint
 
       - name: Build (dev)
-        run: yarn build:dev
+        run: pnpm run build:dev
 
       - name: Cache Theia plugins
         uses: actions/cache@v5
@@ -66,7 +66,7 @@ jobs:
           key: plugins-${{ runner.os }}-${{ hashFiles('package.json') }}
 
       - name: Download plugins
-        run: yarn download:plugins
+        run: pnpm run download:plugins
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -75,14 +75,14 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install Playwright Chromium
-        run: cd tests && npx playwright install --with-deps chromium
+        run: cd tests && pnx playwright install --with-deps chromium
 
       - name: Run Yukibana
         run: |
-          yarn browser start &
+          pnpm run start:browser &
           # Wait for the server.
           for i in $(seq 1 60); do
             if curl -sf http://localhost:3000 > /dev/null; then exit 0; fi
@@ -92,10 +92,10 @@ jobs:
           exit 1
 
       - name: Test (playwright browser)
-        run: yarn tests ui-tests-ci
+        run: pnpm run tests ui-tests-ci
 
       - name: Generate report
-        run: yarn tests ui-tests-report-generate
+        run: pnpm run tests ui-tests-report-generate
 
       - name: Upload test results (browser)
         if: always()
@@ -129,12 +129,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Use Node.js 24.x
-        uses: actions/setup-node@v6
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
         with:
-          node-version: "24.x"
-          registry-url: "https://registry.npmjs.org"
-          cache: yarn
+          runtime: node@24.x
+          cache: true
+          install: false
 
       - name: Use Python 3.13
         uses: actions/setup-python@v6
@@ -143,7 +143,7 @@ jobs:
 
       - name: Install dependencies
         shell: bash
-        run: yarn --frozen-lockfile --skip-integrity-check --network-timeout 100000
+        run: pnpm ci --fetch-timeout 100000
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -163,7 +163,7 @@ jobs:
             ~/Library/Caches/electron-builder
             ~/AppData/Local/electron/Cache
             ~/AppData/Local/electron-builder/Cache
-          key: electron-${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('yarn.lock') }}
+          key: electron-${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             electron-${{ runner.os }}-${{ matrix.os }}-
 
@@ -175,9 +175,9 @@ jobs:
       - name: Build prod package
         shell: bash
         run: |
-          yarn build
-          yarn download:plugins
-          yarn package:applications
+          pnpm run build
+          pnpm run download:plugins
+          pnpm run package:applications
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
