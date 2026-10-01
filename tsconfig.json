@@ -16,6 +16,9 @@
       "path": "theia-extensions/yukibana"
     },
     {
+      "path": "theia-extensions/yukibana-submission"
+    },
+    {
       "path": "electron-app"
     },
     {

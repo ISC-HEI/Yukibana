@@ -26,7 +26,8 @@
     "@theia/test": "~1.75.0",
     "@theia/toolbar": "~1.75.0",
     "@theia/workspace": "~1.75.0",
-    "yukibana-ext": "workspace:0.0.0"
+    "yukibana-ext": "workspace:0.0.0",
+    "yukibana-submission": "workspace:0.0.0"
   },
   "devDependencies": {
     "@theia/cli": "~1.75.0"

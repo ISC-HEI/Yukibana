@@ -292,6 +292,9 @@ importers:
       yukibana-ext:
         specifier: workspace:0.0.0
         version: link:../theia-extensions/yukibana
+      yukibana-submission:
+        specifier: workspace:0.0.0
+        version: link:../theia-extensions/yukibana-submission
     devDependencies:
       '@theia/cli':
         specifier: ~1.75.0
@@ -392,6 +395,9 @@ importers:
       yukibana-product-ext:
         specifier: workspace:0.0.0
         version: link:../theia-extensions/yukibana-product
+      yukibana-submission:
+        specifier: workspace:0.0.0
+        version: link:../theia-extensions/yukibana-submission
     devDependencies:
       '@theia/bundle-plugin':
         specifier: ~1.75.0
@@ -564,6 +570,22 @@ importers:
       '@theia/core':
         specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)
+    devDependencies:
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      typescript:
+        specifier: ~5.4.5
+        version: 5.4.5
+
+  theia-extensions/yukibana-submission:
+    dependencies:
+      '@theia/core':
+        specifier: ~1.75.0
+        version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)
+      yukibana-ext:
+        specifier: workspace:0.0.0
+        version: link:../yukibana
     devDependencies:
       rimraf:
         specifier: ^5.0.0
