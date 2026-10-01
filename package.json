@@ -55,7 +55,8 @@
     "vscode-builtin-extensions": "https://github.com/eclipse-theia/vscode-builtin-extensions/releases/download/1.108.2/vscode-builtin-extensions-1.108.2.tar.gz",
     "vscjava.vscode-java-pack": "https://open-vsx.org/api/vscjava/vscode-java-pack/0.30.5/file/vscjava.vscode-java-pack-0.30.5.vsix",
     "vscjava.vscode-java-dependency": "https://open-vsx.org/api/vscjava/vscode-java-dependency/0.27.0/file/vscjava.vscode-java-dependency-0.27.0.vsix",
-    "scalameta.metals": "https://open-vsx.org/api/scalameta/metals/1.70.0/file/scalameta.metals-1.70.0.vsix"
+    "scalameta.metals": "https://open-vsx.org/api/scalameta/metals/1.70.0/file/scalameta.metals-1.70.0.vsix",
+    "ms-ceintl.vscode-language-pack-fr": "https://open-vsx.org/api/MS-CEINTL/vscode-language-pack-fr/1.131.0/file/MS-CEINTL.vscode-language-pack-fr-1.131.0.vsix"
   },
   "theiaPluginsExcludeIds": [
     "ms-vscode.js-debug-companion",
