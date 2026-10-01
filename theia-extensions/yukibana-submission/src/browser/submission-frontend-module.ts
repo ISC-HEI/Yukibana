@@ -1,10 +1,15 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { ContainerModule } from '@theia/core/shared/inversify';
-import { PrepareSubmissionContribution } from './submission-frontend-contribution';
 import { CommandContribution } from '@theia/core';
+import { ServiceConnectionProvider } from '@theia/core/lib/browser';
+import { ContainerModule } from '@theia/core/shared/inversify';
+import { SubmissionService, submissionServicePath } from '../node/submission-protocol';
+import { PrepareSubmissionContribution } from './submission-frontend-contribution';
 
-export default new ContainerModule((bind, unbind, isBound, rebind) => {
+export default new ContainerModule(bind => {
     bind(CommandContribution).to(PrepareSubmissionContribution);
+    bind(SubmissionService).toDynamicValue(
+        ctx => ServiceConnectionProvider.createProxy<SubmissionService>(ctx.container, submissionServicePath)
+    ).inSingletonScope();
 });

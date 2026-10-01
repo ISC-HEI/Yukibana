@@ -28,7 +28,7 @@ export class SubmissionServiceImpl implements SubmissionService {
     }
 
     protected async listFiles(root: string, submissionPath: string, options: SubmissionOptions): Promise<string[]> {
-        return fg(options.include ?? ['** /* '], {
+        return fg(options.include ?? ['**/*'], {
             cwd: root,
             ignore: [
                 ...(options.exclude ?? []),
