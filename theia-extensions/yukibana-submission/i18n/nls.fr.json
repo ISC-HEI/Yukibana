@@ -1,0 +1,8 @@
+{
+  "yukibana": {
+    "submission": {
+      "prepareSubmission": "Préparer la remise",
+      "submissionReady": "Exercice préparé dans {0} ({1} fichier(s))"
+    }
+  }
+}
