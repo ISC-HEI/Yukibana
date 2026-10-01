@@ -29,7 +29,7 @@
     "test": "lerna run test",
     "electron": "pnpm run --filter yukibana-electron-app",
     "browser": "pnpm run --filter yukibana-browser-app",
-    "tests": "pnpm run --filter tests",
+    "tests": "pnpm run --filter yukibana-tests",
     "dep:all": "ts-node scripts/dep-all.ts"
   },
   "devDependencies": {
