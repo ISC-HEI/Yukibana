@@ -30,7 +30,7 @@
     "typescript": "~5.4.5"
   },
   "scripts": {
-    "prepare": "npm run clean && npm run build",
+    "prepare": "pnpm run clean && pnpm run build",
     "clean": "rimraf lib",
     "build": "tsc",
     "watch": "tsc -w"
