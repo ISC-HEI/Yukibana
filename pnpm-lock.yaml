@@ -482,40 +482,43 @@ importers:
         specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(proxy-agent@8.0.2(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)(yauzl@2.10.0)(zod@4.6.5)
       '@theia/core':
-        specifier: 1.75.0
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)
       '@theia/debug':
-        specifier: ^1.75.0
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@theia/markers':
-        specifier: ^1.75.0
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@theia/monaco':
-        specifier: ^1.75.0
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@theia/monaco-editor-core':
         specifier: ^1.108.201
         version: 1.108.201
       '@theia/navigator':
-        specifier: ^1.75.0
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@theia/outline-view':
-        specifier: ^1.75.0
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)
       '@theia/plugin-ext':
-        specifier: ^1.75.0
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)(zod@4.6.5)
       '@theia/scm':
-        specifier: ^1.75.0
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@theia/search-in-workspace':
-        specifier: ^1.75.0
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@theia/test':
-        specifier: ^1.75.0
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@theia/toolbar':
-        specifier: ^1.75.0
+        specifier: ~1.75.0
+        version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
+      '@theia/workspace':
+        specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       zod:
         specifier: ^4.6
