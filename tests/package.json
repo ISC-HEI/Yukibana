@@ -12,20 +12,20 @@
     "url": "git+https://github.com/ISC-HEI/Yukibana.git"
   },
   "scripts": {
-    "prepare": "npm run clean && npm run build",
+    "prepare": "pnpm run clean && pnpm run build",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "build": "tsc --incremental && if-env SKIP_CHROMIUM_INSTALLATION=1 && echo 'Skipping chromium install' || npx playwright install chromium",
+    "build": "tsc --incremental && if-env SKIP_CHROMIUM_INSTALLATION=1 && echo 'Skipping chromium install' || pnx playwright install chromium",
     "ui-tests": "playwright test --config=../configs/playwright.config.ts --project=Browser",
     "ui-tests-electron": "cross-env USE_ELECTRON=true playwright test --config=../configs/playwright.config.ts --project=Electron",
     "ui-tests-ci": "playwright test --config=../configs/playwright.ci.config.ts --project=Browser",
     "ui-tests-ci-electron": "cross-env USE_ELECTRON=true playwright test --config=../configs/playwright.ci.config.ts --project=Electron",
     "ui-tests-headful": "playwright test --config=../configs/playwright.headful.config.ts --project=Browser",
     "ui-tests-report-generate": "allure generate ./allure-results --clean -o allure-results/allure-report",
-    "ui-tests-report": "npm run ui-tests-report-generate && allure open allure-results/allure-report",
-    "performance": "npm run performance-on-chromium",
+    "ui-tests-report": "pnpm run ui-tests-report-generate && allure open allure-results/allure-report",
+    "performance": "pnpm run performance-on-chromium",
     "performance-on-chromium": "playwright test --config=../configs/performance.config.ts --project=Browser",
     "performance-on-electron": "cross-env USE_ELECTRON=true playwright test --config=../configs/performance.config.ts --project=Electron",
-    "performance-report": "npm run performance-report-chromium",
+    "performance-report": "pnpm run performance-report-chromium",
     "performance-report-chromium": "node lib/scripts/performance-report.js --performanceMetricsPath performance-metrics/Browser --performancePublishPath=performance/chromium",
     "performance-report-electron": "node lib/scripts/performance-report.js --performanceMetricsPath performance-metrics/Electron --performancePublishPath=performance/electron"
   },
@@ -39,6 +39,6 @@
   },
   "dependencies": {
     "@playwright/test": "^1.63.0",
-    "@theia/playwright": "^1.75.0"
+    "@theia/playwright": "~1.75.0"
   }
 }

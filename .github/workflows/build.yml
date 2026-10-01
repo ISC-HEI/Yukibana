@@ -1,5 +1,6 @@
 # Adapted from https://github.com/eclipse-theia/theia-ide/blob/74bd976ef60102bdbaf754817c88d00811465e72/.github/workflows/build.yml
 name: Build, package and test
+
 on:
   push:
     branches:
@@ -13,34 +14,127 @@ on:
     paths-ignore:
       - "**/*.md"
       - "**/*.typ"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  NODE_OPTIONS: --max_old_space_size=4096
 
 jobs:
-  build:
-    name: ${{ matrix.os }}, Node.js v${{ matrix.node }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-2022, ubuntu-22.04, macos-15, macos-15-intel]
-        node: ["24.x"]
-
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-
-    permissions:
-      contents: read
+  check:
+    name: Lint and E2E browser tests
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
-      - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v6
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
         with:
-          node-version: ${{ matrix.node }}
-          registry-url: "https://registry.npmjs.org"
+          runtime: node@24.x
+          cache: true
+          install: false
+
+      - name: Use Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pnpm ci --fetch-timeout 100000
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Build (dev)
+        run: pnpm run build:dev
+
+      - name: Cache Theia plugins
+        uses: actions/cache@v5
+        with:
+          path: plugins
+          key: plugins-${{ runner.os }}-${{ hashFiles('package.json') }}
+
+      - name: Download plugins
+        run: pnpm run download:plugins
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Playwright Chromium
+        run: cd tests && pnx playwright install --with-deps chromium
+
+      - name: Run Yukibana
+        run: |
+          pnpm run start:browser &
+          # Wait for the server.
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:3000 > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          echo "Server did not start in time" >&2
+          exit 1
+
+      - name: Test (playwright browser)
+        run: pnpm run tests ui-tests-ci
+
+      - name: Generate report
+        run: pnpm run tests ui-tests-report-generate
+
+      - name: Upload test results (browser)
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: ui-tests-browser
+          path: |
+            test-results/
+            tests/allure-results/
+          if-no-files-found: ignore
+          retention-days: 5
+
+  package:
+    name: Package (${{ matrix.artifact }})
+    if: github.event_name != 'pull_request'
+    needs: check
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-2022, artifact: windows }
+          - { os: ubuntu-22.04, artifact: linux }
+          - { os: macos-15, artifact: mac-arm64 }
+          - { os: macos-15-intel, artifact: mac-x64 }
+
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          runtime: node@24.x
+          cache: true
+          install: false
 
       - name: Use Python 3.13
         uses: actions/setup-python@v6
@@ -49,26 +143,29 @@ jobs:
 
       - name: Install dependencies
         shell: bash
-        run: yarn --skip-integrity-check --network-timeout 100000
+        run: pnpm ci --fetch-timeout 100000
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Lint
-        shell: bash
-        run: yarn lint
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
+      - name: Cache Theia plugins
+        uses: actions/cache@v5
+        with:
+          path: plugins
+          key: plugins-${{ runner.os }}-${{ hashFiles('package.json') }}
 
-      - name: Build dev package (Windows, Linux)
-        if: (runner.os == 'Windows' || runner.os == 'Linux') && github.event_name == 'pull_request'
-        shell: bash
-        run: |
-          yarn build:dev
-          yarn download:plugins
-          yarn package:applications:preview
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cache Electron / electron-builder downloads
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cache/electron
+            ~/.cache/electron-builder
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+            ~/AppData/Local/electron/Cache
+            ~/AppData/Local/electron-builder/Cache
+          key: electron-${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            electron-${{ runner.os }}-${{ matrix.os }}-
 
       - name: Update electron-builder.yml for macos-15
         if: matrix.os == 'macos-15'
@@ -76,194 +173,23 @@ jobs:
           sed -i '' 's|https://yukibana.isc-vs.ch/download/latest/macos|https://yukibana.isc-vs.ch/download/latest/macos-arm|g' electron-app/electron-builder.yml
 
       - name: Build prod package
-        if: github.event_name != 'pull_request'
         shell: bash
         run: |
-          yarn build
-          yarn download:plugins
-          yarn package:applications
+          pnpm run build
+          pnpm run download:plugins
+          pnpm run package:applications
         env:
-          NODE_OPTIONS: --max_old_space_size=4096
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Mac Dist Files
-        if: runner.os == 'macOS' && github.event_name != 'pull_request'
+      - name: Upload dist files
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ matrix.os == 'macos-15-intel' && 'mac-x64' || matrix.os == 'macos-15' && 'mac-arm64'}}
+          name: ${{ matrix.artifact }}
           path: |
             electron-app/dist/**
+            !electron-app/dist/*-unpacked/**
             !electron-app/dist/mac/**
             !electron-app/dist/mac-arm64/**
+          compression-level: 0
+          if-no-files-found: error
           retention-days: 1
-
-      - name: Upload Windows Dist Files
-        if: runner.os == 'Windows' && github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v6
-        with:
-          name: windows
-          path: |
-            electron-app/dist/**
-          retention-days: 1
-
-      - name: Upload Linux Dist Files
-        if: runner.os == 'Linux' && github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v6
-        with:
-          name: linux
-          path: |
-            electron-app/dist/**
-          retention-days: 1
-
-      - name: Cache Build Result
-        uses: actions/cache@v5
-        id: build-result
-        with:
-          path: ./*
-          key: ${{ github.run_number }}-${{ matrix.os }}
-
-  browser-tests:
-    name: E2E Browser Tests on ${{ matrix.os }}, Node.js v${{ matrix.node }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        # Disable MacOS because of connection refused error
-        # See https://github.com/ISC-HEI/Yukibana/actions/runs/36688863666/job/109803818086
-        #os: [windows-2022, ubuntu-22.04, macos-15, macos-15-intel]
-        os: [windows-2022, ubuntu-22.04]
-        node: ["24.x"]
-
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-
-    needs: [build]
-
-    steps:
-      - name: Restore Build Result (#${{ github.run_number }}-${{ matrix.os }}-node${{ matrix.node }})
-        uses: actions/cache/restore@v5
-        id: build-result
-        with:
-          path: ./*
-          key: ${{ github.run_number }}-${{ matrix.os }}
-          fail-on-cache-miss: true
-
-      - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node }}
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Use Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('tests/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      - name: Install Playwright Chromium
-        shell: bash
-        run: cd tests && npx playwright install chromium
-
-      - name: Run Yukibana
-        shell: bash
-        run: yarn browser start &
-
-      - name: Test (playwright browser)
-        shell: bash
-        run: yarn tests ui-tests-ci
-
-      - name: Upload test results (browser)
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: ui-tests-browser-${{ matrix.os }}
-          path: |
-            test-results/
-            tests/allure-results/
-          if-no-files-found: ignore
-          retention-days: 5
-
-  # Disabled because it doesn't work on Windows and MacOS at the moment
-  # TODO: investigate why openEditor times out
-  # See https://github.com/ISC-HEI/Yukibana/actions/runs/35966188269
-  electron-tests:
-    name: E2E Electron Tests on ${{ matrix.os }}, Node.js v${{ matrix.node }}
-    if: false
-
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-2022, ubuntu-22.04, macos-15, macos-15-intel]
-        node: ["24.x"]
-
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-
-    needs: [build]
-
-    steps:
-      - name: Restore Build Result (#${{ github.run_number }}-${{ matrix.os }}-node${{ matrix.node }})
-        uses: actions/cache/restore@v5
-        id: build-result
-        with:
-          path: ./*
-          key: ${{ github.run_number }}-${{ matrix.os }}
-          fail-on-cache-miss: true
-
-      - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node }}
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Use Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('tests/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      - name: Install Playwright Chromium
-        shell: bash
-        run: cd tests && npx playwright install chromium
-
-      - name: Test (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          xvfb-run -a yarn tests ui-tests-ci-electron
-
-      - name: Test (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          yarn tests ui-tests-ci-electron
-
-      - name: Test (macOS)
-        if: runner.os == 'macOS'
-        shell: bash
-        run: |
-          yarn tests ui-tests-ci-electron
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: ui-tests-electron-${{ matrix.os }}
-          path: |
-            test-results/
-            tests/allure-results/
-          if-no-files-found: ignore
-          retention-days: 5
