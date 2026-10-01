@@ -10,6 +10,7 @@ packages:
 allowBuilds:
   "@parcel/watcher": true
   "@theia/ffmpeg": true
+  "@vscode/windows-ca-certs": true
   chromedriver: true
   core-js: true
   drivelist: true
