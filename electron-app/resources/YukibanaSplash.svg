@@ -2,8 +2,8 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="128"
-   height="128"
+   width="256"
+   height="256"
    viewBox="0 0 128 128"
    version="1.1"
    id="svg1"
@@ -12,6 +12,17 @@
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs1">
+    <linearGradient
+       id="linearGradient1">
+      <stop
+         style="stop-color:#808080;stop-opacity:0.30491129;"
+         offset="0.38692963"
+         id="stop3" />
+      <stop
+         style="stop-color:#7e7e7e;stop-opacity:0;"
+         offset="1"
+         id="stop4" />
+    </linearGradient>
     <linearGradient
        id="linearGradient10">
       <stop
@@ -49,10 +60,10 @@
     <linearGradient
        id="linearGradient2-0"
        gradientTransform="scale(0.84952193,1.1771326)"
-       x1="56.502593"
-       y1="20.388526"
-       x2="70.094945"
-       y2="20.388526"
+       x1="56.502594"
+       y1="20.388527"
+       x2="70.094948"
+       y2="20.388527"
        gradientUnits="userSpaceOnUse">
       <stop
          style="stop-color:#686868;stop-opacity:0.2084205;"
@@ -329,7 +340,22 @@
        y1="19.999832"
        x2="39.917301"
        y2="10.00002" />
+    <radialGradient
+       xlink:href="#linearGradient1"
+       id="radialGradient4"
+       cx="64"
+       cy="64"
+       fx="64"
+       fy="64"
+       r="64"
+       gradientUnits="userSpaceOnUse" />
   </defs>
+  <circle
+     style="fill:url(#radialGradient4);stroke:none;stroke-linecap:round;stroke-linejoin:round"
+     id="path1"
+     cx="64"
+     cy="64"
+     r="64" />
   <g
      id="g88">
     <g

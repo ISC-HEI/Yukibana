@@ -8,6 +8,7 @@ asarUnpack:
   - "**/lib/backend/native/**"
   - "**/lib/backend/shell-integrations/**"
   - "**/lib/prebuilds/**"
+  - "resources/icons/WindowIcon/512-512.png"
 nodeGypRebuild: false
 npmRebuild: false
 
