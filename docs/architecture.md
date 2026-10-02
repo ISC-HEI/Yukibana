@@ -22,12 +22,16 @@ When the app is launched, backend modules are first loaded to initialize the ser
 Only one instance of the backend can run at once. Then, any window that is opened
 launches the frontend modules.
 
+For more information, please refer to Theia's [own documentation](https://theia-ide.org/docs/),
+in particular the [Services and Contributions](https://theia-ide.org/docs/services_and_contributions/)
+and [Architecture Overview](https://theia-ide.org/docs/architecture/) sections.
+
 ### Backend modules
 
 Backend modules form the IDE's central process, which manages server-side extensions
 such as build servers and LSPs. They are initialized on first startup of the app
 and only run in a single backend instance. They can provide REST endpoints
-to communicate with frontend modules.
+to communicate with frontend modules, or use the provided RPC system.
 
 ### Frontend modules
 
