@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "default": {},
+  "type": "object",
+  "properties": {
+    "features": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "codeSuggestions": {
+          "default": true,
+          "type": "boolean"
+        },
+        "squiggles": {
+          "default": true,
+          "type": "boolean"
+        },
+        "ai": {
+          "default": true,
+          "type": "boolean"
+        }
+      }
+    },
+    "layout": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "widgets": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "files": {
+              "default": true,
+              "type": "boolean"
+            },
+            "search": {
+              "default": true,
+              "type": "boolean"
+            },
+            "vcs": {
+              "default": true,
+              "type": "boolean"
+            },
+            "debug": {
+              "default": true,
+              "type": "boolean"
+            },
+            "testing": {
+              "default": true,
+              "type": "boolean"
+            },
+            "outline": {
+              "default": true,
+              "type": "boolean"
+            },
+            "aiChat": {
+              "default": true,
+              "type": "boolean"
+            }
+          }
+        },
+        "containers": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
+        "views": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "openFiles": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "submission": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "filename": {
+          "default": "submission.zip",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

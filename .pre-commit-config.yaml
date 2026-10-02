@@ -1,0 +1,17 @@
+repos:
+  - repo: local
+    hooks:
+      - id: pnpm
+        name: Update pnpm-lock.yaml
+        entry: pnpm install
+        language: system
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: config-schema
+        name: Update config schema
+        entry: pnpm run config:schema
+        language: system
+        files: theia-extensions/yukibana/src/common/yukibana-config.ts
+        pass_filenames: false
