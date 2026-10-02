@@ -1,0 +1,35 @@
+{
+  "name": "yukibana-submission-ext",
+  "keywords": [
+    "theia-extension"
+  ],
+  "version": "0.0.0",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@theia/core": "~1.75.0",
+    "@theia/workspace": "~1.75.0",
+    "archiver": "8.0.0",
+    "fast-glob": "3.3.3",
+    "yukibana-ext": "workspace:0.0.0"
+  },
+  "devDependencies": {
+    "@types/archiver": "8.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "~5.4.5"
+  },
+  "scripts": {
+    "prepare": "pnpm run clean && pnpm run build",
+    "clean": "rimraf lib",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "theiaExtensions": [
+    {
+      "frontend": "lib/browser/submission-frontend-module",
+      "backend": "lib/node/submission-backend-module"
+    }
+  ]
+}

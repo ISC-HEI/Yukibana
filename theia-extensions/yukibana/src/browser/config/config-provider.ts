@@ -7,8 +7,10 @@ import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model';
 import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
 import { loadConfig, YukibanaConfig } from '../../common/yukibana-config';
-import { UserConfigURI } from './config-constants';
+
+export const YUKIBANA_CONFIG_FILENAME = 'yukibana.cfg';
 
 /**
  * Provider which handles reading and parsing the config file
@@ -22,16 +24,21 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
     readonly onConfigChanged = this.onConfigChangeEmitter.event;
 
     private _config: YukibanaConfig = loadConfig({});
+    private _configURI: URI = new URI(YUKIBANA_CONFIG_FILENAME);
 
     constructor(
         @inject(MonacoTextModelService) protected readonly textModelService: MonacoTextModelService,
-        @inject(UserConfigURI) protected readonly USER_CONFIG_URI: URI,
+        @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService,
         @inject(ILogger) @named('yukibana:ConfigProvider')
         protected readonly logger: ILogger
     ) { }
 
     async onStart(): Promise<void> {
-        const reference = await this.textModelService.createModelReference(this.USER_CONFIG_URI);
+        const roots = await this.workspaceService.roots;
+        const root = roots[0];
+        this._configURI = root?.resource.resolve(YUKIBANA_CONFIG_FILENAME);
+
+        const reference = await this.textModelService.createModelReference(this._configURI);
         this.model = reference.object;
         this.toDispose.push(reference);
         this.toDispose.push(Disposable.create(() => this.model = undefined));
@@ -63,7 +70,7 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
                 this.logger.debug('Model is invalid');
             }
         } catch (e) {
-            this.logger.error(`Failed to load Yukibana configuration from '${this.USER_CONFIG_URI}': ${e}`, e);
+            this.logger.error(`Failed to load Yukibana configuration from '${this._configURI}': ${e}`, e);
         } finally {
             this.logger.debug('Configuration loaded');
             this.onConfigChangeEmitter.fire(this._config);

@@ -23,6 +23,11 @@ const ConfigSchema = z.object({
         views: z.record(z.string(), z.boolean()).default({}),
     }).prefault({}),
     openFiles: z.array(z.string()).default([]),
+    submission: z.object({
+        include: z.array(z.string()).optional(),
+        exclude: z.array(z.string()).optional(),
+        filename: z.string().default('submission.zip')
+    }).prefault({})
 }).prefault({});
 
 export type YukibanaConfig = z.infer<typeof ConfigSchema>;
@@ -36,4 +41,10 @@ export function loadConfig(raw: object): YukibanaConfig {
         }
         throw e;
     }
+}
+
+export function getJSONSchema(): object {
+    return z.toJSONSchema(ConfigSchema, {
+        io: 'input',
+    });
 }
