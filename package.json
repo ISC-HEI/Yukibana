@@ -30,11 +30,13 @@
     "electron": "pnpm run --filter yukibana-electron-app",
     "browser": "pnpm run --filter yukibana-browser-app",
     "tests": "pnpm run --filter yukibana-tests",
-    "dep:all": "ts-node scripts/dep-all.ts"
+    "dep:all": "ts-node scripts/dep-all.ts",
+    "config:schema": "ts-node scripts/export-config-schema.ts"
   },
   "devDependencies": {
     "@eclipse-dash/nodejs-wrapper": "^0.0.1",
     "@theia/cli": "~1.75.0",
+    "@types/node": "26.6.3",
     "@types/yargs": "^17.0.35",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.33.0",

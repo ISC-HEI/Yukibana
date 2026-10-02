@@ -42,3 +42,9 @@ export function loadConfig(raw: object): YukibanaConfig {
         throw e;
     }
 }
+
+export function getJSONSchema(): object {
+    return z.toJSONSchema(ConfigSchema, {
+        io: 'input',
+    });
+}
