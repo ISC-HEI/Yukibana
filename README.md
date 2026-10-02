@@ -1,5 +1,8 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/ISC-HEI/yukibana/main/electron-app/resources/YukibanaSplash.svg?sanitize=true" alt="Yukibana Logo" width="200">
+    <img
+        src="https://raw.githubusercontent.com/ISC-HEI/yukibana/main/electron-app/resources/YukibanaSplash.svg?sanitize=true"
+        alt="Yukibana Logo"
+        width="200" />
     <h2>Yukibana</h2>
 </div>
 

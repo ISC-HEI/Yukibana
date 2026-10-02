@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - [Node.js v24+](https://nodejs.org/en/download/)
-- [Yarn](https://yarnpkg.com/getting-started/install)
+- [pnpm](https://pnpm.io/installation)
 - [Python 3](https://docs.python.org/3/using/index.html)
 
 Some additional tools and libraries are needed depending on your platform,
@@ -26,7 +26,7 @@ see Theia's [own documentation](https://github.com/eclipse-theia/theia/blob/mast
 3. Download dependencies
 
    ```bash
-   yarn
+   pnpm install
    ```
 
 ## Building the app
@@ -37,25 +37,29 @@ Here are some of the most useful ones:
 
 ### General
 
-- `yarn`: install dependencies
-- `yarn lint`: run the linter on the whole project
-- `yarn lint:fix`: run the linter on the whole project and apply fixes
-- `yarn start:electron` or `yarn electron start`: (after building) start the electron application
-- `yarn start:browser` or `yarn browser start`: (after building) start the browser application
+- `pnpm install`: install dependencies
+- `pnpm run lint`: run the linter on the whole project
+- `pnpm run lint:fix`: run the linter on the whole project and apply fixes
+- `pnpm run start:electron` or `pnpm run electron start`:
+  (after building) start the electron application
+- `pnpm run start:browser` or `pnpm run browser start`:
+  (after building) start the browser application
 
 ### Development
 
-- `yarn build:dev`: build extensions and both apps in development mode
-- `yarn download:plugins`: (only once and after changing `theiaPlugins` in a `package.json`) download bundled plugins specified in the `theiaPlugins` section of `package.json`
-- `yarn package:applications:preview`:
+- `pnpm run build:dev`: build extensions and both apps in development mode
+- `pnpm run download:plugins`:
+  (only once and after changing `theiaPlugins` in a `package.json`) download
+  bundled plugins specified in the `theiaPlugins` section of `package.json`
+- `pnpm run package:applications:preview`:
   (optional) package the electron application in preview mode\
   The packaged application will be located in `electron-app/dist`
 
 ### Production
 
-- `yarn build`: build extensions and both apps in production mode
-- `yarn download:plugins`: see [Development](#development)
-- `yarn package:applications`:
+- `pnpm run build`: build extensions and both apps in production mode
+- `pnpm run download:plugins`: see [Development](#development)
+- `pnpm run package:applications`:
   (optional) package the electron application in production mode\
   The packaged application will be located in `electron-app/dist`
 
@@ -76,6 +80,8 @@ The top-level project also provides general commands.
 Extensions that should be bundled with the IDE as builtin extensions
 must be added as dependencies of the application (both [browser-app](browser-app)
 and [electron-app](electron-app)).
+
+More information can be found in [docs/architecture.md](docs/architecture.md).
 
 ## Troubleshooting
 
