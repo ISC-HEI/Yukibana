@@ -102,7 +102,8 @@ Yukibana
 └── theia-extensions        
     ├── yukibana            # Main extension, where customization features are implemented
     ├── yukibana-launcher   # Extension to create .desktop file and CLI command
-    └── yukibana-product    # Extension to set window icon on Linux
+    ├── yukibana-product    # Extension to set window icon on Linux
+    └── yukibana-submission # Extension to manage submission (preparation and upload)
 ```
 
 ### Configuration
