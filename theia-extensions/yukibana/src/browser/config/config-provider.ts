@@ -42,17 +42,21 @@ export class ConfigProvider implements FrontendApplicationContribution {
         this.toDisposeOnWorkspaceChanged.dispose();
         const root = this.workspaceService.tryGetRoots()[0]?.resource;
         if (!root) {
-            this.apply(undefined, loadConfig({}));
+            this.applyDefault();
             return;
         }
-
         this._configURI = root.resolve(YUKIBANA_CONFIG_FILENAME);
+        if (!await this.files.exists(this._configURI)) {
+            this.applyDefault();
+            return;
+        }
         const read = async () => {
             try {
                 const { value } = await this.files.read(this._configURI);
                 this.apply(root, loadConfig(JSON.parse(value)));
             } catch (e) {
                 this.logger.error(`Failed to load Yukibana configuration from '${this._configURI}: ${e}`, e);
+                this.applyDefault();
             }
         };
         this.toDisposeOnWorkspaceChanged.push(this.files.watch(this._configURI));
@@ -75,6 +79,10 @@ export class ConfigProvider implements FrontendApplicationContribution {
     }
 
     protected readonly _ready = new Deferred<YukibanaConfig>();
+
+    protected applyDefault(): void {
+        this.apply(undefined, loadConfig({}));
+    }
 
     protected apply(root: URI | undefined, config: YukibanaConfig): void {
         this._config = config;
