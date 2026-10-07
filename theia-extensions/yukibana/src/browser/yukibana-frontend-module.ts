@@ -5,6 +5,7 @@ import { AIIdeActivationServiceImpl } from '@theia/ai-ide/lib/browser/ai-ide-act
 import { FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { bindContribution, CommandContribution, FilterContribution, MenuContribution } from '@theia/core/lib/common';
 import { ContainerModule } from '@theia/core/shared/inversify';
+import { RemoteFileSystemProvider } from '@theia/filesystem/lib/common/remote-file-system-provider';
 import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
 import { ProblemManager } from '@theia/markers/lib/browser/problem/problem-manager';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
@@ -16,6 +17,7 @@ import { YukibanaFilterContribution } from './yukibana-filter-contribution';
 import { bindLayout } from './yukibana-layout-contribution';
 import { YukibanaProblemContributioun } from './yukibana-problem-contribution';
 import { YukibanaProblemManager } from './yukibana-problem-manager';
+import { YukibanaRemoteFileSystemProvider } from './yukibana-remote-file-system-provider';
 import { SuggestionsContribution } from './yukibana-suggestions-contribution';
 import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
 
@@ -50,4 +52,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     bind(YukibanaAIIdeActivationService).toSelf().inSingletonScope();
     rebind(AIIdeActivationServiceImpl).toService(YukibanaAIIdeActivationService);
+
+    bind(YukibanaRemoteFileSystemProvider).toSelf().inSingletonScope();
+    rebind(RemoteFileSystemProvider).toService(YukibanaRemoteFileSystemProvider);
 });
