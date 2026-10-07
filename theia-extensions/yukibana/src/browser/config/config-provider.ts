@@ -9,6 +9,7 @@ import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model
 import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
 import { loadConfig, YukibanaConfig } from '../../common/yukibana-config';
+import { FileStat } from '@theia/filesystem/lib/common/files';
 
 export const YUKIBANA_CONFIG_FILENAME = 'yukibana.cfg';
 
@@ -34,10 +35,17 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
     ) { }
 
     async onStart(): Promise<void> {
-        const roots = await this.workspaceService.roots;
-        const root = roots[0];
-        this._configURI = root?.resource.resolve(YUKIBANA_CONFIG_FILENAME);
+        this.workspaceService.onWorkspaceChanged(e => this.onWorkspaceChanged(e));
+    }
 
+    async onWorkspaceChanged(event: FileStat[]): Promise<void> {
+        const roots = await this.workspaceService.roots;
+        if (roots.length === 0) {
+            this._ready.resolve(this._config);
+            return;
+        }
+        const root = roots[0];
+        this._configURI = root.resource.resolve(YUKIBANA_CONFIG_FILENAME);
         const reference = await this.textModelService.createModelReference(this._configURI);
         this.model = reference.object;
         this.toDispose.push(reference);
