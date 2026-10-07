@@ -8,6 +8,7 @@ import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
 import { loadConfig, YukibanaConfig } from '../../common/yukibana-config';
+import { ReadOnlyPolicy } from './read-only-policy';
 
 export const YUKIBANA_CONFIG_FILENAME = 'yukibana.cfg';
 
@@ -26,6 +27,7 @@ export class ConfigProvider implements FrontendApplicationContribution {
     constructor(
         @inject(FileService) protected readonly files: FileService,
         @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService,
+        @inject(ReadOnlyPolicy) protected readonly readOnlyPolicy: ReadOnlyPolicy,
         @inject(ILogger) @named('yukibana:ConfigProvider')
         protected readonly logger: ILogger
     ) { }
@@ -76,6 +78,7 @@ export class ConfigProvider implements FrontendApplicationContribution {
 
     protected apply(root: URI | undefined, config: YukibanaConfig): void {
         this._config = config;
+        this.readOnlyPolicy.update(root, config.readOnly);
         this.logger.info('Configuration loaded');
         this.onConfigChangeEmitter.fire(config);
         this._ready.resolve(this._config);

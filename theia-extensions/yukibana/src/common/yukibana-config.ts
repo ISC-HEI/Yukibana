@@ -23,6 +23,7 @@ const ConfigSchema = z.object({
         views: z.record(z.string(), z.boolean()).default({}),
     }).prefault({}),
     openFiles: z.array(z.string()).default([]),
+    readOnly: z.array(z.string()).default([]),
     submission: z.object({
         include: z.array(z.string()).optional(),
         exclude: z.array(z.string()).optional(),
