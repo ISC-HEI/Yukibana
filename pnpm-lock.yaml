@@ -508,9 +508,6 @@ importers:
       '@theia/markers':
         specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
-      '@theia/monaco':
-        specifier: ~1.75.0
-        version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@theia/monaco-editor-core':
         specifier: ^1.108.201
         version: 1.108.201

@@ -6,8 +6,8 @@
   },
   "packageManager": "pnpm@12.8.1",
   "scripts": {
-    "build:browser": "pnpm run build:extensions && pnpm run --filter yukibana-browser-app run bundle",
-    "build:electron": "pnpm run build:extensions && pnpm run --filter yukibana-electron-app run bundle",
+    "build:browser": "pnpm run build:extensions && pnpm run --filter yukibana-browser-app bundle",
+    "build:electron": "pnpm run build:extensions && pnpm run --filter yukibana-electron-app bundle",
     "build": "pnpm run build:extensions && pnpm run build:applications",
     "build:dev": "pnpm run build:extensions && pnpm run build:applications:dev",
     "build:applications": "lerna run --scope=\"yukibana*app\" --ignore=\"yukibana-next*\" build:prod --concurrency 1",
