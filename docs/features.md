@@ -16,6 +16,7 @@ their implementations are located.
 - [Squiggles disabling](#squiggles-disabling)
 - [AI Chatbot disabling](#ai-chatbot-disabling)
 - [Submission preparation](#submission-preparation)
+- [Readonly files](#readonly-files)
 
 </details>
 
@@ -101,3 +102,14 @@ and [yukibana-submission/src/browser/submission-fronted-module.ts](../theia-exte
 Additionally, translations for the action and feedback message are provided by
 a `LocalizationContribution` in [yukibana-submission/src/node/submission-localization-contribution.ts](../theia-extensions/yukibana-submission/src/node/submission-localization-contribution.ts).
 Translations are defined in [yukibana-submission/i18n/](../theia-extensions/yukibana-submission/i18n/).
+
+## Readonly files
+
+Some files can be configured to open in readonly mode. This feature is purely UX
+because as long as the files are on the student's device, they will be able
+to modify them. A hard check shall be implemented in the backend to verify
+that submitted files respect this parameter.
+
+For this feature, we implement a custom `YukibanaRemoteFileSystemProvider` in [yukibana/src/browser/yukibana-remote-file-system-provider.ts](../theia-extensions/yukibana/src/browser/yukibana-remote-file-system-provider.ts)
+and rebind the default `RemoteFileSystemProvider`. Our custom provider prepends
+file accesses with a check to see whether the files are defined as readonly.
