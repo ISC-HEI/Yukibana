@@ -1,14 +1,14 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { Disposable, DisposableCollection, Emitter, ILogger, URI } from '@theia/core';
+import { DisposableCollection, Emitter, ILogger, URI } from '@theia/core';
 import { FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
-import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model';
-import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
 import { loadConfig, YukibanaConfig } from '../../common/yukibana-config';
+import { ReadOnlyPolicy } from './read-only-policy';
 
 export const YUKIBANA_CONFIG_FILENAME = 'yukibana.cfg';
 
@@ -16,10 +16,8 @@ export const YUKIBANA_CONFIG_FILENAME = 'yukibana.cfg';
  * Provider which handles reading and parsing the config file
  */
 @injectable()
-export class ConfigProvider implements FrontendApplicationContribution, Disposable {
-    protected model: MonacoEditorModel | undefined;
-    protected toDispose = new DisposableCollection();
-
+export class ConfigProvider implements FrontendApplicationContribution {
+    protected readonly toDisposeOnWorkspaceChanged = new DisposableCollection();
     private readonly onConfigChangeEmitter = new Emitter<YukibanaConfig>();
     readonly onConfigChanged = this.onConfigChangeEmitter.event;
 
@@ -27,24 +25,49 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
     private _configURI: URI = new URI(YUKIBANA_CONFIG_FILENAME);
 
     constructor(
-        @inject(MonacoTextModelService) protected readonly textModelService: MonacoTextModelService,
+        @inject(FileService) protected readonly files: FileService,
         @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService,
+        @inject(ReadOnlyPolicy) protected readonly readOnlyPolicy: ReadOnlyPolicy,
         @inject(ILogger) @named('yukibana:ConfigProvider')
         protected readonly logger: ILogger
     ) { }
 
     async onStart(): Promise<void> {
-        const roots = await this.workspaceService.roots;
-        const root = roots[0];
-        this._configURI = root?.resource.resolve(YUKIBANA_CONFIG_FILENAME);
+        await this.workspaceService.ready;
+        await this.reload();
+        this.workspaceService.onWorkspaceChanged(() => this.reload());
+    }
 
-        const reference = await this.textModelService.createModelReference(this._configURI);
-        this.model = reference.object;
-        this.toDispose.push(reference);
-        this.toDispose.push(Disposable.create(() => this.model = undefined));
-        this.readConfiguration();
-        this.model.onDidChangeContent(e => this.readConfiguration());
-        this._ready.resolve(this._config);
+    protected async reload(): Promise<void> {
+        this.toDisposeOnWorkspaceChanged.dispose();
+        const root = this.workspaceService.tryGetRoots()[0]?.resource;
+        if (!root) {
+            this.applyDefault();
+            return;
+        }
+        this._configURI = root.resolve(YUKIBANA_CONFIG_FILENAME);
+        if (!await this.files.exists(this._configURI)) {
+            this.applyDefault();
+            return;
+        }
+        const read = async () => {
+            try {
+                const { value } = await this.files.read(this._configURI);
+                this.apply(root, loadConfig(JSON.parse(value)));
+            } catch (e) {
+                this.logger.error(`Failed to load Yukibana configuration from '${this._configURI}: ${e}`, e);
+                this.applyDefault();
+            }
+        };
+        this.toDisposeOnWorkspaceChanged.push(this.files.watch(this._configURI));
+        this.toDisposeOnWorkspaceChanged.push(
+            this.files.onDidFilesChange(e => {
+                if (e.contains(this._configURI)) {
+                    read();
+                }
+            })
+        );
+        await read();
     }
 
     get ready(): Promise<YukibanaConfig> {
@@ -57,37 +80,15 @@ export class ConfigProvider implements FrontendApplicationContribution, Disposab
 
     protected readonly _ready = new Deferred<YukibanaConfig>();
 
-    protected readConfiguration(): void {
-        this.logger.debug('Loading configuration');
-        if (!this.model || this.model.dirty) {
-            return;
-        }
-        try {
-            if (this.model.valid) {
-                const content = this.model.getText();
-                this._config = this.parseContent(content);
-            } else {
-                this.logger.debug('Model is invalid');
-            }
-        } catch (e) {
-            this.logger.error(`Failed to load Yukibana configuration from '${this._configURI}': ${e}`, e);
-        } finally {
-            this.logger.debug('Configuration loaded');
-            this.onConfigChangeEmitter.fire(this._config);
-        }
+    protected applyDefault(): void {
+        this.apply(undefined, loadConfig({}));
     }
 
-    protected parseContent(fileContent: string): YukibanaConfig {
-        let data;
-        try {
-            data = JSON.parse(fileContent);
-        } catch (e) {
-            throw new Error(`Malformed JSON: ${e}`);
-        }
-        return loadConfig(data);
-    }
-
-    dispose(): void {
-        this.toDispose.dispose();
+    protected apply(root: URI | undefined, config: YukibanaConfig): void {
+        this._config = config;
+        this.readOnlyPolicy.update(root, config.readOnly);
+        this.logger.info('Configuration loaded');
+        this.onConfigChangeEmitter.fire(config);
+        this._ready.resolve(this._config);
     }
 }

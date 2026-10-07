@@ -13,8 +13,8 @@
     "@theia/ai-ide": "~1.75.0",
     "@theia/core": "~1.75.0",
     "@theia/debug": "~1.75.0",
+    "@theia/filesystem": "~1.75.0",
     "@theia/markers": "~1.75.0",
-    "@theia/monaco": "~1.75.0",
     "@theia/monaco-editor-core": "^1.108.201",
     "@theia/navigator": "~1.75.0",
     "@theia/outline-view": "~1.75.0",
@@ -27,6 +27,7 @@
     "zod": "^4.6"
   },
   "devDependencies": {
+    "@types/micromatch": "4.0.10",
     "rimraf": "^5.0.0",
     "typescript": "~5.4.5"
   },

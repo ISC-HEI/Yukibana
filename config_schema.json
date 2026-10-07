@@ -88,6 +88,13 @@
         "type": "string"
       }
     },
+    "readOnly": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "submission": {
       "default": {},
       "type": "object",
