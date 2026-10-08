@@ -4,11 +4,12 @@
 import { ILogger } from '@theia/core';
 import { FileUri } from '@theia/core/lib/node';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
-import { ZipArchive } from 'archiver';
+import { TarArchive } from 'archiver';
 import * as fs from 'fs';
 import ignore, { Ignore } from 'ignore';
 import * as os from 'os';
 import * as path from 'path';
+import * as zlib from 'zlib';
 import { SubmissionOptions, SubmissionService } from './submission-protocol';
 const fg = require('fast-glob');
 
@@ -53,7 +54,7 @@ export class SubmissionServiceImpl implements SubmissionService {
         const root = FileUri.fsPath(options.workspaceUri);
         const out = !!options.outputUri
             ? FileUri.fsPath(options.outputUri)
-            : path.join(os.tmpdir(), `yukibana-${Date.now()}.zip`);
+            : path.join(os.tmpdir(), `yukibana-${Date.now()}.tar.zst`);
         const files = await this.listFiles(root, out, options);
 
         await this.createArchive(root, out, files);
@@ -85,10 +86,10 @@ export class SubmissionServiceImpl implements SubmissionService {
     protected async createArchive(root: string, out: string, files: string[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const output = fs.createWriteStream(out);
-            const archive = new ZipArchive();
+            const archive = new TarArchive();
             output.on('close', () => resolve());
             archive.on('error', reject);
-            archive.pipe(output);
+            archive.pipe(zlib.createZstdCompress()).pipe(output);
             for (const f of files) {
                 archive.file(path.join(root, f), { name: f });
             }

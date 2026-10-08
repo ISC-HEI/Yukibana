@@ -14,7 +14,8 @@
     "archiver": "8.0.0",
     "fast-glob": "3.3.3",
     "ignore": "7.0.12",
-    "yukibana-ext": "workspace:0.0.0"
+    "yukibana-ext": "workspace:0.0.0",
+    "zlib": "1.0.5"
   },
   "devDependencies": {
     "@types/archiver": "8.0.0",
