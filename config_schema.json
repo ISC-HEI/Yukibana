@@ -115,6 +115,10 @@
             "type": "string"
           }
         },
+        "respectGitignore": {
+          "default": true,
+          "type": "boolean"
+        },
         "filename": {
           "default": "submission.zip",
           "type": "string"

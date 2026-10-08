@@ -9,6 +9,7 @@ export interface SubmissionOptions {
     include?: string[];
     exclude?: string[];
     outputUri?: string;
+    respectGitignore?: boolean;
 }
 
 export interface SubmissionService {
