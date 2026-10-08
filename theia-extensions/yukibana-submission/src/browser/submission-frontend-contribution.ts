@@ -31,6 +31,7 @@ export class PrepareSubmissionContribution implements CommandContribution {
                     include: config.submission.include,
                     exclude: config.submission.exclude,
                     outputUri: root.resolve(config.submission.filename).toString(),
+                    respectGitignore: config.submission.respectGitignore,
                 };
                 const { outputUri, fileCount } = await this.submissionService.prepareSubmission(options);
                 const message = nls.localize('yukibana/submission/submissionReady', 'Submission ready at {0} ({1} file(s))', outputUri, fileCount);
