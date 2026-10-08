@@ -13,10 +13,16 @@
     "@theia/workspace": "~1.75.0",
     "archiver": "8.0.0",
     "fast-glob": "3.3.3",
-    "yukibana-ext": "workspace:0.0.0"
+    "ignore": "7.0.12",
+    "yukibana-ext": "workspace:0.0.0",
+    "zlib": "1.0.5"
   },
   "devDependencies": {
     "@types/archiver": "8.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "rimraf": "^5.0.0",
     "typescript": "~5.4.5"
   },
@@ -31,5 +37,11 @@
       "frontend": "lib/browser/submission-frontend-module",
       "backend": "lib/node/submission-backend-module"
     }
-  ]
+  ],
+  "peerDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  }
 }

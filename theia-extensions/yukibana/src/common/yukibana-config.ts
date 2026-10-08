@@ -29,7 +29,8 @@ const ConfigSchema = z.object({
     submission: z.object({
         include: z.array(z.string()).optional(),
         exclude: z.array(z.string()).optional(),
-        filename: z.string().default('submission.zip')
+        respectGitignore: z.boolean().default(true),
+        filename: z.string().default('submission.tar.zst')
     }).prefault({})
 }).prefault({});
 

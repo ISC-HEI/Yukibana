@@ -5,7 +5,8 @@ import { Command, CommandContribution, CommandRegistry, CommandService, MessageS
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
 import { ConfigProvider } from 'yukibana-ext/lib/browser/config/config-provider';
-import { SubmissionOptions, SubmissionService } from '../node/submission-protocol';
+import { SubmissionOptions, SubmissionService } from '../common/submission-protocol';
+import { SubmissionSummaryDialog } from './submission-summary-dialog';
 
 export const PrepareSubmissionCommand: Command = Command.toLocalizedCommand({
     id: 'yukibana.prepareSubmission',
@@ -31,7 +32,13 @@ export class PrepareSubmissionContribution implements CommandContribution {
                     include: config.submission.include,
                     exclude: config.submission.exclude,
                     outputUri: root.resolve(config.submission.filename).toString(),
+                    respectGitignore: config.submission.respectGitignore,
                 };
+                const preview = await this.submissionService.previewSubmission(options);
+                const confirmed = await new SubmissionSummaryDialog(preview).open();
+                if (!confirmed) {
+                    return;
+                }
                 const { outputUri, fileCount } = await this.submissionService.prepareSubmission(options);
                 const message = nls.localize('yukibana/submission/submissionReady', 'Submission ready at {0} ({1} file(s))', outputUri, fileCount);
                 this.messageService.info(
