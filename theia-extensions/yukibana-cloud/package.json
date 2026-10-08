@@ -1,0 +1,31 @@
+{
+  "name": "yukibana-cloud-ext",
+  "keywords": [
+    "theia-extension"
+  ],
+  "version": "0.0.0",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@theia/core": "~1.75.0",
+    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#path:/cli"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.0",
+    "typescript": "~5.4.5"
+  },
+  "scripts": {
+    "prepare": "pnpm run clean && pnpm run build",
+    "clean": "rimraf lib",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "theiaExtensions": [
+    {
+      "frontend": "lib/browser/cloud-frontend-module",
+      "backend": "lib/node/cloud-backend-module"
+    }
+  ]
+}

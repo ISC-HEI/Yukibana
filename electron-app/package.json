@@ -45,7 +45,8 @@
     "yukibana-ext": "workspace:0.0.0",
     "yukibana-launcher-ext": "workspace:0.0.0",
     "yukibana-product-ext": "workspace:0.0.0",
-    "yukibana-submission-ext": "workspace:0.0.0"
+    "yukibana-submission-ext": "workspace:0.0.0",
+    "yukibana-cloud-ext": "workspace:0.0.0"
   },
   "devDependencies": {
     "@theia/bundle-plugin": "~1.75.0",
