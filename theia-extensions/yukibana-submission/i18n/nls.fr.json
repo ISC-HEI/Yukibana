@@ -2,6 +2,11 @@
   "yukibana": {
     "submission": {
       "prepareSubmission": "Préparer la remise",
+      "summaryTitle": "Résumé de votre tentative",
+      "summaryHeader": "Êtes-vous prêt·e à remettre votre travail ?",
+      "summaryFileCount": "Nombre de fichiers",
+      "summaryTotalSize": "Taille totale",
+      "summaryFiles": "Fichiers inclus",
       "submissionReady": "Exercice préparé dans {0} ({1} fichier(s))"
     }
   }
