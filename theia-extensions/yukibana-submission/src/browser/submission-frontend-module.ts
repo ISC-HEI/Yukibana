@@ -1,10 +1,12 @@
 /**
  * SPDX-License-Identifier: MIT
  */
+import '../../src/browser/style/index.css';
+
 import { CommandContribution } from '@theia/core';
 import { ServiceConnectionProvider } from '@theia/core/lib/browser';
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { SubmissionService, submissionServicePath } from '../node/submission-protocol';
+import { SubmissionService, submissionServicePath } from '../common/submission-protocol';
 import { PrepareSubmissionContribution } from './submission-frontend-contribution';
 
 export default new ContainerModule(bind => {

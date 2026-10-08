@@ -12,6 +12,17 @@ export interface SubmissionOptions {
     respectGitignore?: boolean;
 }
 
+export interface SubmissionEntry {
+    path: string;
+    size: number;
+}
+
+export interface SubmissionPreview {
+    entries: SubmissionEntry[];
+    totalSize: number;
+}
+
 export interface SubmissionService {
+    previewSubmission(options: SubmissionOptions): Promise<SubmissionPreview>;
     prepareSubmission(options: SubmissionOptions): Promise<{ outputUri: string, fileCount: number }>;
 }

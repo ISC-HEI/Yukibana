@@ -1,0 +1,20 @@
+.yukibana-submission-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--theia-code-font-family);
+    font-size: var(--theia-code-font-size);
+}
+
+.yukibana-submission-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+}
+
+.yukibana-submission-list .size {
+    opacity: 0.6;
+    margin-left: 1em;
+}
