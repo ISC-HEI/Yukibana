@@ -3,6 +3,10 @@
   "default": {},
   "type": "object",
   "properties": {
+    "assignmentFile": {
+      "default": "ASSIGNMENT.md",
+      "type": "string"
+    },
     "features": {
       "default": {},
       "type": "object",

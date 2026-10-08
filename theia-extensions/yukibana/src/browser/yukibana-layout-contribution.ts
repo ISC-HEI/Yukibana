@@ -16,6 +16,8 @@ import { SearchInWorkspaceFrontendContribution } from '@theia/search-in-workspac
 import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { YukibanaConfig } from '../common/yukibana-config';
+import { AssignmentPaneContribution } from './assignment/assignment-pane-contribution';
+import { AssignmentResolver } from './assignment/assignment-resolver';
 import { ConfigProvider } from './config/config-provider';
 import { YukibanaPluginViewRegistry } from './yukibana-plugin-view-registry';
 
@@ -63,10 +65,18 @@ export class YukibanaLayoutContribution implements FrontendApplicationContributi
         @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService,
         @inject(FileService) protected readonly fileService: FileService,
         @inject(EditorManager) protected readonly editorManager: EditorManager,
+        @inject(AssignmentPaneContribution) protected readonly assignmentPane: AssignmentPaneContribution,
+        @inject(AssignmentResolver) protected readonly assignmentResolver: AssignmentResolver,
     ) { }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
         this.logger.debug('Initializing layout');
+        const assignmentURI = await this.assignmentResolver.resolve();
+        if (!!assignmentURI) {
+            if (await this.fileService.exists(assignmentURI)) {
+                this.assignmentPane.openView({ activate: true, reveal: true });
+            }
+        }
     }
 
     async onDidInitializeLayout(app: FrontendApplication): Promise<void> {

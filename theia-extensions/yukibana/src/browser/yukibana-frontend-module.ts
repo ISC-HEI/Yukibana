@@ -2,13 +2,16 @@
  * SPDX-License-Identifier: MIT
  */
 import { AIIdeActivationServiceImpl } from '@theia/ai-ide/lib/browser/ai-ide-activation-service';
-import { FrontendApplicationContribution } from '@theia/core/lib/browser';
+import { ApplicationShell, ApplicationShellOptions, bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { bindContribution, CommandContribution, FilterContribution, MenuContribution } from '@theia/core/lib/common';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { RemoteFileSystemProvider } from '@theia/filesystem/lib/common/remote-file-system-provider';
 import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
 import { ProblemManager } from '@theia/markers/lib/browser/problem/problem-manager';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
+import { AssignmentPaneContribution } from './assignment/assignment-pane-contribution';
+import { AssignmentPaneWidget } from './assignment/assignment-pane-widget';
+import { AssignmentResolver } from './assignment/assignment-resolver';
 import { bindConfig } from './config/config-contribution';
 import { YukibanaAIIdeActivationService } from './yukibana-ai-ide-activation-service';
 import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
@@ -55,4 +58,27 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     bind(YukibanaRemoteFileSystemProvider).toSelf().inSingletonScope();
     rebind(RemoteFileSystemProvider).toService(YukibanaRemoteFileSystemProvider);
+
+    bind(AssignmentResolver).toSelf().inSingletonScope();
+    bindViewContribution(bind, AssignmentPaneContribution);
+    bind(FrontendApplicationContribution).toService(AssignmentPaneContribution);
+
+    bind(AssignmentPaneWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: AssignmentPaneWidget.ID,
+        createWidget: () => ctx.container.get(AssignmentPaneWidget)
+    })).inSingletonScope();
+
+    const shellOptions = {
+        ...ApplicationShell.DEFAULT_OPTIONS,
+        leftPanel: {
+            ...ApplicationShell.DEFAULT_OPTIONS.leftPanel,
+            initialSizeRatio: 0.3
+        }
+    };
+    if (isBound(ApplicationShellOptions)) {
+        rebind(ApplicationShellOptions).toConstantValue(shellOptions);
+    } else {
+        bind(ApplicationShellOptions).toConstantValue(shellOptions);
+    }
 });

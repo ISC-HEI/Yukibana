@@ -13,6 +13,7 @@
     "@theia/ai-ide": "~1.75.0",
     "@theia/core": "~1.75.0",
     "@theia/debug": "~1.75.0",
+    "@theia/editor": "~1.75.0",
     "@theia/filesystem": "~1.75.0",
     "@theia/markers": "~1.75.0",
     "@theia/monaco-editor-core": "^1.108.201",

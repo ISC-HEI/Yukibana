@@ -17,6 +17,7 @@ their implementations are located.
 - [AI Chatbot disabling](#ai-chatbot-disabling)
 - [Submission preparation](#submission-preparation)
 - [Readonly files](#readonly-files)
+- [Assignment panel](#assignment-panel)
 
 </details>
 
@@ -113,3 +114,11 @@ that submitted files respect this parameter.
 For this feature, we implement a custom `YukibanaRemoteFileSystemProvider` in [yukibana/src/browser/yukibana-remote-file-system-provider.ts](../theia-extensions/yukibana/src/browser/yukibana-remote-file-system-provider.ts)
 and rebind the default `RemoteFileSystemProvider`. Our custom provider prepends
 file accesses with a check to see whether the files are defined as readonly.
+
+## Assignment panel
+
+A default markdown assignment description can be automatically shown through
+the assignment panel. This widget is implemented in [theia-extensions/yukibana/src/browser/assignment/assignment-pane-widget.ts](../theia-extensions/yukibana/src/browser/assignment/assignment-pane-widget.ts).
+
+A simple `AssignmentResolver` provides a dynamic URI to the assignment file,
+in [theia-extensions/yukibana/src/browser/assignment/assignment-resolver.ts](../theia-extensions/yukibana/src/browser/assignment/assignment-resolver.ts).

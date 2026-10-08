@@ -3,7 +3,9 @@
  */
 import { z } from 'zod';
 
+// TODO: extract constant strings
 const ConfigSchema = z.object({
+    assignmentFile: z.string().default('ASSIGNMENT.md'),
     features: z.object({
         codeSuggestions: z.boolean().default(true),
         squiggles: z.boolean().default(true),
