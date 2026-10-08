@@ -1,12 +1,23 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { ServiceConnectionProvider } from '@theia/core/lib/browser';
+import { CommandContribution } from '@theia/core';
+import { RemoteConnectionProvider, ServiceConnectionProvider } from '@theia/core/lib/browser';
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { CloudService, cloudServicePath } from '../common/cloud-protocol';
+import { CloudAuth, cloudAuthPath } from '../common/cloud-protocol';
+import { AuthClientImpl } from './cloud-auth-client';
+import { LoginCommandContribution } from './command-contribution';
 
 export default new ContainerModule(bind => {
-    bind(CloudService).toDynamicValue(
-        ctx => ServiceConnectionProvider.createProxy<CloudService>(ctx.container, cloudServicePath)
+    bind(AuthClientImpl).toSelf().inSingletonScope();
+
+    bind(CloudAuth).toDynamicValue(
+        ctx => {
+            const provider = ctx.container.get<ServiceConnectionProvider>(RemoteConnectionProvider);
+            const client = ctx.container.get(AuthClientImpl);
+            return provider.createProxy<CloudAuth>(cloudAuthPath, client);
+        }
     ).inSingletonScope();
+
+    bind(CommandContribution).to(LoginCommandContribution);
 });
