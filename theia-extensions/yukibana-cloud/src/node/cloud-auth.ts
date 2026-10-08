@@ -4,10 +4,14 @@
 import { inject } from '@theia/core/shared/inversify';
 import { AuthClient, CloudAuth, LoginResult } from '../common/cloud-protocol';
 import { CloudService } from './cloud-service';
+import { Emitter } from '@theia/core';
 
 export class CloudAuthImpl implements CloudAuth {
     @inject(CloudService) protected readonly service!: CloudService;
     private client?: AuthClient;
+
+    private readonly onLoginChangeEmitter = new Emitter<boolean>();
+    readonly onLoginChanged = this.onLoginChangeEmitter.event;
 
     setClient(client?: AuthClient): void {
         this.client = client;

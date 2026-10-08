@@ -10,6 +10,7 @@ export interface CloudAuth {
     login(): Promise<LoginResult>
     logout(): Promise<void>
     isLoggedIn(): Promise<boolean>
+    onLoginChanged(listener: (loggedIn: boolean) => void): void
 }
 
 export interface AuthClient {
