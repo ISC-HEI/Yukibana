@@ -10,7 +10,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service
 import { loadConfig, YukibanaConfig } from '../../common/yukibana-config';
 import { ReadOnlyPolicy } from './read-only-policy';
 
-export const YUKIBANA_CONFIG_FILENAME = 'yukibana.cfg';
+export const YUKIBANA_CONFIG_FILENAME = 'yukibana.json';
 
 /**
  * Provider which handles reading and parsing the config file
