@@ -2,15 +2,14 @@
     "extends": "../../configs/base.tsconfig",
     "compilerOptions": {
         "rootDir": "src",
-        "outDir": "lib",
-        "esModuleInterop": true
+        "outDir": "lib"
     },
     "include": [
         "src"
     ],
     "references": [
         {
-            "path": "../yukibana"
+            "path": "../yukibana-submission"
         }
     ]
 }

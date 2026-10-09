@@ -1,5 +1,5 @@
 {
-  "name": "yukibana-launcher-ext",
+  "name": "yukibana-cloud-ext",
   "keywords": [
     "theia-extension"
   ],
@@ -10,24 +10,23 @@
   ],
   "dependencies": {
     "@theia/core": "~1.75.0",
-    "@vscode/sudo-prompt": "9.3.2",
-    "body-parser": "^1.20.8",
-    "fs-extra": "^4.0.3"
+    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#path:/cli",
+    "yukibana-submission-ext": "workspace:*"
   },
   "devDependencies": {
     "rimraf": "^5.0.0",
     "typescript": "~5.4.5"
   },
   "scripts": {
-    "prepare": "npm run clean && npm run build",
+    "prepare": "pnpm run clean && pnpm run build",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
     "build": "tsc",
     "watch": "tsc -w"
   },
   "theiaExtensions": [
     {
-      "frontendElectron": "lib/browser/create-launcher-frontend-module",
-      "backend": "lib/node/launcher-backend-module"
+      "frontend": "lib/browser/cloud-frontend-module",
+      "backend": "lib/node/cloud-backend-module"
     }
   ]
 }

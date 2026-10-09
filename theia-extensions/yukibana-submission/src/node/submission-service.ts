@@ -50,9 +50,9 @@ export class SubmissionServiceImpl implements SubmissionService {
         return ignored;
     }
 
-    private async resolveEntries(options: SubmissionOptions, out?: string): Promise<{ root: string, entries: SubmissionEntry[] }> {
+    private async resolveEntries(options: SubmissionOptions): Promise<{ root: string, entries: SubmissionEntry[] }> {
         const root = FileUri.fsPath(options.workspaceUri);
-        const files = await this.listFiles(root, options, out);
+        const files = await this.listFiles(root, options);
         const entries = files.map(f => ({
             path: f.path,
             size: f.stats?.size ?? 0,
@@ -61,8 +61,7 @@ export class SubmissionServiceImpl implements SubmissionService {
     }
 
     async previewSubmission(options: SubmissionOptions): Promise<SubmissionPreview> {
-        const out = !!options.outputUri ? FileUri.fsPath(options.outputUri) : undefined;
-        const { entries } = await this.resolveEntries(options, out);
+        const { entries } = await this.resolveEntries(options);
         entries.sort((a, b) => a.path.localeCompare(b.path));
         return {
             entries: entries,
@@ -71,24 +70,35 @@ export class SubmissionServiceImpl implements SubmissionService {
     }
 
     async prepareSubmission(options: SubmissionOptions): Promise<{ outputUri: string; fileCount: number; }> {
-        const out = !!options.outputUri
-            ? FileUri.fsPath(options.outputUri)
-            : path.join(os.tmpdir(), `yukibana-${Date.now()}.tar.zst`);
-
-        const { root, entries } = await this.resolveEntries(options, out);
+        const out = path.join(os.tmpdir(), `yukibana-${Date.now()}.tar.zst`);
+        const { root, entries } = await this.resolveEntries(options);
         await this.createArchive(root, out, entries);
-
         return { outputUri: FileUri.create(out).toString(), fileCount: entries.length };
     }
 
-    protected async listFiles(root: string, options: SubmissionOptions, submissionPath?: string): Promise<Entry[]> {
+    async cleanSubmission(archiveURI: string): Promise<boolean> {
+        const archivePath = FileUri.fsPath(archiveURI);
+        const parts = archivePath.split('/');
+        const filename = parts[parts.length - 1];
+        if (!/^yukibana-.*\.tar\.zst$/.test(filename)) {
+            this.logger.warn(`Submission archive '${archivePath}' doesn't match name pattern, not cleaning`);
+            return false;
+        }
+        try {
+            await fs.promises.unlink(archivePath);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    protected async listFiles(root: string, options: SubmissionOptions): Promise<Entry[]> {
         let files = await fg(options.include ?? ['**/*'], {
             cwd: root,
             ignore: [
                 ...(options.exclude ?? []),
                 '**/node_moules/**',
                 '.git/**',
-                ...(!!submissionPath ? path.relative(root, submissionPath) : []),
             ],
             dot: true,
             onlyFiles: true,
@@ -115,5 +125,14 @@ export class SubmissionServiceImpl implements SubmissionService {
             }
             archive.finalize();
         });
+    }
+
+    async copyFile(source: string, destination: string): Promise<boolean> {
+        try {
+            await fs.promises.copyFile(FileUri.fsPath(source), FileUri.fsPath(destination));
+            return true;
+        } catch {
+            return false;
+        }
     }
 }

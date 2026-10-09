@@ -119,11 +119,15 @@
           "default": true,
           "type": "boolean"
         },
-        "filename": {
-          "default": "submission.tar.zst",
+        "target": {
+          "default": "cloud",
           "type": "string"
         }
       }
+    },
+    "projectId": {
+      "default": "",
+      "type": "string"
     }
   }
 }
