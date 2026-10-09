@@ -1,10 +1,14 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-export const cloudAuthPath = '/services/yukibana/cloud';
+import { Accepted } from '@yukibana/cli';
+
+export const cloudAuthPath = '/services/yukibana/cloud-auth';
 export const authClientPath = '/services/yukibana/auth-client';
+export const cloudServicePath = '/services/yukibana/cloud';
 export const CloudAuth = Symbol('CloudAuth');
 export const AuthClient = Symbol('AuthClient');
+export const CloudService = Symbol('CloudService');
 
 export interface CloudAuth {
     login(): Promise<LoginResult>
@@ -22,4 +26,15 @@ export type LoginResult = {
 } | {
     readonly ok: false;
     readonly reason: string;
+};
+
+export interface CloudService {
+    submit(projectId: string, archivePath: string): Promise<SubmissionResult>
+}
+
+export type SubmissionResult = (
+    { ok: true } & Accepted
+) | {
+    ok: false,
+    reason: string
 };

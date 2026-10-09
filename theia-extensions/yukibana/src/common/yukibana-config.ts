@@ -30,8 +30,10 @@ const ConfigSchema = z.object({
         include: z.array(z.string()).optional(),
         exclude: z.array(z.string()).optional(),
         respectGitignore: z.boolean().default(true),
-        filename: z.string().default('submission.tar.zst')
-    }).prefault({})
+        filename: z.string().default('submission.tar.zst'),
+        target: z.string().default('cloud'),
+    }).prefault({}),
+    projectId: z.string().default(''),
 }).prefault({});
 
 export type YukibanaConfig = z.infer<typeof ConfigSchema>;

@@ -122,8 +122,16 @@
         "filename": {
           "default": "submission.tar.zst",
           "type": "string"
+        },
+        "target": {
+          "default": "cloud",
+          "type": "string"
         }
       }
+    },
+    "projectId": {
+      "default": "",
+      "type": "string"
     }
   }
 }

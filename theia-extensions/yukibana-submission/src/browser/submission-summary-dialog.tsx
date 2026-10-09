@@ -20,7 +20,7 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
             title: nls.localize('yukibana/submission/summaryTitle', 'Submission summary'),
         });
         this.appendCloseButton(Dialog.CANCEL);
-        this.appendAcceptButton(Dialog.OK);
+        this.appendAcceptButton(nls.localize('yukibana/submission/submit', 'Submit'));
     }
 
     protected render(): React.ReactNode {

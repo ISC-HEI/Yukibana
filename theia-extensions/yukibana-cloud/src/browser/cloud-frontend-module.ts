@@ -4,8 +4,10 @@
 import { CommandContribution } from '@theia/core';
 import { RemoteConnectionProvider, ServiceConnectionProvider } from '@theia/core/lib/browser';
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { CloudAuth, cloudAuthPath } from '../common/cloud-protocol';
+import { SubmissionTarget } from 'yukibana-submission-ext/lib/common/submission-target';
+import { CloudAuth, cloudAuthPath, CloudService, cloudServicePath } from '../common/cloud-protocol';
 import { AuthClientImpl } from './cloud-auth-client';
+import { CloudSubmissionTarget } from './cloud-submission-target';
 import { LoginCommandContribution } from './command-contribution';
 
 export default new ContainerModule(bind => {
@@ -20,4 +22,11 @@ export default new ContainerModule(bind => {
     ).inSingletonScope();
 
     bind(CommandContribution).to(LoginCommandContribution);
+
+    bind(CloudService).toDynamicValue(
+        ctx => ServiceConnectionProvider.createProxy<CloudService>(ctx.container, cloudServicePath)
+    ).inSingletonScope();
+
+    bind(CloudSubmissionTarget).toSelf().inSingletonScope();
+    bind(SubmissionTarget).to(CloudSubmissionTarget);
 });

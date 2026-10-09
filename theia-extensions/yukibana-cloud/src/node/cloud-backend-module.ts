@@ -3,12 +3,14 @@
  */
 import { ConnectionHandler, RpcConnectionHandler } from '@theia/core';
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { AuthClient, cloudAuthPath } from '../common/cloud-protocol';
+import { AuthClient, cloudAuthPath, CloudService, cloudServicePath } from '../common/cloud-protocol';
 import { CloudAuthImpl } from './cloud-auth';
-import { CloudService } from './cloud-service';
+import { CloudClient } from './cloud-client';
+import { CloudServiceImpl } from './cloud-service';
+import { CloudSessionManager } from './cloud-session-manager';
 
 export default new ContainerModule(bind => {
-    bind(CloudService).toSelf().inSingletonScope();
+    bind(CloudSessionManager).toSelf().inSingletonScope();
 
     bind(CloudAuthImpl).toSelf().inTransientScope();
     bind(ConnectionHandler).toDynamicValue(
@@ -19,4 +21,12 @@ export default new ContainerModule(bind => {
             return server;
         })
     ).inSingletonScope();
+
+    bind(CloudServiceImpl).toSelf().inSingletonScope();
+    bind(CloudService).toService(CloudServiceImpl);
+    bind(ConnectionHandler).toDynamicValue(
+        ctx => new RpcConnectionHandler(cloudServicePath, () => ctx.container.get(CloudService))
+    ).inSingletonScope();
+
+    bind(CloudClient).toSelf().inSingletonScope();
 });

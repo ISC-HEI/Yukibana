@@ -1,13 +1,13 @@
 /**
  * SPDX-License-Identifier: MIT
  */
+import { Emitter } from '@theia/core';
 import { inject } from '@theia/core/shared/inversify';
 import { AuthClient, CloudAuth, LoginResult } from '../common/cloud-protocol';
-import { CloudService } from './cloud-service';
-import { Emitter } from '@theia/core';
+import { CloudSessionManager } from './cloud-session-manager';
 
 export class CloudAuthImpl implements CloudAuth {
-    @inject(CloudService) protected readonly service!: CloudService;
+    @inject(CloudSessionManager) protected readonly service!: CloudSessionManager;
     private client?: AuthClient;
 
     private readonly onLoginChangeEmitter = new Emitter<boolean>();

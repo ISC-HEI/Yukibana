@@ -566,6 +566,9 @@ importers:
       '@yukibana/cli':
         specifier: github:tothambrus11/yukibana-cloud#path:/cli
         version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/a84256361b71c61d0df3f25232ed27c9eb4f62b1#path:/cli
+      yukibana-submission-ext:
+        specifier: workspace:0.0.0
+        version: link:../yukibana-submission
     devDependencies:
       rimraf:
         specifier: ^5.0.0
