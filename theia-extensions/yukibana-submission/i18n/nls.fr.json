@@ -1,6 +1,10 @@
 {
   "yukibana": {
     "submission": {
+      "fileTarget": {
+        "noWorkspaceRoot": "Pas de racine dans l'espace de travail",
+        "copyFail": "Échec de copie du fichier"
+      },
       "submitAssignment": "Remettre votre travail...",
       "summaryTitle": "Résumé de votre tentative",
       "summaryHeader": "Êtes-vous prêt·e à remettre votre travail ?",

@@ -8,6 +8,7 @@ import { ServiceConnectionProvider } from '@theia/core/lib/browser';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { SubmissionService, submissionServicePath } from '../common/submission-protocol';
 import { SubmissionTarget } from '../common/submission-target';
+import { FileSubmissionTarget } from './file-submission-target';
 import { SubmitCommandContribution } from './submission-frontend-contribution';
 
 export default new ContainerModule(bind => {
@@ -17,4 +18,6 @@ export default new ContainerModule(bind => {
     ).inSingletonScope();
 
     bindContributionProvider(bind, SubmissionTarget);
+    bind(FileSubmissionTarget).toSelf().inSingletonScope();
+    bind(SubmissionTarget).to(FileSubmissionTarget);
 });

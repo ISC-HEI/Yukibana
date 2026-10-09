@@ -119,10 +119,6 @@
           "default": true,
           "type": "boolean"
         },
-        "filename": {
-          "default": "submission.tar.zst",
-          "type": "string"
-        },
         "target": {
           "default": "cloud",
           "type": "string"

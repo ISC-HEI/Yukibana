@@ -35,7 +35,6 @@ export class SubmitCommandContribution implements CommandContribution {
                     workspaceUri: root.toString(),
                     include: config.submission.include,
                     exclude: config.submission.exclude,
-                    outputUri: root.resolve(config.submission.filename).toString(),
                     respectGitignore: config.submission.respectGitignore,
                 };
                 const preview = await this.submissionService.previewSubmission(options);
@@ -65,6 +64,7 @@ export class SubmitCommandContribution implements CommandContribution {
                         { timeout: 5000 },
                     );
                 }
+                await this.submissionService.cleanSubmission(outputUri);
             }
         });
     }
