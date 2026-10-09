@@ -17,7 +17,7 @@
   },
   "scripts": {
     "prepare": "npm run clean && npm run build",
-    "clean": "rimraf lib",
+    "clean": "rimraf lib tsconfig.tsbuildinfo",
     "build": "tsc",
     "watch": "tsc -w"
   },

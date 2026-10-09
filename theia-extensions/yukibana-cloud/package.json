@@ -11,7 +11,7 @@
   "dependencies": {
     "@theia/core": "~1.75.0",
     "@yukibana/cli": "github:tothambrus11/yukibana-cloud#path:/cli",
-    "yukibana-submission-ext": "workspace:0.0.0"
+    "yukibana-submission-ext": "workspace:*"
   },
   "devDependencies": {
     "rimraf": "^5.0.0",
@@ -19,7 +19,7 @@
   },
   "scripts": {
     "prepare": "pnpm run clean && pnpm run build",
-    "clean": "rimraf lib",
+    "clean": "rimraf lib tsconfig.tsbuildinfo",
     "build": "tsc",
     "watch": "tsc -w"
   },
