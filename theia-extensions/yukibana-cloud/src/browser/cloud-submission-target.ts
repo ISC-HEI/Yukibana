@@ -17,10 +17,7 @@ export class CloudSubmissionTarget implements SubmissionTarget {
         return this.auth.isLoggedIn();
     }
 
-    async submit(projectId: string, archive: URI): Promise<SubmissionResult> {
-        const result = await this.service.submit(projectId, archive.toString());
-        return {
-            ok: result.ok
-        };
+    submit(projectId: string, archive: URI): Promise<SubmissionResult> {
+        return this.service.submit(projectId, archive.toString());
     }
 }

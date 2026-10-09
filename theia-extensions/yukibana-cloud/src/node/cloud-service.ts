@@ -2,6 +2,7 @@
  * SPDX-License-Identifier: MIT
  */
 import { ILogger } from '@theia/core';
+import { FileUri } from '@theia/core/lib/node';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
 import * as fs from 'fs';
 import { CloudService, SubmissionResult } from '../common/cloud-protocol';
@@ -12,8 +13,8 @@ export class CloudServiceImpl implements CloudService {
     @inject(CloudClient) protected readonly client!: CloudClient;
     @inject(ILogger) @named('yukibana:CloudService') protected readonly logger!: ILogger;
 
-    async submit(projectId: string, archivePath: string): Promise<SubmissionResult> {
-        this.logger.info(`Submitting archive for project '${projectId}'`);
+    async submit(projectId: string, archiveURI: string): Promise<SubmissionResult> {
+        const archivePath = FileUri.fsPath(archiveURI);
         const archiveBytes = await fs.promises.readFile(archivePath);
         try {
             const result = await this.client.submitArchive(projectId, archiveBytes);

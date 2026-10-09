@@ -8,8 +8,12 @@
       "summaryTotalSize": "Taille totale",
       "summaryFiles": "Fichiers inclus",
       "submit": "Envoyer",
+      "submitProgress": "Envoi",
+      "preparing": "Préparation...",
+      "transmitting": "Transmission...",
+      "targetUnavailable": "La destination n'est pas disponible",
       "submitSuccess": "Travail remis avec succès",
-      "submitFail": "Échec de la soumission"
+      "submitFail": "Échec de la soumission: {0}"
     }
   }
 }

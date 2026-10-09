@@ -6,7 +6,7 @@ import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
 import { ConfigProvider } from 'yukibana-ext/lib/browser/config/config-provider';
 import { SubmissionOptions, SubmissionService } from '../common/submission-protocol';
-import { SubmissionTarget } from '../common/submission-target';
+import { SubmissionResult, SubmissionTarget } from '../common/submission-target';
 import { SubmissionSummaryDialog } from './submission-summary-dialog';
 
 export const SubmitCommand: Command = Command.toLocalizedCommand({
@@ -43,17 +43,25 @@ export class SubmitCommandContribution implements CommandContribution {
                 if (!confirmed) {
                     return;
                 }
+                const progress = await this.messageService.showProgress({ text: nls.localize('yukibana/submission/submitProgress', 'Submitting') });
+                progress.report({
+                    message: nls.localize('yukibana/submission/preparing', 'Preparing...')
+                });
                 const { outputUri, fileCount } = await this.submissionService.prepareSubmission(options);
                 this.logger.info(`Prepared submission (${fileCount} files)`);
-                const ok = await this.submit(config.submission.target, config.projectId, new URI(outputUri));
-                if (ok) {
+                progress.report({
+                    message: nls.localize('yukibana/submission/transmitting', 'Transmitting...')
+                });
+                const result = await this.submit(config.submission.target, config.projectId, new URI(outputUri));
+                progress.cancel();
+                if (result.ok) {
                     this.messageService.info(
                         nls.localize('yukibana/submission/submitSuccess', 'Submitted successfully'),
                         { timeout: 5000 },
                     );
                 } else {
                     this.messageService.error(
-                        nls.localize('yukibana/submission/submitFail', 'Failed to submit'),
+                        nls.localize('yukibana/submission/submitFail', 'Failed to submit: {0}', result.reason),
                         { timeout: 5000 },
                     );
                 }
@@ -61,7 +69,7 @@ export class SubmitCommandContribution implements CommandContribution {
         });
     }
 
-    private async submit(targetId: string, projectId: string, archiveURI: URI): Promise<boolean> {
+    private async submit(targetId: string, projectId: string, archiveURI: URI): Promise<SubmissionResult> {
         const availableTargets = new Map<string, SubmissionTarget>();
         for (const t of this.targets.getContributions()) {
             if (await t.isAvailable()) {
@@ -72,8 +80,11 @@ export class SubmitCommandContribution implements CommandContribution {
         }
         const target = availableTargets.get(targetId);
         if (!target) {
-            return false;
+            return {
+                ok: false,
+                reason: nls.localize('yukibana/submission/targetUnavailable', 'Submission target is unavailable')
+            };
         }
-        return (await target.submit(projectId, archiveURI)).ok;
+        return target.submit(projectId, archiveURI);
     }
 }

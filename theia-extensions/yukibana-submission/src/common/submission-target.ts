@@ -5,9 +5,12 @@ import { URI } from '@theia/core';
 
 export const SubmissionTarget = Symbol('SubmissionTarget');
 
-export interface SubmissionResult {
-    ok: boolean;
-}
+export type SubmissionResult = {
+    readonly ok: true
+} | {
+    readonly ok: false,
+    readonly reason: string
+};
 
 export interface SubmissionTarget {
     readonly id: string;

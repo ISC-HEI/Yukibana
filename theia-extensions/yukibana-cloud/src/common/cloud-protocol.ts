@@ -33,8 +33,8 @@ export interface CloudService {
 }
 
 export type SubmissionResult = (
-    { ok: true } & Accepted
+    { readonly ok: true } & Accepted
 ) | {
-    ok: false,
-    reason: string
+    readonly ok: false,
+    readonly reason: string
 };
