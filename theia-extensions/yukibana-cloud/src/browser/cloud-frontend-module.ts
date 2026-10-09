@@ -2,13 +2,14 @@
  * SPDX-License-Identifier: MIT
  */
 import { CommandContribution } from '@theia/core';
-import { RemoteConnectionProvider, ServiceConnectionProvider } from '@theia/core/lib/browser';
+import { OpenHandler, RemoteConnectionProvider, ServiceConnectionProvider } from '@theia/core/lib/browser';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { SubmissionTarget } from 'yukibana-submission-ext/lib/common/submission-target';
 import { CloudAuth, cloudAuthPath, CloudService, cloudServicePath } from '../common/cloud-protocol';
 import { AuthClientImpl } from './cloud-auth-client';
 import { CloudSubmissionTarget } from './cloud-submission-target';
 import { LoginCommandContribution } from './command-contribution';
+import { YukibanaOpenHandler } from './yukibana-url-handler';
 
 export default new ContainerModule(bind => {
     bind(AuthClientImpl).toSelf().inSingletonScope();
@@ -29,4 +30,7 @@ export default new ContainerModule(bind => {
 
     bind(CloudSubmissionTarget).toSelf().inSingletonScope();
     bind(SubmissionTarget).to(CloudSubmissionTarget);
+
+    bind(YukibanaOpenHandler).toSelf().inSingletonScope();
+    bind(OpenHandler).to(YukibanaOpenHandler);
 });
