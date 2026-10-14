@@ -19,6 +19,7 @@ their implementations are located.
 - [Readonly files](#readonly-files)
 - [Assignment panel](#assignment-panel)
 - [Cloud login and submission](#cloud-login-and-submission)
+- [Open project via custom URI](#open-project-via-custom-uri)
 
 </details>
 
@@ -138,3 +139,12 @@ The `yukibana-cloud` extension implements a bridge with the cloud registry.
 It adds commands to log in and out of the registry, and registers
 a `FileSubmissionTarget` in [yukibana-cloud/src/browser/cloud-submission-target.ts](../theia-extensions/yukibana-cloud/src/browser/cloud-submission-target.ts)
 (see [Submission](#submission)).
+
+## Open project via custom URI
+
+A custom URI handler is implemented in [yukibana-cloud/src/browser/yukibana-url-handler.ts](../theia-extensions/yukibana-cloud/src/browser/yukibana-url-handler.ts).
+
+It handles `yukibana://` URIs, and more specifically, those of the form `yukibana://project/open?id=<project-uuid>`.
+When such an URI is opened, the user is asked to choose a destination directory.
+Then the starter archive is fetched from the registry and extracted. Finally,
+the project is opened in the current or a new window, as chosen by the user.
