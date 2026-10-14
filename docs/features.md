@@ -15,9 +15,10 @@ their implementations are located.
 - [Inline suggestions disabling](#inline-suggestions-disabling)
 - [Squiggles disabling](#squiggles-disabling)
 - [AI Chatbot disabling](#ai-chatbot-disabling)
-- [Submission preparation](#submission-preparation)
+- [Submission](#submission)
 - [Readonly files](#readonly-files)
 - [Assignment panel](#assignment-panel)
+- [Cloud login and submission](#cloud-login-and-submission)
 
 </details>
 
@@ -88,10 +89,11 @@ AI features can be completely toggled by `YukibanaAIIdeActivationService` in [yu
 which rebinds the default implementation to override the user's setting with
 the config's value.
 
-## Submission preparation
+## Submission
 
-To prepare the workspace for submission, we implement both a frontend contribution
-to provide a command, and a backend contribution to perform the actual file processing.
+To submit an assignment, we implement both a frontend contribution
+to provide a command, and a backend contribution to perform the actual
+file processing and upload.
 
 This is implemented in a dedicated `yukibana-submission` extension.
 The frontend contribution is defined in [yukibana-submission/src/browser/submission-frontend-contribution.ts](../theia-extensions/yukibana-submission/src/browser/submission-frontend-contribution.ts).
@@ -103,6 +105,13 @@ and [yukibana-submission/src/browser/submission-fronted-module.ts](../theia-exte
 Additionally, translations for the action and feedback message are provided by
 a `LocalizationContribution` in [yukibana-submission/src/node/submission-localization-contribution.ts](../theia-extensions/yukibana-submission/src/node/submission-localization-contribution.ts).
 Translations are defined in [yukibana-submission/i18n/](../theia-extensions/yukibana-submission/i18n/).
+
+The extension defines a simple `FileSubmissionTarget` interface in [yukibana-submission/src/common/submission-target.ts](../theia-extensions/yukibana-submission/src/common/submission-target.ts).
+
+This lets other extensions (such as `yukibana-cloud`) define their own submission
+targets and register them as contributions. Then a setting in the config file
+lets the teacher select how the assignment should be submitted (e.g. via the cloud
+registry, a GitHub repository, a file sent by mail or uploaded on Moodle).
 
 ## Readonly files
 
@@ -122,3 +131,10 @@ the assignment panel. This widget is implemented in [theia-extensions/yukibana/s
 
 A simple `AssignmentResolver` provides a dynamic URI to the assignment file,
 in [theia-extensions/yukibana/src/browser/assignment/assignment-resolver.ts](../theia-extensions/yukibana/src/browser/assignment/assignment-resolver.ts).
+
+## Cloud login and submission
+
+The `yukibana-cloud` extension implements a bridge with the cloud registry.
+It adds commands to log in and out of the registry, and registers
+a `FileSubmissionTarget` in [yukibana-cloud/src/browser/cloud-submission-target.ts](../theia-extensions/yukibana-cloud/src/browser/cloud-submission-target.ts)
+(see [Submission](#submission)).
