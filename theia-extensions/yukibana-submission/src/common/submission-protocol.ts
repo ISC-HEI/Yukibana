@@ -8,7 +8,6 @@ export interface SubmissionOptions {
     workspaceUri: string;
     include?: string[];
     exclude?: string[];
-    outputUri?: string;
     respectGitignore?: boolean;
 }
 
@@ -25,4 +24,6 @@ export interface SubmissionPreview {
 export interface SubmissionService {
     previewSubmission(options: SubmissionOptions): Promise<SubmissionPreview>;
     prepareSubmission(options: SubmissionOptions): Promise<{ outputUri: string, fileCount: number }>;
+    cleanSubmission(archiveURI: string): Promise<boolean>;
+    copyFile(source: string, destination: string): Promise<boolean>;
 }

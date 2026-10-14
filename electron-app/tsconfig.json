@@ -7,13 +7,19 @@
   },
   "references": [
     {
-      "path": "../theia-extensions/launcher"
+      "path": "../theia-extensions/yukibana-launcher"
     },
     {
-      "path": "../theia-extensions/product"
+      "path": "../theia-extensions/yukibana-product"
     },
     {
-      "path": "../theia-extensions/updater"
+      "path": "../theia-extensions/yukibana"
+    },
+    {
+      "path": "../theia-extensions/yukibana-submission"
+    },
+    {
+      "path": "../theia-extensions/yukibana-cloud"
     }
   ]
 }

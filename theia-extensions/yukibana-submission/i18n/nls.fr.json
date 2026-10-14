@@ -1,13 +1,23 @@
 {
   "yukibana": {
     "submission": {
-      "prepareSubmission": "Préparer la remise",
+      "fileTarget": {
+        "noWorkspaceRoot": "Pas de racine dans l'espace de travail",
+        "copyFail": "Échec de copie du fichier"
+      },
+      "submitAssignment": "Remettre votre travail...",
       "summaryTitle": "Résumé de votre tentative",
       "summaryHeader": "Êtes-vous prêt·e à remettre votre travail ?",
       "summaryFileCount": "Nombre de fichiers",
       "summaryTotalSize": "Taille totale",
       "summaryFiles": "Fichiers inclus",
-      "submissionReady": "Exercice préparé dans {0} ({1} fichier(s))"
+      "submit": "Envoyer",
+      "submitProgress": "Envoi",
+      "preparing": "Préparation...",
+      "transmitting": "Transmission...",
+      "targetUnavailable": "La destination n'est pas disponible",
+      "submitSuccess": "Travail remis avec succès",
+      "submitFail": "Échec de la soumission: {0}"
     }
   }
 }
