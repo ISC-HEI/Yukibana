@@ -8,6 +8,7 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { CloudService } from '../common/cloud-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { OpenProjectNewWindowDialog } from './open-project-window-dialog';
 
 @injectable()
 export class YukibanaOpenHandler implements OpenHandler {
@@ -89,7 +90,10 @@ export class YukibanaOpenHandler implements OpenHandler {
             progress.report({
                 message: nls.localize('yukibana/cloud/openProject/opening', 'Opening...')
             });
-            this.workspaces.open(result.uri);
+
+            const inNewWindow = await new OpenProjectNewWindowDialog().open();
+
+            this.workspaces.open(result.uri, { preserveWindow: !inNewWindow });
             progress.cancel();
         }
     }
