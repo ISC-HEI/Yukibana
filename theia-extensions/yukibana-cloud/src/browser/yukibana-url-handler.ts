@@ -7,6 +7,7 @@ import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { CloudService } from '../common/cloud-protocol';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 
 @injectable()
 export class YukibanaOpenHandler implements OpenHandler {
@@ -20,6 +21,7 @@ export class YukibanaOpenHandler implements OpenHandler {
     @inject(FileDialogService) protected readonly fileDialogs!: FileDialogService;
     @inject(WorkspaceService) protected readonly workspaces!: WorkspaceService;
     @inject(MessageService) protected readonly messages!: MessageService;
+    @inject(FileService) protected readonly files!: FileService;
 
     canHandle(uri: URI, options?: OpenerOptions): MaybePromise<number> {
         return uri.scheme === 'yukibana' ? YukibanaOpenHandler.PRIORITY : 0;
@@ -77,8 +79,8 @@ export class YukibanaOpenHandler implements OpenHandler {
             progress.report({
                 message: nls.localize('yukibana/cloud/openProject/downloading', 'Downloading...')
             });
-            const ok = await this.service.downloadProject(projectId, folder.toString());
-            if (!ok) {
+            const result = await this.service.downloadProject(projectId, folder.toString());
+            if (!result.ok) {
                 this.logger.error('Could not download project');
                 progress.cancel();
                 this.messages.error(nls.localize('yukibana/cloud/openProject/downloadFail', 'Download failed'));
@@ -87,7 +89,7 @@ export class YukibanaOpenHandler implements OpenHandler {
             progress.report({
                 message: nls.localize('yukibana/cloud/openProject/opening', 'Opening...')
             });
-            this.workspaces.open(folder);
+            this.workspaces.open(result.uri);
             progress.cancel();
         }
     }
