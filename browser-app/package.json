@@ -28,7 +28,8 @@
     "@theia/workspace": "~1.75.0",
     "yukibana-ext": "workspace:*",
     "yukibana-submission-ext": "workspace:*",
-    "yukibana-cloud-ext": "workspace:*"
+    "yukibana-cloud-ext": "workspace:*",
+    "yukibana-telemetry-ext": "workspace:*"
   },
   "devDependencies": {
     "@theia/cli": "~1.75.0"
