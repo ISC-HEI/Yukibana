@@ -1,7 +1,8 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { Accepted } from '@yukibana/cli';
+import { URI } from '@theia/core';
+import { Accepted, Project } from '@yukibana/cli';
 
 export const cloudAuthPath = '/services/yukibana/cloud-auth';
 export const authClientPath = '/services/yukibana/auth-client';
@@ -28,13 +29,22 @@ export type LoginResult = {
     readonly reason: string;
 };
 
-export interface CloudService {
-    submit(projectId: string, archivePath: string): Promise<SubmissionResult>
-}
-
 export type SubmissionResult = (
     { readonly ok: true } & Accepted
 ) | {
     readonly ok: false,
     readonly reason: string
 };
+
+export type DownloadResult = {
+    readonly ok: true;
+    readonly uri: URI;
+} | {
+    readonly ok: false;
+};
+
+export interface CloudService {
+    submit(projectId: string, archivePath: string): Promise<SubmissionResult>
+    getProjectInfo(projectId: string): Promise<Project | undefined>
+    downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult>
+}

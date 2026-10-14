@@ -1,0 +1,12 @@
+{
+  "yukibana": {
+    "cloud": {
+      "openProject": {
+        "title": "Ouverture du projet",
+        "where": "Où voulez-vous ouvrir le projet ?",
+        "thisWindow": "Dans cette fenêtre",
+        "newWindow": "Dans une nouvelle fenêtre"
+      }
+    }
+  }
+}
