@@ -80,7 +80,7 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install Playwright Chromium
-        run: cd tests && pnx playwright install --with-deps chromium
+        run: cd tests && pnpm exec playwright install --with-deps chromium
 
       - name: Run Yukibana
         run: |
