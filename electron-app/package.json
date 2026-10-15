@@ -36,6 +36,7 @@
     "@theia/process": "~1.75.0",
     "@theia/scm": "~1.75.0",
     "@theia/search-in-workspace": "~1.75.0",
+    "@theia/telemetry": "~1.75.0",
     "@theia/terminal": "~1.75.0",
     "@theia/test": "~1.75.0",
     "@theia/toolbar": "~1.75.0",
@@ -46,7 +47,8 @@
     "yukibana-launcher-ext": "workspace:*",
     "yukibana-product-ext": "workspace:*",
     "yukibana-submission-ext": "workspace:*",
-    "yukibana-cloud-ext": "workspace:*"
+    "yukibana-cloud-ext": "workspace:*",
+    "yukibana-telemetry-ext": "workspace:*"
   },
   "devDependencies": {
     "@theia/bundle-plugin": "~1.75.0",
@@ -105,7 +107,8 @@
           }
         },
         "preferences": {
-          "security.workspace.trust.enabled": false
+          "security.workspace.trust.enabled": false,
+          "telemetry.telemetryLevel": "all"
         }
       }
     },

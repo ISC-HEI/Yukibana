@@ -22,6 +22,9 @@
       "path": "theia-extensions/yukibana-cloud"
     },
     {
+      "path": "theia-extensions/yukibana-telemetry"
+    },
+    {
       "path": "electron-app"
     },
     {

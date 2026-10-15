@@ -1,0 +1,31 @@
+{
+  "name": "yukibana-telemetry-ext",
+  "keywords": [
+    "theia-extension"
+  ],
+  "version": "0.0.0",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@theia/core": "~1.75.0",
+    "@theia/telemetry": "~1.75.0"
+  },
+  "devDependencies": {
+    "@types/archiver": "8.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "~5.4.5"
+  },
+  "scripts": {
+    "prepare": "pnpm run clean && pnpm run build",
+    "clean": "rimraf lib",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "theiaExtensions": [
+    {
+      "backend": "lib/node/telemetry-backend-module"
+    }
+  ]
+}
