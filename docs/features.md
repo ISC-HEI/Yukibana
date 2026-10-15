@@ -20,6 +20,7 @@ their implementations are located.
 - [Assignment panel](#assignment-panel)
 - [Cloud login and submission](#cloud-login-and-submission)
 - [Open project via custom URI](#open-project-via-custom-uri)
+- [Telemetry](#telemetry)
 
 </details>
 
@@ -148,3 +149,15 @@ It handles `yukibana://` URIs, and more specifically, those of the form `yukiban
 When such an URI is opened, the user is asked to choose a destination directory.
 Then the starter archive is fetched from the registry and extracted. Finally,
 the project is opened in the current or a new window, as chosen by the user.
+
+## Telemetry
+
+A standalone `yukibana-telemetry` extension provides a dedicated
+telemetry sink in [yukibana-telemetry/src/node/yukibana-telemetry-sink.ts](../theia-extensions/yukibana-telemetry/src/node/yukibana-telemetry-sink.ts).
+
+It collects telemetry report sent to topics starting with `yukibana/`,
+batches them (count and timeout limits), and sends them to a server. At the moment,
+the server's address is hardcoded to a localhost endpoint.
+
+Examples of telemetry reporting can be found in [yukibana-cloud/src/browser/yukibana-url-handler.ts](../theia-extensions/yukibana-cloud/src/browser/yukibana-url-handler.ts)
+and [yukibana-submission/src/browser/submission-frontend-contribution.ts](../theia-extensions/yukibana-submission/src/browser/submission-frontend-contribution.ts).
