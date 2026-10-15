@@ -107,7 +107,8 @@
           }
         },
         "preferences": {
-          "security.workspace.trust.enabled": false
+          "security.workspace.trust.enabled": false,
+          "telemetry.telemetryLevel": "all"
         }
       }
     },
