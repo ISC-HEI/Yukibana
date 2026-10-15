@@ -7,7 +7,7 @@ import { TelemetrySink } from '@theia/telemetry/lib/node';
 
 const BATCH_SIZE = 50;
 const MAX_DRAIN_DELAY_MS = 10_000;
-const ENDPOINT = 'http://localhost:5432';
+const ENDPOINT = 'http://localhost:5432/telemetry';
 
 @injectable()
 export class YukibanaTelemetrySink implements TelemetrySink {
