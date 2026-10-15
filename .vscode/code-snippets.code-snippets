@@ -1,0 +1,13 @@
+{
+	"Copyright": {
+		"scope": "javascript,typescript",
+		"prefix": "copyright",
+		"body": [
+			"/**",
+			" * SPDX-License-Identifier: MIT",
+			" */",
+			"$0"
+		],
+		"description": "Insert copyright header"
+	}
+}
