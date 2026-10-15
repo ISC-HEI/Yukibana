@@ -54,7 +54,7 @@ export class AssignmentPaneWidget extends BaseWidget {
 
     showMarkdown(text: string): void {
         const renderer = this.rendererFactory();
-        const md = new MarkdownStringImpl(text, { supportHtml: false });
+        const md = new MarkdownStringImpl(text, { supportHtml: true, isTrusted: true, supportThemeIcons: true });
         const rendered = renderer.render(md);
         this.node.replaceChildren(rendered.element);
         this.toDispose.push(rendered);
