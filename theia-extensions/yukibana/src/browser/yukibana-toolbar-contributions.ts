@@ -33,10 +33,10 @@ export const YukibanaToolbarDefaults: () => DeflatedToolbarTree = () => ({
         [ToolbarAlignment.RIGHT]: [
             [
                 {
-                    id: 'workbench.action.showCommands',
-                    command: 'workbench.action.showCommands',
-                    icon: 'codicon codicon-terminal',
-                    tooltip: nls.localizeByDefault('Command Palette'),
+                    id: 'yukibana.submitAssignment',
+                    command: 'yukibana.submitAssignment',
+                    icon: 'codicon codicon-send',
+                    tooltip: nls.localize('yukibana/submission/submitAssignment', 'Submit assignment...'),
                 },
             ]
         ],
