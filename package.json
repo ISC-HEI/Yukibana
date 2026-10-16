@@ -19,6 +19,7 @@
     "postinstall": "theia check:theia-version",
     "start:browser": "pnpm run --filter yukibana-browser-app start",
     "start:electron": "pnpm run --filter yukibana-electron-app start",
+    "start:electron:log": "pnpm run --filter yukibana-electron-app start --log-config ../log-config.json",
     "watch:browser": "pnpm run -r --parallel --filter \"!electron-app\" watch",
     "watch:electron": "pnpm run -r --parallel --filter \"!browser-app\" watch",
     "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false && pnpm run permissions:writeable",
