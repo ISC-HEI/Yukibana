@@ -11,3 +11,5 @@
 **/test-screenshots
 **/test-results
 **/allure-results
+**/coverage
+.nyc_output
