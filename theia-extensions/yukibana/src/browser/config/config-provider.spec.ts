@@ -1,14 +1,15 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { enableJSDOM } from '@theia/core/lib/browser/test/jsdom';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
+import { enableJSDOM } from '@theia/core/lib/browser/test/jsdom';
 
 let disableJSDom = enableJSDOM();
 FrontendApplicationConfigProvider.set({});
 
-import { Disposable, Emitter, ILogger, Loggable, URI } from '@theia/core';
+import { Disposable, Emitter, ILogger, URI } from '@theia/core';
 import { Deferred } from '@theia/core/lib/common/promise-util';
+import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { FileService, ReadTextFileOptions, TextFileContent } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent, FileChangeType, FileStat, WatchOptions } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
@@ -128,14 +129,7 @@ describe('ConfigProvider', () => {
     it('should apply defaults if not config file can be found', async () => {
         const mockFileService = createMockFileService({});
         const mockWorkspaceService = createMockWorkspaceService();
-        const mockILogger: ILogger = <ILogger>{
-            error(loggable: Loggable): Promise<void> {
-                return Promise.resolve(undefined);
-            },
-            info(loggable: Loggable): Promise<void> {
-                return Promise.resolve(undefined);
-            }
-        };
+        const mockILogger: ILogger = new MockLogger();
         const provider = new ConfigProvider(
             mockFileService as unknown as FileService,
             mockWorkspaceService as unknown as WorkspaceService,
@@ -148,6 +142,5 @@ describe('ConfigProvider', () => {
         const config = await provider.ready;
         const defaultConfig = loadConfig({});
         expect(config).to.deep.equal(defaultConfig);
-
     });
 });
