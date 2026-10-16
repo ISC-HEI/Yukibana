@@ -4,10 +4,10 @@
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
 import { enableJSDOM } from '@theia/core/lib/browser/test/jsdom';
 
-let disableJSDom = enableJSDOM();
+const disableJSDom = enableJSDOM();
 FrontendApplicationConfigProvider.set({});
 
-import { Disposable, Emitter, ILogger, URI } from '@theia/core';
+import { Disposable, Emitter, Event, URI } from '@theia/core';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { FileService, ReadTextFileOptions, TextFileContent } from '@theia/filesystem/lib/browser/file-service';
@@ -110,37 +110,109 @@ function createMockWorkspaceService(initialRoot?: URI): MockWorkspaceService {
     };
 }
 
+interface MockServices {
+    readOnlyPolicy: ReadOnlyPolicy;
+    fileService: MockFileService;
+    workspaceService: MockWorkspaceService;
+    logger: MockLogger;
+    provider: ConfigProvider;
+}
+
+function setup(initialRoot?: URI): MockServices {
+    const readOnlyPolicy = new ReadOnlyPolicy();
+    const fileService = createMockFileService({});
+    const workspaceService = createMockWorkspaceService();
+    const logger = new MockLogger();
+    const provider = new ConfigProvider(
+        fileService as unknown as FileService,
+        workspaceService as unknown as WorkspaceService,
+        readOnlyPolicy,
+        logger,
+    );
+    if (!!initialRoot) {
+        workspaceService.setRoot(initialRoot);
+    }
+    workspaceService.markReady();
+    return {
+        readOnlyPolicy,
+        fileService,
+        workspaceService,
+        logger,
+        provider,
+    };
+}
+
 disableJSDom();
 
 describe('ConfigProvider', () => {
-    let readOnlyPolicy: ReadOnlyPolicy;
+    const root = new URI('file:///');
 
-    before(() => {
-        disableJSDom = enableJSDOM();
-    });
-    after(() => {
-        disableJSDom();
-    });
-
-    beforeEach(() => {
-        readOnlyPolicy = new ReadOnlyPolicy();
-    });
-
-    it('should apply defaults if not config file can be found', async () => {
-        const mockFileService = createMockFileService({});
-        const mockWorkspaceService = createMockWorkspaceService();
-        const mockILogger: ILogger = new MockLogger();
-        const provider = new ConfigProvider(
-            mockFileService as unknown as FileService,
-            mockWorkspaceService as unknown as WorkspaceService,
-            readOnlyPolicy,
-            mockILogger,
-        );
-
-        mockWorkspaceService.markReady();
+    it('should apply defaults if no workspace root is defined', async () => {
+        const { provider } = setup();
         await provider.onStart();
+
         const config = await provider.ready;
         const defaultConfig = loadConfig({});
         expect(config).to.deep.equal(defaultConfig);
+    });
+
+    it('should apply defaults if not config file can be found', async () => {
+        const { provider } = setup(root);
+        await provider.onStart();
+
+        const config = await provider.ready;
+        const defaultConfig = loadConfig({});
+        expect(config).to.deep.equal(defaultConfig);
+    });
+
+    it('should apply defaults if the config is invalid', async () => {
+        const { provider, fileService } = setup(root);
+        fileService.write(root.resolve('yukibana.json'), 'invalid JSON');
+        await provider.onStart();
+
+        const config = await provider.ready;
+        const defaultConfig = loadConfig({});
+        expect(config).to.deep.equal(defaultConfig);
+    });
+
+    it('should load a valid config file', async () => {
+        const { provider, fileService } = setup(root);
+        fileService.write(root.resolve('yukibana.json'), '{"projectId": "valid-id"}');
+        await provider.onStart();
+
+        const config = await provider.ready;
+        const defaultConfig = loadConfig({});
+        expect(config).to.deep.equal({ ...defaultConfig, projectId: 'valid-id' });
+        expect(config).to.deep.equal(provider.config);
+    });
+
+    it('should reload if the config has changed', async () => {
+        const { provider, fileService } = setup(root);
+        fileService.write(root.resolve('yukibana.json'), '{"projectId": "valid-id"}');
+        await provider.onStart();
+
+        await provider.ready;
+        const configChanged = Event.toPromise(provider.onConfigChanged);
+        fileService.write(root.resolve('yukibana.json'), '{"projectId": "new-id"}');
+        const newConfig = await configChanged;
+        const defaultConfig = loadConfig({});
+        expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: 'new-id' });
+        expect(newConfig).to.deep.equal(provider.config);
+    });
+
+    it('should reload if the workspace root has changed', async () => {
+        const root2 = new URI('file:///root2');
+        const { provider, fileService, workspaceService } = setup(root);
+        fileService.write(root.resolve('yukibana.json'), '{"projectId": "valid-id"}');
+        fileService.write(root2.resolve('yukibana.json'), '{"projectId": "new-id"}');
+        await provider.onStart();
+
+        await provider.ready;
+        const configChanged = Event.toPromise(provider.onConfigChanged);
+        workspaceService.setRoot(root2);
+        const newConfig = await configChanged;
+        const defaultConfig = loadConfig({});
+        expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: 'new-id' });
+        expect(newConfig).to.deep.equal(provider.config);
     });
 });
