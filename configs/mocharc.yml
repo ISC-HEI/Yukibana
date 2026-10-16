@@ -6,3 +6,5 @@ reporter: "spec"
 watch-files:
   - "**/*.js"
 exit: true
+extension:
+  - .spec.ts

@@ -1,0 +1,19 @@
+{
+  "include": [
+    "theia-extensions/*/src/**/*.ts",
+    "theia-extensions/*/lib/**/*.js"
+  ],
+  "exclude": [
+    "theia-extensions/*/lib/**/typings/**",
+    "theia-extensions/*/lib/**/*.spec.js"
+  ],
+  "reporter": [
+    "html",
+    "lcov"
+  ],
+  "extension": [
+    ".js",
+    ".ts"
+  ],
+  "all": true
+}
