@@ -22,6 +22,10 @@
             "dom"
         ],
         "sourceMap": true,
-        "composite": true
+        "composite": true,
+        "types": [
+            "node",
+            "mocha"
+        ]
     }
 }

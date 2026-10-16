@@ -41,7 +41,7 @@ export class ConfigProvider implements FrontendApplicationContribution {
     protected async reload(): Promise<void> {
         this.toDisposeOnWorkspaceChanged.dispose();
         const root = this.workspaceService.tryGetRoots()[0]?.resource;
-        if (!root) {
+        if (root === undefined) {
             this.applyDefault();
             return;
         }

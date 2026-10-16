@@ -1,0 +1,10 @@
+require:
+  - "ignore-styles"
+  - "reflect-metadata/Reflect"
+  - "test-setup"
+reporter: "spec"
+watch-files:
+  - "**/*.js"
+exit: true
+extension:
+  - .spec.ts
