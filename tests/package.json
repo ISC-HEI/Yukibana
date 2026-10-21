@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "yukibana-tests",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Yukibana Team <info.yukibana@isc-vs.ch>",
   "homepage": "https://github.com/ISC-HEI/Yukibana#readme",
   "bugs": {

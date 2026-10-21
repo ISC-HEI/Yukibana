@@ -2,7 +2,7 @@
   "private": true,
   "name": "yukibana-electron-app",
   "description": "Yukibana IDE",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "scripts/theia-electron-main.js",
   "author": "Yukibana Team <info.yukibana@isc-vs.ch>",
   "homepage": "https://github.com/ISC-HEI/Yukibana#readme",
@@ -43,11 +43,11 @@
     "@theia/workspace": "~1.75.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "yukibana-cloud-ext": "workspace:*",
     "yukibana-ext": "workspace:*",
     "yukibana-launcher-ext": "workspace:*",
     "yukibana-product-ext": "workspace:*",
     "yukibana-submission-ext": "workspace:*",
-    "yukibana-cloud-ext": "workspace:*",
     "yukibana-telemetry-ext": "workspace:*"
   },
   "devDependencies": {
