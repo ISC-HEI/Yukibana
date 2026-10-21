@@ -42,3 +42,7 @@
 .yukibana-availability-actions button.theia-button {
     margin-left: 0;
 }
+
+.yukibana-availability-message {
+    font-weight: bold;
+}

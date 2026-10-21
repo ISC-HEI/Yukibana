@@ -43,8 +43,18 @@ export type DownloadResult = {
     readonly ok: false;
 };
 
+export enum CanSubmitStatus {
+    NOT_ALLOWED,
+    NOT_OPEN,
+    OPEN,
+    LATE,
+    CLOSED,
+    UNKNOWN
+}
+
 export interface CloudService {
     submit(projectId: string, archivePath: string): Promise<SubmissionResult>
     getProjectInfo(projectId: string): Promise<Project | undefined>
     downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult>
+    canSubmitProject(projectId: string): Promise<CanSubmitStatus>
 }

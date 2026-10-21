@@ -13,7 +13,8 @@ export type SubmissionResult = {
 };
 
 export type SubmissionTargetAvailability = {
-    readonly available: true
+    readonly available: true,
+    readonly message?: string
 } | {
     readonly available: false,
     readonly reason: string,
@@ -24,6 +25,6 @@ export type SubmissionTargetAvailability = {
 export interface SubmissionTarget {
     readonly id: string;
     readonly label: string;
-    getAvailability(): Promise<SubmissionTargetAvailability>;
+    getAvailability(projectId: string): Promise<SubmissionTargetAvailability>;
     submit(projectId: string, archive: URI): Promise<SubmissionResult>;
 }

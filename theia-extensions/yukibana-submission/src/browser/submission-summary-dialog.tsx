@@ -17,6 +17,7 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
     private availability: SubmissionTargetAvailability | undefined;
 
     constructor(
+        protected readonly projectId: string,
         protected readonly preview: SubmissionPreview,
         protected readonly target: SubmissionTarget,
         protected readonly commandService: CommandService,
@@ -34,7 +35,7 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
         this.update();
         await this.validate();
         try {
-            this.availability = await this.target.getAvailability();
+            this.availability = await this.target.getAvailability(this.projectId);
         } catch (e) {
             this.availability = {
                 available: false,
@@ -104,15 +105,20 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
             </div>;
         }
         if (a.available) {
+            if (a.message !== undefined) {
+                return <div>
+                    <p className='yukibana-availability-message'>{a.message}</p>
+                </div>;
+            }
             return undefined;
         }
         const title = nls.localize('yukibana/submission/unavailabilityHeader', 'There might be an issue');
         return <div className='yukibana-availability unavailable' role='alert'>
             <h3>{title}</h3>
-            <div className="yukibana-availability-info">
-                <p className="yukibana-availability-reason">{a.reason}</p>
+            <div className='yukibana-availability-info'>
+                <p className='yukibana-availability-reason'>{a.reason}</p>
                 {a.actions?.length ? (
-                    <div className="yukibana-availability-actions">
+                    <div className='yukibana-availability-actions'>
                         {a.actions.map(action => (
                             <button
                                 key={action.label}

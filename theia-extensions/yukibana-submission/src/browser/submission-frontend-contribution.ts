@@ -41,17 +41,18 @@ export class SubmitCommandContribution implements CommandContribution {
                     respectGitignore: config.submission.respectGitignore,
                 };
                 const preview = await this.submissionService.previewSubmission(options);
+                const projectId = config.projectId;
                 const targetId = config.submission.target;
                 const target: SubmissionTarget | undefined = this.getTarget(targetId);
                 if (target === undefined) {
                     this.messageService.error(nls.localize('yukibana/submission/unknownTarget', 'Unknown submission target \'{0}\'', targetId));
                     return;
                 }
-                const confirmed = await new SubmissionSummaryDialog(preview, target, this.commandService).open();
+                const confirmed = await new SubmissionSummaryDialog(projectId, preview, target, this.commandService).open();
                 if (!confirmed) {
                     return;
                 }
-                await this.prepareAndSubmit(config.submission.target, config.projectId, options);
+                await this.prepareAndSubmit(targetId, projectId, options);
             }
         });
     }
@@ -130,7 +131,7 @@ export class SubmitCommandContribution implements CommandContribution {
                 reason: nls.localize('yukibana/submission/unknownTarget', 'Unknown submission target \'{0}\'', targetId)
             };
         }
-        const availability = await target.getAvailability();
+        const availability = await target.getAvailability(projectId);
         if (!availability.available) {
             return {
                 ok: false,

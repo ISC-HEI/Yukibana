@@ -10,7 +10,12 @@
       "logoutSuccessful": "Déconnecté avec succès",
       "submission": {
         "notLoggedIn": "Vous n'êtes pas connecté·e",
-        "login": "Se connecter"
+        "login": "Se connecter",
+        "late": "Vous êtes en retard mais vous pouvez toujours soumettre votre travail. Dépêchez-vous",
+        "notAllowed": "Vous n'êtes pas autorisé·e à soumettre ce projet",
+        "tooEarly": "Il est trop tôt pour soumettre votre travail. Réessayez plus tard",
+        "tooLate": "Ce projet a été clos. Vous ne pouvez plus le rendre",
+        "cannotSubmitUnknown": "Vous ne pouvez actuellement pas soumettre votre travail. Réessayez plus tard"
       },
       "openProject": {
         "title": "Ouverture du projet",
