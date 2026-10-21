@@ -1,8 +1,14 @@
 {
   "private": true,
   "engines": {
-    "node": ">=18",
-    "npm": ">=8"
+    "node": ">=24"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24",
+      "onFail": "error"
+    }
   },
   "packageManager": "pnpm@12.8.1",
   "scripts": {

@@ -1,4 +1,3 @@
-nodeVersion: "24.18.0"
 saveExact: true
 linkWorkspacePackages: true
 nodeLinker: hoisted # Needed for Theia's version check
