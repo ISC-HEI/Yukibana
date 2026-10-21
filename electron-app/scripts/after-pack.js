@@ -2,11 +2,10 @@
 
 const fs = require('fs');
 const path = require('path');
-const util = require('util');
 const child_process = require('child_process');
 const rimraf = require('rimraf');
 const sign_util = require('electron-osx-sign/util');
-const asyncRimraf = util.promisify(rimraf);
+const asyncRimraf = rimraf.rimraf;
 
 const DELETE_PATHS = [
     'Contents/Resources/app/node_modules/unzip-stream/aa.zip',
@@ -56,7 +55,7 @@ exports.default = async function (context) {
     }
 
     // Only continue for macOS during CI
-    if ((( branch === 'master' || releaseDryRun)  && running_ci && running_on_mac)) {
+    if (((branch === 'master' || releaseDryRun) && running_ci && running_on_mac)) {
         console.log('Detected Theia IDE Release on Mac ' + releaseDryRun ? ' (dry-run)' : ''
             + ' - proceeding with signing and notarizing');
     } else {
