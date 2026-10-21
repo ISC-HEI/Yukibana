@@ -111,7 +111,8 @@
           "security.workspace.trust.enabled": false,
           "telemetry.telemetryLevel": "all",
           "debug.internalConsoleOptions": "neverOpen",
-          "debug.openDebug": "neverOpen"
+          "debug.openDebug": "neverOpen",
+          "metals.disableReleaseNotes": true
         }
       }
     },
