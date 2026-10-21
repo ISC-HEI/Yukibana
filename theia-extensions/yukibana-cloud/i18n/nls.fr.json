@@ -1,11 +1,30 @@
 {
   "yukibana": {
     "cloud": {
+      "alreadyLoggedIn": "Déjà connecté",
+      "loggingIn": "Connexion...",
+      "login": "Se connecter au cloud",
+      "loginFailed": "Échec de connexion: {0}",
+      "loginSuccessful": "Connecté avec succès",
+      "logout": "Se déconnecter du cloud",
+      "logoutSuccessful": "Déconnecté avec succès",
+      "submission": {
+        "notLoggedIn": "Vous n'êtes pas connecté·e",
+        "login": "Se connecter"
+      },
       "openProject": {
         "title": "Ouverture du projet",
         "where": "Où voulez-vous ouvrir le projet ?",
         "thisWindow": "Dans cette fenêtre",
-        "newWindow": "Dans une nouvelle fenêtre"
+        "newWindow": "Dans une nouvelle fenêtre",
+        "choosingLocation": "Choosing download location...",
+        "downloadFail": "Download failed",
+        "downloadLocation": "Save project '{0}'",
+        "downloading": "Downloading...",
+        "gettingInfo": "Getting info...",
+        "notFound": "Project not found",
+        "opening": "Opening...",
+        "progressMessage": "Opening project"
       }
     }
   }

@@ -12,9 +12,18 @@ export type SubmissionResult = {
     readonly reason: string
 };
 
+export type SubmissionTargetAvailability = {
+    readonly available: true
+} | {
+    readonly available: false,
+    readonly reason: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    readonly actions: { label: string, command: string, args?: any[] }[]
+};
+
 export interface SubmissionTarget {
     readonly id: string;
     readonly label: string;
-    isAvailable(): Promise<boolean>;
+    getAvailability(): Promise<SubmissionTargetAvailability>;
     submit(projectId: string, archive: URI): Promise<SubmissionResult>;
 }

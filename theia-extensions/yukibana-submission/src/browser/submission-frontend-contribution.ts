@@ -117,19 +117,18 @@ export class SubmitCommandContribution implements CommandContribution {
     }
 
     private async submit(targetId: string, projectId: string, archiveURI: URI): Promise<SubmissionResult> {
-        const availableTargets = new Map<string, SubmissionTarget>();
-        for (const t of this.targets.getContributions()) {
-            if (await t.isAvailable()) {
-                availableTargets.set(t.id, t);
-            } else {
-                this.logger.warn(`Submission target '${t.id}' is not available`);
-            }
-        }
-        const target = availableTargets.get(targetId);
-        if (!target) {
+        const target: SubmissionTarget | undefined = this.targets.getContributions().filter(t => t.id === targetId)[0];
+        if (target === undefined) {
             return {
                 ok: false,
-                reason: nls.localize('yukibana/submission/targetUnavailable', 'Submission target is unavailable')
+                reason: nls.localize('yukibana/submission/unknownTarget', 'Unknown submission target \'{0}\'', targetId)
+            };
+        }
+        const availability = await target.getAvailability();
+        if (!availability.available) {
+            return {
+                ok: false,
+                reason: nls.localize('yukibana/submission/targetUnavailable', 'Submission target is unavailable: {0}', availability.reason)
             };
         }
         return target.submit(projectId, archiveURI);

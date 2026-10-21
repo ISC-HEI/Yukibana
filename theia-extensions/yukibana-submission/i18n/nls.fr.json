@@ -15,7 +15,8 @@
       "submitProgress": "Envoi",
       "preparing": "Préparation...",
       "transmitting": "Transmission...",
-      "targetUnavailable": "La destination n'est pas disponible",
+      "unknownTarget": "Destination '{0}' inconnue",
+      "targetUnavailable": "La destination n'est pas disponible: {0}",
       "submitSuccess": "Travail remis avec succès",
       "submitFail": "Échec de la soumission: {0}"
     }
