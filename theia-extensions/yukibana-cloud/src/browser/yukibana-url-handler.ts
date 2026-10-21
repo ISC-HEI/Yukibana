@@ -1,16 +1,17 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { ILogger, MaybePromise, MessageService, nls, URI } from '@theia/core';
+import { CommandService, ILogger, MaybePromise, MessageService, nls, URI } from '@theia/core';
 import { OpenerOptions, OpenHandler } from '@theia/core/lib/browser';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { TelemetryService } from '@theia/telemetry/lib/common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { CloudService } from '../common/cloud-protocol';
+import { CloudAuth, CloudService } from '../common/cloud-protocol';
 import { CloudTelemetry } from '../common/cloud-telemetry';
 import { OpenProjectNewWindowDialog } from './open-project-window-dialog';
+import { LoginCommand } from './command-contribution';
 
 @injectable()
 export class YukibanaOpenHandler implements OpenHandler {
@@ -21,11 +22,13 @@ export class YukibanaOpenHandler implements OpenHandler {
 
     @inject(ILogger) @named('yukibana:OpenHandler') protected readonly logger!: ILogger;
     @inject(CloudService) protected readonly service!: CloudService;
+    @inject(CloudAuth) protected readonly auth!: CloudAuth;
     @inject(FileDialogService) protected readonly fileDialogs!: FileDialogService;
     @inject(WorkspaceService) protected readonly workspaces!: WorkspaceService;
     @inject(MessageService) protected readonly messages!: MessageService;
     @inject(FileService) protected readonly files!: FileService;
     @inject(TelemetryService) protected readonly telemetry!: TelemetryService;
+    @inject(CommandService) protected readonly commands!: CommandService;
 
     canHandle(uri: URI, options?: OpenerOptions): MaybePromise<number> {
         return uri.scheme === 'yukibana' ? YukibanaOpenHandler.PRIORITY : 0;
@@ -44,6 +47,10 @@ export class YukibanaOpenHandler implements OpenHandler {
     }
 
     private async doProjectCommand(command: string, uri: URI): Promise<void> {
+        if (!await this.auth.isLoggedIn()) {
+            await this.commands.executeCommand(LoginCommand.id);
+        }
+
         if (command === '/open') {
             await this.openProjectURI(uri);
         }
