@@ -3,7 +3,7 @@
  */
 import { AIIdeActivationServiceImpl } from '@theia/ai-ide/lib/browser/ai-ide-activation-service';
 import { ApplicationShell, ApplicationShellOptions, bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
-import { bindContribution, CommandContribution, FilterContribution, MenuContribution } from '@theia/core/lib/common';
+import { bindContribution, CommandContribution, FilterContribution, MenuContribution, MessageService } from '@theia/core/lib/common';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { RemoteFileSystemProvider } from '@theia/filesystem/lib/common/remote-file-system-provider';
 import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
@@ -23,6 +23,7 @@ import { YukibanaProblemManager } from './yukibana-problem-manager';
 import { YukibanaRemoteFileSystemProvider } from './yukibana-remote-file-system-provider';
 import { SuggestionsContribution } from './yukibana-suggestions-contribution';
 import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
+import { YukibanaMessageService } from '../common/yukibana-message-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bindConfig(bind);
@@ -80,5 +81,12 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         rebind(ApplicationShellOptions).toConstantValue(shellOptions);
     } else {
         bind(ApplicationShellOptions).toConstantValue(shellOptions);
+    }
+
+    bind(YukibanaMessageService).toSelf().inSingletonScope();
+    if (isBound(MessageService)) {
+        rebind(MessageService).toService(YukibanaMessageService);
+    } else {
+        bind(MessageService).toService(YukibanaMessageService);
     }
 });
