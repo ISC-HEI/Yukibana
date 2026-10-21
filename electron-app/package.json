@@ -109,7 +109,9 @@
         },
         "preferences": {
           "security.workspace.trust.enabled": false,
-          "telemetry.telemetryLevel": "all"
+          "telemetry.telemetryLevel": "all",
+          "debug.internalConsoleOptions": "neverOpen",
+          "debug.openDebug": "neverOpen"
         }
       }
     },
