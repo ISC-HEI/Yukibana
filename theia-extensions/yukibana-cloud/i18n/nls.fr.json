@@ -22,14 +22,14 @@
         "where": "Où voulez-vous ouvrir le projet ?",
         "thisWindow": "Dans cette fenêtre",
         "newWindow": "Dans une nouvelle fenêtre",
-        "choosingLocation": "Choosing download location...",
-        "downloadFail": "Download failed",
-        "downloadLocation": "Save project '{0}'",
-        "downloading": "Downloading...",
-        "gettingInfo": "Getting info...",
-        "notFound": "Project not found",
-        "opening": "Opening...",
-        "progressMessage": "Opening project"
+        "choosingLocation": "Sélection d'un emplacement de téléchargment...",
+        "downloadFail": "Échec du téléchargment",
+        "downloadLocation": "Enregistrer le projet '{0}'",
+        "downloading": "Téléchargment...",
+        "gettingInfo": "Récupération des informations...",
+        "notFound": "Projet introuvable",
+        "opening": "Ouverture...",
+        "progressMessage": "Ouverture du projet"
       }
     }
   }
