@@ -18,3 +18,31 @@
     opacity: 0.6;
     margin-left: 1em;
 }
+
+.yukibana-availability.checking {
+    text-align: center;
+}
+
+.yukibana-availability-info {
+    background-color: rgb(255 179 116 / 8%);
+    padding: calc(var(--theia-ui-padding) * 2);
+}
+
+.yukibana-availability-reason {
+    margin: 0;
+    font-weight: bold;
+}
+
+.yukibana-availability-actions {
+    display: flex;
+    gap: 1em;
+    justify-content: center;
+}
+
+.yukibana-availability-actions button.theia-button {
+    margin-left: 0;
+}
+
+.yukibana-availability-message {
+    font-weight: bold;
+}

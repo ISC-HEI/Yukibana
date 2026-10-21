@@ -8,7 +8,7 @@ import { Project } from '@yukibana/cli';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as tar from 'tar';
-import { CloudService, DownloadResult, SubmissionResult } from '../common/cloud-protocol';
+import { CanSubmitStatus, CloudService, DownloadResult, SubmissionResult } from '../common/cloud-protocol';
 import { CloudClient } from './cloud-client';
 
 @injectable()
@@ -82,5 +82,9 @@ export class CloudServiceImpl implements CloudService {
             this.logger.error(e instanceof Error ? e : String(e));
             return { ok: false };
         }
+    }
+
+    canSubmitProject(projectId: string): Promise<CanSubmitStatus> {
+        return this.client.isProjectAcceptingSubmissions(projectId);
     }
 }

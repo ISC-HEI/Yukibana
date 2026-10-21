@@ -1,11 +1,35 @@
 {
   "yukibana": {
     "cloud": {
+      "alreadyLoggedIn": "Déjà connecté",
+      "loggingIn": "Connexion...",
+      "login": "Se connecter au cloud",
+      "loginFailed": "Échec de connexion: {0}",
+      "loginSuccessful": "Connecté avec succès",
+      "logout": "Se déconnecter du cloud",
+      "logoutSuccessful": "Déconnecté avec succès",
+      "submission": {
+        "notLoggedIn": "Vous n'êtes pas connecté·e",
+        "login": "Se connecter",
+        "late": "Vous êtes en retard mais vous pouvez toujours soumettre votre travail. Dépêchez-vous",
+        "notAllowed": "Vous n'êtes pas autorisé·e à soumettre ce projet",
+        "tooEarly": "Il est trop tôt pour soumettre votre travail. Réessayez plus tard",
+        "tooLate": "Ce projet a été clos. Vous ne pouvez plus le rendre",
+        "cannotSubmitUnknown": "Vous ne pouvez actuellement pas soumettre votre travail. Réessayez plus tard"
+      },
       "openProject": {
         "title": "Ouverture du projet",
         "where": "Où voulez-vous ouvrir le projet ?",
         "thisWindow": "Dans cette fenêtre",
-        "newWindow": "Dans une nouvelle fenêtre"
+        "newWindow": "Dans une nouvelle fenêtre",
+        "choosingLocation": "Sélection d'un emplacement de téléchargment...",
+        "downloadFail": "Échec du téléchargment",
+        "downloadLocation": "Enregistrer le projet '{0}'",
+        "downloading": "Téléchargment...",
+        "gettingInfo": "Récupération des informations...",
+        "notFound": "Projet introuvable",
+        "opening": "Ouverture...",
+        "progressMessage": "Ouverture du projet"
       }
     }
   }

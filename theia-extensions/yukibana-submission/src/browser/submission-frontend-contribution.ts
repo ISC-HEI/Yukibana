@@ -41,11 +41,18 @@ export class SubmitCommandContribution implements CommandContribution {
                     respectGitignore: config.submission.respectGitignore,
                 };
                 const preview = await this.submissionService.previewSubmission(options);
-                const confirmed = await new SubmissionSummaryDialog(preview).open();
+                const projectId = config.projectId;
+                const targetId = config.submission.target;
+                const target: SubmissionTarget | undefined = this.getTarget(targetId);
+                if (target === undefined) {
+                    this.messageService.error(nls.localize('yukibana/submission/unknownTarget', 'Unknown submission target \'{0}\'', targetId));
+                    return;
+                }
+                const confirmed = await new SubmissionSummaryDialog(projectId, preview, target, this.commandService).open();
                 if (!confirmed) {
                     return;
                 }
-                await this.prepareAndSubmit(config.submission.target, config.projectId, options);
+                await this.prepareAndSubmit(targetId, projectId, options);
             }
         });
     }
@@ -117,21 +124,24 @@ export class SubmitCommandContribution implements CommandContribution {
     }
 
     private async submit(targetId: string, projectId: string, archiveURI: URI): Promise<SubmissionResult> {
-        const availableTargets = new Map<string, SubmissionTarget>();
-        for (const t of this.targets.getContributions()) {
-            if (await t.isAvailable()) {
-                availableTargets.set(t.id, t);
-            } else {
-                this.logger.warn(`Submission target '${t.id}' is not available`);
-            }
-        }
-        const target = availableTargets.get(targetId);
-        if (!target) {
+        const target: SubmissionTarget | undefined = this.getTarget(targetId);
+        if (target === undefined) {
             return {
                 ok: false,
-                reason: nls.localize('yukibana/submission/targetUnavailable', 'Submission target is unavailable')
+                reason: nls.localize('yukibana/submission/unknownTarget', 'Unknown submission target \'{0}\'', targetId)
+            };
+        }
+        const availability = await target.getAvailability(projectId);
+        if (!availability.available) {
+            return {
+                ok: false,
+                reason: nls.localize('yukibana/submission/targetUnavailable', 'Submission target is unavailable: {0}', availability.reason)
             };
         }
         return target.submit(projectId, archiveURI);
+    }
+
+    private getTarget(targetId: string): SubmissionTarget | undefined {
+        return this.targets.getContributions().filter(t => t.id === targetId)[0];
     }
 }

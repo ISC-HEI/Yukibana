@@ -5,7 +5,7 @@ import { nls, URI } from '@theia/core';
 import { inject } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
 import { SubmissionService } from '../common/submission-protocol';
-import { SubmissionResult, SubmissionTarget } from '../common/submission-target';
+import { SubmissionResult, SubmissionTarget, SubmissionTargetAvailability } from '../common/submission-target';
 
 export class FileSubmissionTarget implements SubmissionTarget {
     readonly id = 'file';
@@ -14,13 +14,15 @@ export class FileSubmissionTarget implements SubmissionTarget {
     @inject(WorkspaceService) protected readonly workspaceService!: WorkspaceService;
     @inject(SubmissionService) protected readonly submissionService!: SubmissionService;
 
-    async isAvailable(): Promise<boolean> {
-        return true;
+    async getAvailability(): Promise<SubmissionTargetAvailability> {
+        return {
+            available: true
+        };
     }
 
     async submit(projectId: string, archive: URI): Promise<SubmissionResult> {
         const root = this.workspaceService.tryGetRoots()[0]?.resource;
-        if (!root) {
+        if (root === undefined) {
             return {
                 ok: false,
                 reason: nls.localize('yukibana/submission/fileTarget/noWorkspaceRoot', 'No workspace root'),
