@@ -2,20 +2,30 @@
  * SPDX-License-Identifier: MIT
  */
 import { nls, URI } from '@theia/core';
-import { inject } from '@theia/core/shared/inversify';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import { Project } from '@yukibana/cli';
 import { SubmissionResult, SubmissionTarget, SubmissionTargetAvailability } from 'yukibana-submission-ext/lib/common/submission-target';
-import { CanSubmitStatus, CloudAuth, CloudService } from '../common/cloud-protocol';
-import { LoginCommand } from './command-contribution';
+import { CanSubmitStatus, CloudAccount, CloudService } from '../common/cloud-protocol';
+import { CloudAccountService, CloudAccountState } from './cloud-account-service';
+import { LoginCommand, SwitchAccountCommand } from './command-contribution';
 
+/** `reason`, saying which account it applies to, since the registry decides by account. */
+function asAccount(reason: string, account: CloudAccount): string {
+    return nls.localize('yukibana/cloud/reasonAsAccount', '{0} (logged in as {1})', reason, CloudAccount.label(account));
+}
+
+@injectable()
 export class CloudSubmissionTarget implements SubmissionTarget {
     readonly id = 'cloud';
     readonly label = 'Cloud';
 
     @inject(CloudService) protected readonly service!: CloudService;
-    @inject(CloudAuth) protected readonly auth!: CloudAuth;
+    @inject(CloudAccountService) protected readonly accounts!: CloudAccountService;
 
     async getAvailability(projectId: string): Promise<SubmissionTargetAvailability> {
-        if (!await this.auth.isLoggedIn()) {
+        // The keystore may hold a session the registry no longer accepts, so ask the registry who this is
+        const [state, { status, project }] = await Promise.all([this.accounts.refresh(), this.service.canSubmitProject(projectId)]);
+        if (state.kind === 'logged-out') {
             return {
                 available: false,
                 reason: nls.localize('yukibana/cloud/submission/notLoggedIn', 'You are not logged in'),
@@ -27,9 +37,8 @@ export class CloudSubmissionTarget implements SubmissionTarget {
                 ]
             };
         }
-        const canSubmit: CanSubmitStatus = await this.service.canSubmitProject(projectId);
 
-        switch (canSubmit) {
+        switch (status) {
             case CanSubmitStatus.OPEN:
                 return { available: true };
 
@@ -42,8 +51,13 @@ export class CloudSubmissionTarget implements SubmissionTarget {
             case CanSubmitStatus.NOT_ALLOWED:
                 return {
                     available: false,
-                    reason: nls.localize('yukibana/cloud/submission/notAllowed', 'You are not allowed to submit for this project'),
-                    actions: [],
+                    reason: this.notAllowedReason(state, project),
+                    actions: [
+                        {
+                            label: nls.localize('yukibana/cloud/submission/switchAccount', 'Switch account'),
+                            command: SwitchAccountCommand.id,
+                        },
+                    ],
                 };
 
             case CanSubmitStatus.NOT_OPEN:
@@ -69,7 +83,28 @@ export class CloudSubmissionTarget implements SubmissionTarget {
         }
     }
 
-    submit(projectId: string, archive: URI): Promise<SubmissionResult> {
-        return this.service.submit(projectId, archive.toString());
+    /** The registry decides by account and role, so say which ones it refused. */
+    protected notAllowedReason(state: CloudAccountState, project?: Project): string {
+        const notAllowed = nls.localize('yukibana/cloud/submission/notAllowed', 'You are not allowed to submit for this project');
+        if (state.kind !== 'logged-in') {
+            return notAllowed;
+        }
+        if (project && project.role !== 'student') {
+            return nls.localize(
+                'yukibana/cloud/submission/notAllowedStaff',
+                '{0}: you are its {1} in {2} {3}, logged in as {4}. Only enrolled students can submit.',
+                notAllowed, project.role, project.courseCode, project.editionLabel, CloudAccount.label(state.account)
+            );
+        }
+        return asAccount(notAllowed, state.account);
+    }
+
+    async submit(projectId: string, archive: URI): Promise<SubmissionResult> {
+        const result = await this.service.submit(projectId, archive.toString());
+        if (result.ok) {
+            return result;
+        }
+        const state = await this.accounts.refresh();
+        return state.kind === 'logged-in' ? { ok: false, reason: asAccount(result.reason, state.account) } : result;
     }
 }

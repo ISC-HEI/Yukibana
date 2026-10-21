@@ -2,10 +2,12 @@
  * SPDX-License-Identifier: MIT
  */
 import { CommandContribution } from '@theia/core';
-import { OpenHandler, RemoteConnectionProvider, ServiceConnectionProvider } from '@theia/core/lib/browser';
+import { FrontendApplicationContribution, OpenHandler, RemoteConnectionProvider, ServiceConnectionProvider } from '@theia/core/lib/browser';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { SubmissionTarget } from 'yukibana-submission-ext/lib/common/submission-target';
 import { CloudAuth, cloudAuthPath, CloudService, cloudServicePath } from '../common/cloud-protocol';
+import { CloudAccountService } from './cloud-account-service';
+import { CloudAccountMenuContribution } from './cloud-account-menu';
 import { AuthClientImpl } from './cloud-auth-client';
 import { CloudSubmissionTarget } from './cloud-submission-target';
 import { LoginCommandContribution } from './command-contribution';
@@ -23,6 +25,11 @@ export default new ContainerModule(bind => {
     ).inSingletonScope();
 
     bind(CommandContribution).to(LoginCommandContribution);
+
+    bind(CloudAccountService).toSelf().inSingletonScope();
+    bind(CloudAccountMenuContribution).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(CloudAccountMenuContribution);
+    bind(CommandContribution).toService(CloudAccountMenuContribution);
 
     bind(CloudService).toDynamicValue(
         ctx => ServiceConnectionProvider.createProxy<CloudService>(ctx.container, cloudServicePath)

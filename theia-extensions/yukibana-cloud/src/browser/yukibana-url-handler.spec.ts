@@ -7,15 +7,16 @@ import { enableJSDOM } from '@theia/core/lib/browser/test/jsdom';
 const disableJSDom = enableJSDOM();
 FrontendApplicationConfigProvider.set({});
 
-import { ILogger, MessageService, URI } from '@theia/core';
+import { CommandService, ILogger, MessageService, URI } from '@theia/core';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { TelemetryService } from '@theia/telemetry/lib/common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { Project } from '@yukibana/cli';
 import { expect } from 'chai';
-import { CloudService, DownloadResult } from '../common/cloud-protocol';
+import { CloudService, DownloadResult, ProjectLookup } from '../common/cloud-protocol';
 import { CloudTelemetry } from '../common/cloud-telemetry';
+import { CloudAccountService } from './cloud-account-service';
 import { YukibanaOpenHandler } from './yukibana-url-handler';
 
 disableJSDom();
@@ -28,6 +29,23 @@ class TestOpenHandler extends YukibanaOpenHandler {
     }
 }
 
+interface Options {
+    loggedIn?: boolean;
+    /** Whether running the Log in command logs the person in. */
+    loginWorks?: boolean;
+    lookup?: () => Promise<ProjectLookup>;
+    folder?: URI;
+    download?: () => Promise<DownloadResult>;
+    /** The action picked on an error message, if any. */
+    choice?: string;
+}
+
+const PROJECT_ID = '01a11653-0353-7389-81f4-01837a3ed666';
+const project = { projectId: PROJECT_ID, title: 'Warm up', starterReady: true } as Project;
+const found = (p: Project): ProjectLookup => ({ kind: 'found', project: p });
+const folder = new URI('file:///home/student/projects');
+const projectUri = new URI('file:///home/student/projects/warmup');
+
 interface Mocks {
     handler: TestOpenHandler;
     /** Progress messages reported, and whether the notification was closed. */
@@ -37,18 +55,8 @@ interface Mocks {
     opened: { uri: URI, preserveWindow?: boolean }[];
     folderDialogs: number;
     downloads: { projectId: string, destination: string }[];
+    commands: string[];
 }
-
-interface Options {
-    info?: () => Promise<Project | undefined>;
-    folder?: URI;
-    download?: () => Promise<DownloadResult>;
-}
-
-const PROJECT_ID = '01a11653-0353-7389-81f4-01837a3ed666';
-const project = { projectId: PROJECT_ID, title: 'Warm up', starterReady: true } as Project;
-const folder = new URI('file:///home/student/projects');
-const projectUri = new URI('file:///home/student/projects/warmup');
 
 function setup(options: Options = {}): Mocks {
     const mocks: Omit<Mocks, 'handler'> = {
@@ -58,6 +66,7 @@ function setup(options: Options = {}): Mocks {
         opened: [],
         folderDialogs: 0,
         downloads: [],
+        commands: [],
     };
     const messages = {
         showProgress: async () => {
@@ -71,11 +80,11 @@ function setup(options: Options = {}): Mocks {
         },
         error: async (message: string) => {
             mocks.errors.push(message);
-            return undefined;
+            return options.choice;
         },
     };
     const service: Partial<CloudService> = {
-        getProjectInfo: options.info ?? (async () => project),
+        getProjectInfo: options.lookup ?? (async () => found(project)),
         downloadProject: async (projectId, destination) => {
             mocks.downloads.push({ projectId, destination });
             return options.download ? options.download() : { ok: true, uri: projectUri };
@@ -93,6 +102,16 @@ function setup(options: Options = {}): Mocks {
     const telemetry = {
         report: (_event: string, data: CloudTelemetry.OpenProjectURIData) => mocks.reports.push(data),
     };
+    let loggedIn = options.loggedIn ?? true;
+    const accounts = {
+        refresh: async () => ({ kind: loggedIn ? 'logged-in' : 'logged-out' }),
+    };
+    const commands = {
+        executeCommand: async (id: string) => {
+            mocks.commands.push(id);
+            loggedIn ||= options.loginWorks ?? false;
+        },
+    };
 
     const handler = new TestOpenHandler();
     Object.assign(handler, {
@@ -102,6 +121,8 @@ function setup(options: Options = {}): Mocks {
         workspaces: workspaces as unknown as WorkspaceService,
         messages: messages as unknown as MessageService,
         telemetry: telemetry as unknown as TelemetryService,
+        accounts: accounts as unknown as CloudAccountService,
+        commands: commands as unknown as CommandService,
     });
     return { handler, ...mocks };
 }
@@ -157,8 +178,53 @@ describe('YukibanaOpenHandler', () => {
             expect(mocks.reports[0]).to.include({ outcome: 'invalid-uri', stage: 'parse' });
         });
 
+        it('should log in first when nobody is logged in', async () => {
+            const mocks = setup({ loggedIn: false, loginWorks: true });
+            await mocks.handler.open(openUri(PROJECT_ID));
+
+            expect(mocks.commands).to.deep.equal(['yukibana.cloudLogin']);
+            expect(mocks.errors).to.have.length(0);
+            expect(mocks.opened).to.have.length(1);
+            expect(mocks.reports.map(r => r.outcome)).to.deep.equal(['opened']);
+        });
+
+        it('should offer to log in again when that login did not work', async () => {
+            const mocks = setup({ loggedIn: false, lookup: async () => ({ kind: 'not-logged-in' }) });
+            await mocks.handler.open(openUri(PROJECT_ID));
+
+            expect(mocks.commands).to.deep.equal(['yukibana.cloudLogin']);
+            expect(mocks.errors).to.deep.equal(['Log in to open this project']);
+            expect(mocks.folderDialogs).to.equal(0);
+            expect(mocks.progress.cancelled).to.equal(1);
+            expect(mocks.reports[0]).to.include({ outcome: 'not-logged-in', stage: 'info' });
+        });
+
+        it('should open the project once a session the registry refused is replaced', async () => {
+            let lookups = 0;
+            const mocks = setup({
+                loginWorks: true,
+                choice: 'Log in',
+                lookup: async () => lookups++ === 0 ? { kind: 'not-logged-in' } : found(project),
+            });
+            await mocks.handler.open(openUri(PROJECT_ID));
+            await new Promise(resolve => setTimeout(resolve));
+
+            expect(mocks.commands).to.deep.equal(['yukibana.cloudLogin']);
+            expect(lookups).to.equal(2);
+            expect(mocks.opened).to.have.length(1);
+            expect(mocks.reports.map(r => r.outcome)).to.deep.equal(['not-logged-in', 'opened']);
+        });
+
+        it('should not let a project title add links to the message', async () => {
+            const mocks = setup({ lookup: async () => found({ ...project, title: '[Click](command:workbench.action.reloadWindow)', starterReady: false }) });
+            await mocks.handler.open(openUri(PROJECT_ID));
+
+            expect(mocks.errors[0]).to.contain('Click');
+            expect(mocks.errors[0]).not.to.contain('[Click](command:');
+        });
+
         it('should report a project that cannot be found', async () => {
-            const mocks = setup({ info: async () => undefined });
+            const mocks = setup({ lookup: async () => ({ kind: 'not-found' }) });
             await mocks.handler.open(openUri(PROJECT_ID));
 
             expect(mocks.errors).to.deep.equal(['Project not found']);
@@ -168,7 +234,7 @@ describe('YukibanaOpenHandler', () => {
         });
 
         it('should not ask for a folder if the project has no starter', async () => {
-            const mocks = setup({ info: async () => ({ ...project, starterReady: false }) });
+            const mocks = setup({ lookup: async () => found({ ...project, starterReady: false }) });
             await mocks.handler.open(openUri(PROJECT_ID));
 
             expect(mocks.errors).to.deep.equal(['Project \'Warm up\' has no starter files to download yet']);
@@ -211,7 +277,7 @@ describe('YukibanaOpenHandler', () => {
         });
 
         it('should close the progress if getting the project info throws', async () => {
-            const mocks = setup({ info: async () => { throw new Error('backend unavailable'); } });
+            const mocks = setup({ lookup: async () => { throw new Error('backend unavailable'); } });
             await mocks.handler.open(openUri(PROJECT_ID));
 
             expect(mocks.progress.cancelled).to.equal(1);

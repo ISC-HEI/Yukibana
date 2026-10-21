@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: MIT
  */
 import { URI } from '@theia/core';
-import { Accepted, Project } from '@yukibana/cli';
+import { Accepted, Me, Project } from '@yukibana/cli';
 
 export const cloudAuthPath = '/services/yukibana/cloud-auth';
 export const authClientPath = '/services/yukibana/auth-client';
@@ -13,13 +13,32 @@ export const CloudService = Symbol('CloudService');
 
 export interface CloudAuth {
     login(): Promise<LoginResult>
+    /** Logs in again, ending the current session only once the new one is there. */
+    switchAccount(): Promise<LoginResult>
     logout(): Promise<void>
-    isLoggedIn(): Promise<boolean>
-    onLoginChanged(listener: (loggedIn: boolean) => void): void
+    /** The account the registry knows the session as, or undefined when nobody is logged in. */
+    whoAmI(): Promise<CloudAccount | undefined>
 }
 
 export interface AuthClient {
-    openLoginUrl(url: string): void;
+    /** `code` is what the login page shows too, so the person can tell it is this login. */
+    openLoginUrl(url: string, code?: string): void;
+    /** Someone logged in or out, possibly from another window. */
+    notifyLoginChanged(): void;
+}
+
+export type CloudAccount = Me;
+
+export namespace CloudAccount {
+    /** What tells the account apart from any other, for messages: the email when there is one. */
+    export function label(account: CloudAccount): string {
+        return account.email ?? account.githubLogin ?? account.fullName ?? account.userId;
+    }
+
+    /** What the person is called, for the status bar: the display name when there is one. */
+    export function displayName(account: CloudAccount): string {
+        return account.fullName ?? label(account);
+    }
 }
 
 export type LoginResult = {
@@ -53,9 +72,21 @@ export enum CanSubmitStatus {
     UNKNOWN
 }
 
+/** A project, or why there is none: the registry answers 404 both for no such project and for one the caller may not see. */
+export type ProjectLookup =
+    | { readonly kind: 'found', readonly project: Project }
+    | { readonly kind: 'not-found' }
+    | { readonly kind: 'not-logged-in' };
+
+/** Whether the caller may submit, with the project it was decided from when the registry answered. */
+export interface SubmitAvailability {
+    readonly status: CanSubmitStatus;
+    readonly project?: Project;
+}
+
 export interface CloudService {
     submit(projectId: string, archivePath: string): Promise<SubmissionResult>
-    getProjectInfo(projectId: string): Promise<Project | undefined>
+    getProjectInfo(projectId: string): Promise<ProjectLookup>
     downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult>
-    canSubmitProject(projectId: string): Promise<CanSubmitStatus>
+    canSubmitProject(projectId: string): Promise<SubmitAvailability>
 }

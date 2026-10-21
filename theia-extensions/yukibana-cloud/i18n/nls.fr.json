@@ -1,7 +1,6 @@
 {
   "yukibana": {
     "cloud": {
-      "alreadyLoggedIn": "Déjà connecté",
       "loggingIn": "Connexion...",
       "login": "Se connecter au cloud",
       "loginFailed": "Échec de connexion: {0}",
@@ -15,7 +14,9 @@
         "notAllowed": "Vous n'êtes pas autorisé·e à soumettre ce projet",
         "tooEarly": "Il est trop tôt pour soumettre votre travail. Réessayez plus tard",
         "tooLate": "Ce projet a été clos. Vous ne pouvez plus le rendre",
-        "cannotSubmitUnknown": "Vous ne pouvez actuellement pas soumettre votre travail. Réessayez plus tard"
+        "cannotSubmitUnknown": "Vous ne pouvez actuellement pas soumettre votre travail. Réessayez plus tard",
+        "switchAccount": "Changer de compte",
+        "notAllowedStaff": "{0}: vous êtes {1} dans {2} {3}, connecté·e en tant que {4}. Seul·e·s les étudiant·e·s inscrit·e·s peuvent soumettre."
       },
       "openProject": {
         "title": "Ouverture du projet",
@@ -23,14 +24,33 @@
         "thisWindow": "Dans cette fenêtre",
         "newWindow": "Dans une nouvelle fenêtre",
         "choosingLocation": "Sélection d'un emplacement de téléchargment...",
-        "downloadFail": "Échec du téléchargment",
         "downloadLocation": "Enregistrer le projet '{0}'",
         "downloading": "Téléchargment...",
         "gettingInfo": "Récupération des informations...",
         "notFound": "Projet introuvable",
         "opening": "Ouverture...",
-        "progressMessage": "Ouverture du projet"
-      }
+        "progressMessage": "Ouverture du projet",
+        "noStarter": "Le projet '{0}' n'a pas encore de fichiers de départ à télécharger",
+        "downloadFailReason": "Échec du téléchargement: {0}",
+        "failed": "Impossible d'ouvrir le projet: {0}",
+        "notLoggedIn": "Connectez-vous pour ouvrir ce projet"
+      },
+      "alreadyLoggedInAs": "Déjà connecté·e en tant que {0}",
+      "loginSuccessfulAs": "Connecté·e en tant que {0}",
+      "switchAccount": "Changer de compte cloud",
+      "refreshAccount": "Actualiser le compte cloud",
+      "account": {
+        "loggedInAs": "Connecté·e en tant que: {0}",
+        "loggedOut": "Non connecté·e",
+        "unavailable": "Impossible de vérifier votre compte: {0}",
+        "unavailableShort": "Compte indisponible",
+        "checking": "Vérification de votre compte...",
+        "logIn": "Se connecter",
+        "logOut": "Se déconnecter",
+        "retry": "Réessayer"
+      },
+      "loginCode": "Continuez dans votre navigateur; la page y affiche le code {0}",
+      "reasonAsAccount": "{0} (connecté·e en tant que {1})"
     }
   }
 }

@@ -8,10 +8,12 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { TelemetryService } from '@theia/telemetry/lib/common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { CloudAuth, CloudService } from '../common/cloud-protocol';
+import { localizeText } from 'yukibana-submission-ext/lib/common/localize-text';
+import { CloudService } from '../common/cloud-protocol';
 import { CloudTelemetry } from '../common/cloud-telemetry';
-import { OpenProjectNewWindowDialog } from './open-project-window-dialog';
+import { CloudAccountService } from './cloud-account-service';
 import { LoginCommand } from './command-contribution';
+import { OpenProjectNewWindowDialog } from './open-project-window-dialog';
 
 @injectable()
 export class YukibanaOpenHandler implements OpenHandler {
@@ -22,12 +24,12 @@ export class YukibanaOpenHandler implements OpenHandler {
 
     @inject(ILogger) @named('yukibana:OpenHandler') protected readonly logger!: ILogger;
     @inject(CloudService) protected readonly service!: CloudService;
-    @inject(CloudAuth) protected readonly auth!: CloudAuth;
     @inject(FileDialogService) protected readonly fileDialogs!: FileDialogService;
     @inject(WorkspaceService) protected readonly workspaces!: WorkspaceService;
     @inject(MessageService) protected readonly messages!: MessageService;
     @inject(FileService) protected readonly files!: FileService;
     @inject(TelemetryService) protected readonly telemetry!: TelemetryService;
+    @inject(CloudAccountService) protected readonly accounts!: CloudAccountService;
     @inject(CommandService) protected readonly commands!: CommandService;
 
     canHandle(uri: URI, options?: OpenerOptions): MaybePromise<number> {
@@ -47,7 +49,8 @@ export class YukibanaOpenHandler implements OpenHandler {
     }
 
     private async doProjectCommand(command: string, uri: URI): Promise<void> {
-        if (!await this.auth.isLoggedIn()) {
+        // The registry, not the keystore, says whether the stored session still works
+        if ((await this.accounts.refresh()).kind === 'logged-out') {
             await this.commands.executeCommand(LoginCommand.id);
         }
 
@@ -67,7 +70,6 @@ export class YukibanaOpenHandler implements OpenHandler {
         try {
             projectId = new URLSearchParams(uri.query).get('id') ?? undefined;
             this.logger.info(`Opening project: ${projectId}`);
-            // Invalid URI
             if (!projectId) {
                 outcome = 'invalid-uri';
                 this.logger.info('No project id');
@@ -80,19 +82,24 @@ export class YukibanaOpenHandler implements OpenHandler {
             progress.report({
                 message: nls.localize('yukibana/cloud/openProject/gettingInfo', 'Getting info...')
             });
-            const info = await this.service.getProjectInfo(projectId);
-            // Project not found
-            if (!info) {
+            const lookup = await this.service.getProjectInfo(projectId);
+            if (lookup.kind === 'not-logged-in') {
+                outcome = 'not-logged-in';
+                this.logger.info('Not logged in');
+                this.offerLogin(uri);
+                return;
+            }
+            if (lookup.kind === 'not-found') {
                 outcome = 'not-found';
                 this.logger.info('Project not found');
                 this.messages.error(nls.localize('yukibana/cloud/openProject/notFound', 'Project not found'));
                 return;
             }
-            // Nothing to download yet
+            const info = lookup.project;
             if (!info.starterReady) {
                 outcome = 'no-starter';
                 this.logger.info('Project has no starter');
-                this.messages.error(nls.localize('yukibana/cloud/openProject/noStarter', 'Project \'{0}\' has no starter files to download yet', info.title));
+                this.messages.error(localizeText('yukibana/cloud/openProject/noStarter', 'Project \'{0}\' has no starter files to download yet', info.title));
                 return;
             }
 
@@ -124,7 +131,7 @@ export class YukibanaOpenHandler implements OpenHandler {
             if (!result.ok) {
                 outcome = 'download-failed';
                 this.logger.error(`Could not download project: ${result.reason}`);
-                this.messages.error(nls.localize('yukibana/cloud/openProject/downloadFail', 'Download failed: {0}', result.reason));
+                this.messages.error(localizeText('yukibana/cloud/openProject/downloadFailReason', 'Download failed: {0}', result.reason));
                 return;
             }
 
@@ -141,12 +148,25 @@ export class YukibanaOpenHandler implements OpenHandler {
             this.workspaces.open(result.uri, { preserveWindow: !newWindow });
         } catch (e) {
             this.logger.error(`Could not open project (stage: ${stage})`, e);
-            this.messages.error(nls.localize('yukibana/cloud/openProject/failed', 'Could not open project: {0}', e instanceof Error ? e.message : String(e)));
+            this.messages.error(localizeText('yukibana/cloud/openProject/failed', 'Could not open project: {0}', e instanceof Error ? e.message : String(e)));
         } finally {
             progress?.cancel();
             if (outcome !== 'opened') {
                 this.report(outcome, stage, start, projectId, newWindow);
             }
+        }
+    }
+
+    /** Offers to log in, and opens the project once that worked. */
+    protected async offerLogin(uri: URI): Promise<void> {
+        const logIn = nls.localize('yukibana/cloud/submission/login', 'Log in');
+        const choice = await this.messages.error(nls.localize('yukibana/cloud/openProject/notLoggedIn', 'Log in to open this project'), logIn);
+        if (choice !== logIn) {
+            return;
+        }
+        await this.commands.executeCommand(LoginCommand.id);
+        if ((await this.accounts.refresh()).kind === 'logged-in') {
+            await this.openProjectURI(uri);
         }
     }
 
