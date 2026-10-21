@@ -1,7 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { CommandService, ILogger, MaybePromise, MessageService, nls, URI } from '@theia/core';
+import { CommandService, ILogger, MaybePromise, MessageService, nls, Progress, URI } from '@theia/core';
 import { OpenerOptions, OpenHandler } from '@theia/core/lib/browser';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
@@ -62,6 +62,7 @@ export class YukibanaOpenHandler implements OpenHandler {
         let outcome: CloudTelemetry.OpenProjectOutcome = 'error';
         let projectId: string | undefined;
         let newWindow: boolean | undefined;
+        let progress: Progress | undefined;
 
         try {
             projectId = new URLSearchParams(uri.query).get('id') ?? undefined;
@@ -75,7 +76,7 @@ export class YukibanaOpenHandler implements OpenHandler {
 
             stage = 'info';
 
-            const progress = await this.messages.showProgress({ text: nls.localize('yukibana/cloud/openProject/progressMessage', 'Opening project') });
+            progress = await this.messages.showProgress({ text: nls.localize('yukibana/cloud/openProject/progressMessage', 'Opening project') });
             progress.report({
                 message: nls.localize('yukibana/cloud/openProject/gettingInfo', 'Getting info...')
             });
@@ -84,8 +85,14 @@ export class YukibanaOpenHandler implements OpenHandler {
             if (!info) {
                 outcome = 'not-found';
                 this.logger.info('Project not found');
-                progress.cancel();
                 this.messages.error(nls.localize('yukibana/cloud/openProject/notFound', 'Project not found'));
+                return;
+            }
+            // Nothing to download yet
+            if (!info.starterReady) {
+                outcome = 'no-starter';
+                this.logger.info('Project has no starter');
+                this.messages.error(nls.localize('yukibana/cloud/openProject/noStarter', 'Project \'{0}\' has no starter files to download yet', info.title));
                 return;
             }
 
@@ -105,7 +112,6 @@ export class YukibanaOpenHandler implements OpenHandler {
             if (!folder) {
                 outcome = 'cancelled';
                 this.logger.info('No selection');
-                progress.cancel();
                 return;
             }
 
@@ -117,9 +123,8 @@ export class YukibanaOpenHandler implements OpenHandler {
             const result = await this.service.downloadProject(projectId, folder.toString());
             if (!result.ok) {
                 outcome = 'download-failed';
-                this.logger.error('Could not download project');
-                progress.cancel();
-                this.messages.error(nls.localize('yukibana/cloud/openProject/downloadFail', 'Download failed'));
+                this.logger.error(`Could not download project: ${result.reason}`);
+                this.messages.error(nls.localize('yukibana/cloud/openProject/downloadFail', 'Download failed: {0}', result.reason));
                 return;
             }
 
@@ -129,17 +134,24 @@ export class YukibanaOpenHandler implements OpenHandler {
                 message: nls.localize('yukibana/cloud/openProject/opening', 'Opening...')
             });
 
-            newWindow = await new OpenProjectNewWindowDialog().open();
+            newWindow = await this.askOpenInNewWindow();
 
             outcome = 'opened';
             this.report(outcome, stage, start, projectId, newWindow);
             this.workspaces.open(result.uri, { preserveWindow: !newWindow });
-            progress.cancel();
+        } catch (e) {
+            this.logger.error(`Could not open project (stage: ${stage})`, e);
+            this.messages.error(nls.localize('yukibana/cloud/openProject/failed', 'Could not open project: {0}', e instanceof Error ? e.message : String(e)));
         } finally {
+            progress?.cancel();
             if (outcome !== 'opened') {
                 this.report(outcome, stage, start, projectId, newWindow);
             }
         }
+    }
+
+    protected askOpenInNewWindow(): Promise<boolean | undefined> {
+        return new OpenProjectNewWindowDialog().open();
     }
 
     private report(outcome: CloudTelemetry.OpenProjectOutcome, stage: CloudTelemetry.OpenProjectStage, start: number, projectId?: string, newWindow?: boolean): void {

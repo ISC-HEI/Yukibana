@@ -42,12 +42,11 @@ export class CloudServiceImpl implements CloudService {
     }
 
     async downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult> {
-        const starter = await this.client.downloadStarter(projectId);
         const destinationPath = FileUri.fsPath(destinationURI);
 
-        const source = Buffer.from(starter.buffer, starter.byteOffset, starter.byteLength);
-
         try {
+            const starter = await this.client.downloadStarter(projectId);
+            const source = Buffer.from(starter.buffer, starter.byteOffset, starter.byteLength);
             const topLevel = new Map<string, boolean>();
 
             await new Promise((resolve, reject) => {
@@ -80,7 +79,10 @@ export class CloudServiceImpl implements CloudService {
             };
         } catch (e) {
             this.logger.error(e instanceof Error ? e : String(e));
-            return { ok: false };
+            return {
+                ok: false,
+                reason: e instanceof Error ? e.message : String(e)
+            };
         }
     }
 

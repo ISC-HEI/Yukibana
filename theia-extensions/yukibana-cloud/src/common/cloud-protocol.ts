@@ -41,6 +41,7 @@ export type DownloadResult = {
     readonly uri: URI;
 } | {
     readonly ok: false;
+    readonly reason: string;
 };
 
 export enum CanSubmitStatus {
