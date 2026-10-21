@@ -18,7 +18,11 @@
       "unknownTarget": "Destination '{0}' inconnue",
       "targetUnavailable": "La destination n'est pas disponible: {0}",
       "submitSuccess": "Travail remis avec succès",
-      "submitFail": "Échec de la soumission: {0}"
+      "submitFail": "Échec de la soumission: {0}",
+      "checkFailed": "Échec de vérification de la disponibilité de la destination",
+      "checkRetry": "Réessayer",
+      "checking": "Vérification de la disponibilité de la destination...",
+      "unavailabilityHeader": "Il y a peut-être un problème"
     }
   }
 }

@@ -41,7 +41,13 @@ export class SubmitCommandContribution implements CommandContribution {
                     respectGitignore: config.submission.respectGitignore,
                 };
                 const preview = await this.submissionService.previewSubmission(options);
-                const confirmed = await new SubmissionSummaryDialog(preview).open();
+                const targetId = config.submission.target;
+                const target: SubmissionTarget | undefined = this.getTarget(targetId);
+                if (target === undefined) {
+                    this.messageService.error(nls.localize('yukibana/submission/unknownTarget', 'Unknown submission target \'{0}\'', targetId));
+                    return;
+                }
+                const confirmed = await new SubmissionSummaryDialog(preview, target, this.commandService).open();
                 if (!confirmed) {
                     return;
                 }
@@ -117,7 +123,7 @@ export class SubmitCommandContribution implements CommandContribution {
     }
 
     private async submit(targetId: string, projectId: string, archiveURI: URI): Promise<SubmissionResult> {
-        const target: SubmissionTarget | undefined = this.targets.getContributions().filter(t => t.id === targetId)[0];
+        const target: SubmissionTarget | undefined = this.getTarget(targetId);
         if (target === undefined) {
             return {
                 ok: false,
@@ -132,5 +138,9 @@ export class SubmitCommandContribution implements CommandContribution {
             };
         }
         return target.submit(projectId, archiveURI);
+    }
+
+    private getTarget(targetId: string): SubmissionTarget | undefined {
+        return this.targets.getContributions().filter(t => t.id === targetId)[0];
     }
 }

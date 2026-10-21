@@ -18,7 +18,7 @@ export type SubmissionTargetAvailability = {
     readonly available: false,
     readonly reason: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    readonly actions: { label: string, command: string, args?: any[] }[]
+    readonly actions: { label: string, command: string | (() => Promise<void>), args?: any[] }[]
 };
 
 export interface SubmissionTarget {
