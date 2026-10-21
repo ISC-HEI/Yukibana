@@ -9,6 +9,10 @@
 Some additional tools and libraries are needed depending on your platform,
 see Theia's [own documentation](https://github.com/eclipse-theia/theia/blob/master/doc/Developing.md#prerequisites).
 
+On Windows, the Visual Studio Build Tools also need the
+"MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs (Latest)" component
+(Visual Studio Installer > Modify > Individual components).
+
 ## Setting up the environment
 
 1. Download the repository
@@ -84,6 +88,13 @@ and [electron-app](electron-app)).
 More information can be found in [docs/architecture.md](docs/architecture.md).
 
 ## Troubleshooting
+
+### `Could not resolve path of module: @vscode/windows-ca-certs`
+
+This native module failed to compile during `pnpm install`, but since it is
+an optional dependency, the installation did not report an error.
+Install the Spectre-mitigated libraries (see [Prerequisites](#prerequisites)),
+then run `pnpm install --force`.
 
 ### Invalid owner and permissions on `chrome-sandbox`
 
