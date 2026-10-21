@@ -21,6 +21,7 @@ their implementations are located.
 - [Cloud login and submission](#cloud-login-and-submission)
 - [Open project via custom URI](#open-project-via-custom-uri)
 - [Telemetry](#telemetry)
+- [Notification cleanup](#notification-cleanup)
 
 </details>
 
@@ -161,3 +162,12 @@ the server's address is hardcoded to a localhost endpoint.
 
 Examples of telemetry reporting can be found in [yukibana-cloud/src/browser/yukibana-url-handler.ts](../theia-extensions/yukibana-cloud/src/browser/yukibana-url-handler.ts)
 and [yukibana-submission/src/browser/submission-frontend-contribution.ts](../theia-extensions/yukibana-submission/src/browser/submission-frontend-contribution.ts).
+
+## Notification cleanup
+
+To ignore specific notifications, we may not always be able to disable them
+at the root (in the emitter), because they may come from external extensions.
+
+Instead, we rebind the `MessageService` to a custom implementation in [yukibana/src/common/yukibana-message-service.ts](../theia-extensions/yukibana/src/common/yukibana-message-service.ts).
+This custom service can ignore notifications and auto-select actions
+without showing the choices to the user.
