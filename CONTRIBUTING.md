@@ -73,10 +73,11 @@ Here are some of the most useful ones:
 
 ## Architecture
 
-The project is separated into 3 main parts:
+The project is separated into 4 main parts:
 - the browser app ([browser-app](browser-app))
 - the Electron app ([electron-app](electron-app))
 - custom extensions ([theia-extensions](theia-extensions))
+- libraries shared by the extensions ([packages](packages))
 
 Each part is its own workspace and contains its own build commands.
 The top-level project also provides general commands.

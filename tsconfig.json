@@ -7,6 +7,9 @@
   },
   "references": [
     {
+      "path": "packages/yukibana-common"
+    },
+    {
       "path": "theia-extensions/yukibana-launcher"
     },
     {

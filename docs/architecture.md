@@ -98,6 +98,8 @@ Yukibana
 ├── browser-app             # Browser-app specific config and resources
 ├── configs                 # General dev config files (ESLint, Playwright, ...)
 ├── electron-app            # Electron-app specific config and resources
+├── packages                # Libraries shared by the extensions (not extensions themselves)
+│   └── yukibana-common     # Helpers used across extensions
 ├── tests                   # Unit and E2E tests
 └── theia-extensions        
     ├── yukibana            # Main extension, where customization features are implemented

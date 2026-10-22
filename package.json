@@ -18,7 +18,7 @@
     "build:dev": "pnpm run build:extensions && pnpm run build:applications:dev",
     "build:applications": "pnpm run --filter=\"yukibana*app\" --filter=\"!yukibana-next*\" --workspace-concurrency=1 build:prod",
     "build:applications:dev": "pnpm run --filter=\"yukibana*app\" --filter=\"!yukibana-next*\" --workspace-concurrency=1 build",
-    "build:extensions": "pnpm run --filter=\"*-ext\" build",
+    "build:extensions": "pnpm run --filter=yukibana-common --filter=\"*-ext\" build",
     "package:applications": "pnpm run --filter=\"yukibana*app\" --filter=\"!yukibana-next*\" --workspace-concurrency=1 package",
     "package:applications:preview": "pnpm run --filter=\"yukibana*app\" --filter=\"!yukibana-next*\" --workspace-concurrency=1 package:preview",
     "package:applications:prod": "pnpm run --filter=\"yukibana*app\" --filter=\"!yukibana-next*\" --workspace-concurrency=1 package:prod",
@@ -32,8 +32,8 @@
     "permissions:writeable": "ts-node scripts/make-files-writeable.ts plugins",
     "lint": "eslint --ext js,jsx,ts,tsx scripts && pnpm run -r --if-present lint",
     "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix && pnpm run -r --if-present lint:fix",
-    "test": "nyc mocha --config configs/mocharc.yml \"./theia-extensions/**/lib/**/*.*spec.js\"",
-    "test:coverage": "nyc --reporter=html --reporter=text mocha --config configs/mocharc.yml \"./theia-extensions/**/lib/**/*.*spec.js\"",
+    "test": "nyc mocha --config configs/mocharc.yml \"./{packages,theia-extensions}/**/lib/**/*.*spec.js\"",
+    "test:coverage": "nyc --reporter=html --reporter=text mocha --config configs/mocharc.yml \"./{packages,theia-extensions}/**/lib/**/*.*spec.js\"",
     "electron": "pnpm run --filter yukibana-electron-app",
     "browser": "pnpm run --filter yukibana-browser-app",
     "tests": "pnpm run --filter yukibana-tests",
@@ -77,6 +77,7 @@
     "vscode.microsoft-authentication"
   ],
   "workspaces": [
+    "packages/*",
     "theia-extensions/*",
     "browser-app",
     "electron-app",

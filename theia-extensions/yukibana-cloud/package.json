@@ -15,6 +15,7 @@
     "@theia/workspace": "~1.75.0",
     "@yukibana/cli": "github:tothambrus11/yukibana-cloud#path:/cli",
     "tar": "7.5.22",
+    "yukibana-common": "workspace:*",
     "yukibana-submission-ext": "workspace:*"
   },
   "devDependencies": {

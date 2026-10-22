@@ -2,6 +2,7 @@ saveExact: true
 linkWorkspacePackages: true
 nodeLinker: hoisted # Needed for Theia's version check
 packages:
+  - packages/*
   - theia-extensions/*
   - dev-packages/*
   - browser-app
