@@ -19,7 +19,7 @@ test.describe('Scala extension', () => {
     
     test.beforeAll(async ({ playwright, browser }) => {
         const ws = new TheiaWorkspace([
-            path.resolve(__dirname, '..', '..', 'resources')
+            path.resolve(__dirname, '..', 'resources')
         ]);
         app = await TheiaAppLoader.load({
             playwright, browser, useElectron: {
