@@ -12,6 +12,7 @@
 //   pnpm package [--preview|--publish]         packages the electron app into electron-app/dist
 //   pnpm download:plugins [--force]
 //   pnpm clean
+//   node scripts/cli.mts compile               only compiles the extensions
 
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -24,12 +25,12 @@ type App = 'browser' | 'electron';
 const APPS: App[] = ['browser', 'electron'];
 
 const root = path.resolve(import.meta.dirname, '..');
-const require = createRequire(import.meta.url);
-const tsc = require.resolve('typescript/bin/tsc');
-const theia = require.resolve('@theia/cli/bin/theia.js');
 // The extensions and the libraries they share.
 const extensions = ['packages', 'theia-extensions'].flatMap(parent =>
-    fs.readdirSync(path.join(root, parent)).map(name => path.join(root, parent, name)));
+    fs.readdirSync(path.join(root, parent)).map(entry => path.join(root, parent, entry)));
+const theia = createRequire(import.meta.url).resolve('@theia/cli/bin/theia.js');
+// The TypeScript hoisted to the root is the older one that @typescript-eslint needs, so use the extensions' own.
+const tsc = createRequire(path.join(extensions[0], 'package.json')).resolve('typescript/bin/tsc');
 
 const appDir = (app: App): string => path.join(root, `${app}-app`);
 
@@ -80,9 +81,13 @@ function unlessUpToDate(stampFile: string, inputs: string, description: string, 
     fs.writeFileSync(stampFile, inputs);
 }
 
-function build(apps: App[], dev: boolean): void {
+function compile(): void {
     console.log('Compiling extensions...');
     exec(root, tsc, ['--build']);
+}
+
+function build(apps: App[], dev: boolean): void {
+    compile();
     const mode = dev ? 'development' : 'production';
     for (const app of apps) {
         const inputs = fingerprint([
@@ -191,6 +196,10 @@ const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Pa
             downloadPlugins(false);
             pnpmRun(appDir('electron'), values.preview ? 'package:preview' : values.publish ? 'deploy' : 'package');
         },
+    },
+    compile: {
+        options: {},
+        run: () => compile(),
     },
     'download:plugins': {
         options: { force: { type: 'boolean' } },

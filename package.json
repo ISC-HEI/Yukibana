@@ -20,8 +20,8 @@
     "postinstall": "theia check:theia-version",
     "lint": "eslint --ext js,jsx,ts,tsx,mts scripts && pnpm run -r --if-present lint",
     "lint:fix": "eslint --ext js,jsx,ts,tsx,mts scripts --fix && pnpm run -r --if-present lint:fix",
-    "test": "tsc --build && nyc mocha --config configs/mocharc.yml \"./{packages,theia-extensions}/**/lib/**/*.*spec.js\"",
-    "test:coverage": "tsc --build && nyc --reporter=html --reporter=text mocha --config configs/mocharc.yml \"./{packages,theia-extensions}/**/lib/**/*.*spec.js\"",
+    "test": "node scripts/cli.mts compile && nyc mocha --config configs/mocharc.yml \"./{packages,theia-extensions}/**/lib/**/*.*spec.js\"",
+    "test:coverage": "node scripts/cli.mts compile && nyc --reporter=html --reporter=text mocha --config configs/mocharc.yml \"./{packages,theia-extensions}/**/lib/**/*.*spec.js\"",
     "tests": "pnpm run --filter yukibana-tests",
     "dep:all": "ts-node scripts/dep-all.ts",
     "config:schema": "ts-node scripts/export-config-schema.ts"
@@ -48,7 +48,6 @@
     "nyc": "18.0.0",
     "ts-node": "^10.9.2",
     "tslint": "^5.20.1",
-    "typescript": "~5.4.5",
     "yargs": "^17.7.3"
   },
   "theiaPlugins": {
