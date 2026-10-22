@@ -95,7 +95,7 @@
       "config": {
         "applicationName": "Yukibana",
         "reloadOnReconnect": true,
-        "defaultTheme": "dark",
+        "defaultTheme": "Default Dark Modern",
         "defaultIconTheme": "theia-file-icons",
         "electron": {
           "appUserModelId": "isc.yukibana",
