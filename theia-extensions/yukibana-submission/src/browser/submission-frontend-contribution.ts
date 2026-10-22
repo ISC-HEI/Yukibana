@@ -10,6 +10,7 @@ import { SubmissionOptions, SubmissionService } from '../common/submission-proto
 import { SubmissionResult, SubmissionTarget } from '../common/submission-target';
 import { SubmissionTelemetry } from '../common/submission-telemetry';
 import { SubmissionSummaryDialog } from './submission-summary-dialog';
+import { localizeText } from '../common/localize-text';
 
 export const SubmitCommand: Command = Command.toLocalizedCommand({
     id: 'yukibana.submitAssignment',
@@ -45,7 +46,7 @@ export class SubmitCommandContribution implements CommandContribution {
                 const targetId = config.submission.target;
                 const target: SubmissionTarget | undefined = this.getTarget(targetId);
                 if (target === undefined) {
-                    this.messageService.error(nls.localize('yukibana/submission/unknownTarget', 'Unknown submission target \'{0}\'', targetId));
+                    this.messageService.error(localizeText('yukibana/submission/unknownTarget', 'Unknown submission target \'{0}\'', targetId));
                     return;
                 }
                 const confirmed = await new SubmissionSummaryDialog(projectId, preview, target, this.commandService).open();
@@ -82,7 +83,7 @@ export class SubmitCommandContribution implements CommandContribution {
             progress.cancel();
             if (!result.ok) {
                 this.messageService.error(
-                    nls.localize('yukibana/submission/submitFail', 'Failed to submit: {0}', result.reason),
+                    localizeText('yukibana/submission/submitFail', 'Failed to submit: {0}', result.reason),
                     { timeout: 5000 },
                 );
                 error = result.reason;

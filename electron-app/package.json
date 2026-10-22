@@ -78,7 +78,7 @@
     "build": "pnpm run --loglevel silent rebuild && theia build --app-target=\"electron\" --mode development && pnpm run fix-sandbox",
     "build:prod": "pnpm run --loglevel silent rebuild && theia build --app-target=\"electron\" && pnpm run fix-sandbox",
     "rebuild": "theia rebuild:electron --cacheRoot ..",
-    "fix-sandbox": "bash scripts/fix-chrome-sandbox.sh",
+    "fix-sandbox": "node scripts/fix-chrome-sandbox.js",
     "start": "theia start --plugins=local-dir:../plugins",
     "watch": "pnpm run rebuild && theia build --watch --mode development",
     "prepackage": "node scripts/patch-ripgrep-asar-path.mjs",

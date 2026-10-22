@@ -4,16 +4,18 @@
 import { ILogger } from '@theia/core';
 import { FileUri } from '@theia/core/lib/node';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
-import { Project } from '@yukibana/cli';
+import { RegistryError } from '@yukibana/cli';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as tar from 'tar';
-import { CanSubmitStatus, CloudService, DownloadResult, SubmissionResult } from '../common/cloud-protocol';
-import { CloudClient } from './cloud-client';
+import { CloudService, DownloadResult, ProjectLookup, SubmissionResult, SubmitAvailability } from '../common/cloud-protocol';
+import { CloudClient, isRefused } from './cloud-client';
+import { CloudSessionManager } from './cloud-session-manager';
 
 @injectable()
 export class CloudServiceImpl implements CloudService {
     @inject(CloudClient) protected readonly client!: CloudClient;
+    @inject(CloudSessionManager) protected readonly sessions!: CloudSessionManager;
     @inject(ILogger) @named('yukibana:CloudService') protected readonly logger!: ILogger;
 
     async submit(projectId: string, archiveURI: string): Promise<SubmissionResult> {
@@ -33,21 +35,26 @@ export class CloudServiceImpl implements CloudService {
         }
     }
 
-    async getProjectInfo(projectId: string): Promise<Project | undefined> {
+    async getProjectInfo(projectId: string): Promise<ProjectLookup> {
         try {
-            return await this.client.project(projectId);
-        } catch {
-            return undefined;
+            return { kind: 'found', project: await this.client.project(projectId) };
+        } catch (e) {
+            if (e instanceof RegistryError && e.status === 404) {
+                return { kind: 'not-found' };
+            }
+            if (isRefused(e) || !(await this.sessions.isLoggedIn())) {
+                return { kind: 'not-logged-in' };
+            }
+            throw e;
         }
     }
 
     async downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult> {
-        const starter = await this.client.downloadStarter(projectId);
         const destinationPath = FileUri.fsPath(destinationURI);
 
-        const source = Buffer.from(starter.buffer, starter.byteOffset, starter.byteLength);
-
         try {
+            const starter = await this.client.downloadStarter(projectId);
+            const source = Buffer.from(starter.buffer, starter.byteOffset, starter.byteLength);
             const topLevel = new Map<string, boolean>();
 
             await new Promise((resolve, reject) => {
@@ -80,11 +87,14 @@ export class CloudServiceImpl implements CloudService {
             };
         } catch (e) {
             this.logger.error(e instanceof Error ? e : String(e));
-            return { ok: false };
+            return {
+                ok: false,
+                reason: e instanceof Error ? e.message : String(e)
+            };
         }
     }
 
-    canSubmitProject(projectId: string): Promise<CanSubmitStatus> {
+    canSubmitProject(projectId: string): Promise<SubmitAvailability> {
         return this.client.isProjectAcceptingSubmissions(projectId);
     }
 }

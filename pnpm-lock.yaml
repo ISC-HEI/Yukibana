@@ -321,6 +321,8 @@ importers:
         specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(proxy-agent@8.0.2(supports-color@8.1.1))(supports-color@8.1.1)
 
+  dev-packages/test-setup: {}
+
   electron-app:
     dependencies:
       '@theia/ai-anthropic':
@@ -595,7 +597,7 @@ importers:
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@yukibana/cli':
         specifier: github:tothambrus11/yukibana-cloud#path:/cli
-        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/399ba75b2a3f17f1e3534dbf7470c02ec2ba8fde#path:/cli
+        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/37c34436a3b1a752123ab10c89be214cbe534556#path:/cli
       tar:
         specifier: 7.5.22
         version: 7.5.22
@@ -2220,8 +2222,8 @@ packages:
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
 
-  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/399ba75b2a3f17f1e3534dbf7470c02ec2ba8fde#path:/cli':
-    resolution: {gitHosted: true, integrity: sha512-t9s7GSCuzJaV3/xv8tqEgzob8iVYRlMrD1FeMRTLYW7ImCOL5uid+4bRyfBp4G/0PoX3ThRzhcRqzPMReTz/Ww==, path: /cli, tarball: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/399ba75b2a3f17f1e3534dbf7470c02ec2ba8fde}
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/37c34436a3b1a752123ab10c89be214cbe534556#path:/cli':
+    resolution: {gitHosted: true, integrity: sha512-n3hUVClcIMgX8xXut4b7F/UfbC+kO6PqWKbFkMo19AHnzD/5ZN6EKy2qsYR30jRsmr78WzWIpj+pdUMzvnUMoA==, path: /cli, tarball: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/37c34436a3b1a752123ab10c89be214cbe534556}
     version: 0.1.0
     engines: {node: '>=22.15'}
     hasBin: true
@@ -10844,7 +10846,7 @@ snapshots:
 
   '@yarnpkg/lockfile@1.1.0': {}
 
-  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/399ba75b2a3f17f1e3534dbf7470c02ec2ba8fde#path:/cli': {}
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/37c34436a3b1a752123ab10c89be214cbe534556#path:/cli': {}
 
   abbrev@4.0.0: {}
 

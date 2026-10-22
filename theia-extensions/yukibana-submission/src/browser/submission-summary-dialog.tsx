@@ -30,24 +30,34 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
         this.refreshAvailability();
     }
 
+    private latestCheck = 0;
+
     protected async refreshAvailability(): Promise<void> {
+        const check = ++this.latestCheck;
         this.availability = undefined;
         this.update();
         await this.validate();
+        let availability: SubmissionTargetAvailability;
         try {
-            this.availability = await this.target.getAvailability(this.projectId);
+            availability = await this.target.getAvailability(this.projectId);
         } catch (e) {
-            this.availability = {
+            availability = {
                 available: false,
                 reason: nls.localize('yukibana/submission/checkFailed', 'Could not check target availability'),
                 actions: [
                     {
                         label: nls.localize('yukibana/submission/checkRetry', 'Retry'),
-                        command: () => this.refreshAvailability(),
+                        // Every action is followed by a fresh check, which is all retrying needs
+                        command: async () => undefined,
                     }
                 ],
             };
         }
+        // A check started after this one, e.g. by an action, knows better
+        if (check !== this.latestCheck) {
+            return;
+        }
+        this.availability = availability;
         this.update();
         await this.validate();
     }
@@ -138,7 +148,6 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
     }
 
     private runCommand(command: string | (() => Promise<void>)): Promise<void> {
-        console.log(`running command ${command}`);
         if (typeof command === 'string') {
             return this.commandService.executeCommand(command);
         } else {
