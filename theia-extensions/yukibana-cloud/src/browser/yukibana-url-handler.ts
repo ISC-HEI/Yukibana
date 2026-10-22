@@ -127,7 +127,7 @@ export class YukibanaOpenHandler implements OpenHandler {
             progress.report({
                 message: nls.localize('yukibana/cloud/openProject/downloading', 'Downloading...')
             });
-            const result = await this.service.downloadProject(projectId, folder.toString());
+            const result = await this.service.downloadProject(projectId, folder.toString(), info.slug);
             if (!result.ok) {
                 outcome = 'download-failed';
                 this.logger.error(`Could not download project: ${result.reason}`);
