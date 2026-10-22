@@ -19,12 +19,9 @@ if (watch) {
     ]);
 } else {
     try {
-        await browserContext.rebuild();
-        await browserContext.dispose();
-        await nodeContext.rebuild();
-        await nodeContext.dispose();
-        await electronContext.rebuild();
-        await electronContext.dispose();
+        // The builds are independent, so run them at the same time.
+        await Promise.all([browserContext.rebuild(), nodeContext.rebuild(), electronContext.rebuild()]);
+        await Promise.all([browserContext.dispose(), nodeContext.dispose(), electronContext.dispose()]);
     } catch {
         process.exit(1);
     }
