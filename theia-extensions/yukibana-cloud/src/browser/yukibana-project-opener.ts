@@ -23,11 +23,8 @@ interface ResolvedConflict {
 
 @injectable()
 export class YukibanaProjectOpener {
-    protected stage: CloudTelemetry.OpenProjectStage;
     protected outcome: CloudTelemetry.OpenProjectOutcome;
     protected progress: Progress | undefined;
-    protected projectId: string | undefined;
-    protected newWindow: boolean | undefined;
 
     @inject(ILogger) @named('yukibana:OpenHandler') protected readonly logger!: ILogger;
     @inject(CloudService) protected readonly service!: CloudService;
@@ -40,18 +37,18 @@ export class YukibanaProjectOpener {
     @inject(CommandService) protected readonly commands!: CommandService;
 
     constructor() {
-        this.stage = 'parse';
         this.outcome = 'error';
     }
 
     async openProjectURI(uri: URI): Promise<void> {
         this.logger.info(`Opening project from URI: ${uri}`);
         const start = Date.now();
-        this.stage = 'parse';
+        let stage: CloudTelemetry.OpenProjectStage = 'parse';
         this.outcome = 'error';
         this.progress = undefined;
         let projectId: string | undefined = undefined;
         let newWindow: boolean | undefined = undefined;
+        let downloadURI: URI | undefined = undefined;
 
         try {
             projectId = this.parseURI(uri);
@@ -63,25 +60,26 @@ export class YukibanaProjectOpener {
                 text: nls.localize('yukibana/cloud/openProject/progressMessage', 'Opening project')
             });
 
-            this.stage = 'info';
+            stage = 'info';
             const project = await this.getProjectInfo(uri, projectId);
             if (!project) {
                 return;
             }
 
-            this.stage = 'location';
+            stage = 'location';
             const folder = await this.chooseFolder(project);
             if (!folder) {
                 return;
             }
 
-            this.stage = 'download';
+            stage = 'download';
             const downloadResult = await this.downloadStarter(projectId);
             if (!downloadResult.ok) {
                 return;
             }
+            downloadURI = downloadResult.uri;
 
-            this.stage = 'copy';
+            stage = 'copy';
             const projectURI = await this.copyStarter(project, downloadResult.uri, folder);
             if (!projectURI) {
                 return;
@@ -91,26 +89,30 @@ export class YukibanaProjectOpener {
                 message: nls.localize('yukibana/cloud/openProject/opening', 'Opening...')
             });
 
-            this.stage = 'window';
+            stage = 'window';
             newWindow = await this.askOpenInNewWindow();
 
             this.outcome = 'opened';
-            this.report(this.outcome, this.stage, start, projectId, newWindow);
+            this.report(this.outcome, stage, start, projectId, newWindow);
             this.workspaces.open(projectURI, { preserveWindow: !newWindow });
         } catch (e) {
-            this.logger.error(`Could not open project (stage: ${this.stage})`, e);
+            this.logger.error(`Could not open project (stage: ${stage})`, e);
             this.messages.error(localizeMarkdown('yukibana/cloud/openProject/failed', 'Could not open project: {0}', e instanceof Error ? e.message : String(e)));
         } finally {
+            if (downloadURI !== undefined) {
+                await this.tryCleanDownload(downloadURI.parent);
+            }
+
             this.progress?.cancel();
             if (this.outcome !== 'opened') {
-                this.report(this.outcome, this.stage, start, projectId, newWindow);
+                this.report(this.outcome, stage, start, projectId, newWindow);
             }
         }
     }
 
     protected parseURI(uri: URI): string | undefined {
         const projectId = new URLSearchParams(uri.query).get('id') ?? undefined;
-        this.logger.info(`Opening project: ${this.projectId}`);
+        this.logger.info(`Opening project: ${projectId}`);
 
         if (!projectId) {
             this.outcome = 'invalid-uri';
@@ -292,5 +294,17 @@ export class YukibanaProjectOpener {
             return false;
         }
         return stat.children === undefined || stat.children.length === 0;
+    }
+
+    protected async tryCleanDownload(downloadURI: URI): Promise<void> {
+        // Best effort, ignore fail
+        try {
+            await this.files.delete(downloadURI, {
+                recursive: true,
+                useTrash: false,
+            });
+        } catch (e) {
+            this.logger.error(`Failed to clean download: ${e instanceof Error ? e.message : String(e)}`);
+        }
     }
 }
