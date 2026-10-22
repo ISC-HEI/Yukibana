@@ -1,7 +1,0 @@
-{
-  "private": true,
-  "name": "test-setup",
-  "version": "0.1.0",
-  "description": "Custom setup for mocha tests",
-  "main": "test-setup.js"
-}

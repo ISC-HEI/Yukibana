@@ -34,14 +34,6 @@
   "devDependencies": {
     "@theia/cli": "~1.75.0"
   },
-  "scripts": {
-    "bundle": "pnpm run rebuild && theia build --mode development",
-    "build": "pnpm run --loglevel silent rebuild && theia build --app-target=\"browser\" --mode development",
-    "build:prod": "pnpm run --loglevel silent rebuild && theia build --app-target=\"browser\"",
-    "rebuild": "theia rebuild:browser --cacheRoot ..",
-    "start": "theia start --plugins=local-dir:../plugins",
-    "watch": "pnpm run rebuild && theia build --watch --mode development"
-  },
   "theia": {
     "target": "browser",
     "frontend": {

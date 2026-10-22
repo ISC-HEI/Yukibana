@@ -5,6 +5,7 @@ import { Emitter, ILogger } from '@theia/core';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { Me, NotLoggedIn, RegistryError } from '@yukibana/cli';
 import { expect } from 'chai';
+import { describe, it } from 'vitest';
 import { AuthClient } from '../common/cloud-protocol';
 import { CloudAuthImpl } from './cloud-auth';
 import { CloudClient, isRefused } from './cloud-client';

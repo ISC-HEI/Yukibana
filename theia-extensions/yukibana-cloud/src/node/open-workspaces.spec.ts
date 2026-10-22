@@ -2,6 +2,7 @@
  * SPDX-License-Identifier: MIT
  */
 import { expect } from 'chai';
+import { describe, it } from 'vitest';
 import { OpenWorkspacesClient } from '../common/open-workspaces-protocol';
 import { OpenWorkspaces, OpenWorkspacesServerImpl } from './open-workspaces';
 

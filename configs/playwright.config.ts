@@ -19,8 +19,8 @@
 import { PlaywrightTestConfig } from '@playwright/test';
 
 const config: PlaywrightTestConfig = {
-    testDir: '../tests/lib/',
-    testMatch: ['**/*.test.js'],
+    testDir: '../tests/e2e/',
+    testMatch: ['**/*.test.ts'],
     workers: 2,
     // Timeout for each test in milliseconds.
     timeout: 60 * 1000,
