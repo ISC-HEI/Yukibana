@@ -13,3 +13,5 @@
 **/allure-results
 **/coverage
 .nyc_output
+
+.idea
