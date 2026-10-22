@@ -10,7 +10,7 @@ import { SubmissionOptions, SubmissionService } from '../common/submission-proto
 import { SubmissionResult, SubmissionTarget } from '../common/submission-target';
 import { SubmissionTelemetry } from '../common/submission-telemetry';
 import { SubmissionSummaryDialog } from './submission-summary-dialog';
-import { localizeText } from '../common/localize-text';
+import { localizeText } from 'yukibana-ext/lib/common/localize-text';
 
 export const SubmitCommand: Command = Command.toLocalizedCommand({
     id: 'yukibana.submitAssignment',

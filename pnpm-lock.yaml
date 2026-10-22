@@ -601,6 +601,9 @@ importers:
       tar:
         specifier: 7.5.22
         version: 7.5.22
+      yukibana-ext:
+        specifier: workspace:*
+        version: link:../yukibana
       yukibana-submission-ext:
         specifier: workspace:*
         version: link:../yukibana-submission
