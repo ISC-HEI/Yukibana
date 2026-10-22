@@ -19,6 +19,7 @@ allowBuilds:
   electron-chromedriver: true
   electron-winstaller: true
   esbuild: true
+  find-git-repositories: true
   keytar: true
   msgpackr-extract: true
   native-keymap: true
