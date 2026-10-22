@@ -1,0 +1,580 @@
+/*
+ * SPDX-License-Identifier: MIT
+ *
+ * The welcome screen, after IntelliJ's: a sidebar with the product, the pages and the account,
+ * and the page itself on the right. Colours come from the theme, except the avatars, which take
+ * the logo's five pastels so a course keeps its colour across windows and themes.
+ */
+
+.yukibana-welcome {
+    --yukibana-welcome-avatar-0: #a78fc4;
+    --yukibana-welcome-avatar-1: #e2a3b1;
+    --yukibana-welcome-avatar-2: #7fbde0;
+    --yukibana-welcome-avatar-3: #8cc4b6;
+    --yukibana-welcome-avatar-4: #e8d873;
+    --yukibana-welcome-radius: 6px;
+    --yukibana-welcome-sidebar-width: 240px;
+
+    background: var(--theia-editor-background);
+    color: var(--theia-foreground);
+    height: 100%;
+    overflow: hidden;
+    outline: none;
+    container-type: inline-size;
+}
+
+.yukibana-welcome-frame {
+    display: flex;
+    height: 100%;
+    min-height: 0;
+}
+
+/* Sidebar */
+
+.yukibana-welcome-sidebar {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 var(--yukibana-welcome-sidebar-width);
+    box-sizing: border-box;
+    padding: 20px 12px 16px;
+    background: var(--theia-sideBar-background);
+    border-right: 1px solid var(--theia-sideBarSectionHeader-border, var(--theia-panel-border));
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.yukibana-welcome-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 8px 20px;
+}
+
+.yukibana-welcome-logo,
+.yukibana-welcome-hero-logo {
+    background: url('./yukibana-logo.png') center / contain no-repeat;
+    flex: none;
+}
+
+.yukibana-welcome-logo {
+    width: 40px;
+    height: 40px;
+}
+
+.yukibana-welcome-product {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.yukibana-welcome-version {
+    font-size: 12px;
+    color: var(--theia-descriptionForeground);
+    margin-top: 2px;
+}
+
+.yukibana-welcome-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.yukibana-welcome-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 7px 10px;
+    border: none;
+    border-radius: var(--yukibana-welcome-radius);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.yukibana-welcome-nav-item:hover {
+    background: var(--theia-list-hoverBackground);
+}
+
+.yukibana-welcome-nav-item.selected {
+    /* The inactive selection's colours, which every theme keeps readable on the sidebar; the active ones assume focus */
+    background: var(--theia-list-inactiveSelectionBackground);
+    color: var(--theia-list-inactiveSelectionForeground, var(--theia-foreground));
+    font-weight: 600;
+}
+
+.yukibana-welcome-nav-item:focus-visible,
+.yukibana-welcome-row:focus-visible,
+.yukibana-welcome-tile:focus-visible,
+.yukibana-welcome-link:focus-visible,
+.yukibana-welcome-row-remove:focus-visible {
+    outline: 1px solid var(--theia-focusBorder);
+    outline-offset: -1px;
+}
+
+.yukibana-welcome-nav-label {
+    flex: 1;
+}
+
+.yukibana-welcome-badge {
+    min-width: 18px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    border-radius: 9px;
+    line-height: 18px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    background: var(--theia-badge-background);
+    color: var(--theia-badge-foreground);
+}
+
+.yukibana-welcome-spacer {
+    flex: 1;
+    min-height: 24px;
+}
+
+/* Account */
+
+.yukibana-welcome-account {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 8px 0;
+    border-top: 1px solid var(--theia-panel-border);
+}
+
+.yukibana-welcome-account-who {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.yukibana-welcome-account-text {
+    min-width: 0;
+}
+
+.yukibana-welcome-account-name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.yukibana-welcome-account-detail {
+    font-size: 12px;
+    color: var(--theia-descriptionForeground);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.yukibana-welcome-account-actions {
+    display: flex;
+    gap: 14px;
+    padding-left: 42px;
+}
+
+.yukibana-welcome-login.theia-button {
+    margin: 0;
+    width: 100%;
+}
+
+.yukibana-welcome-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--theia-textLink-foreground);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.yukibana-welcome-link:hover {
+    color: var(--theia-textLink-activeForeground);
+    text-decoration: underline;
+}
+
+/* Avatars */
+
+.yukibana-welcome-avatar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #1f1f24;
+    user-select: none;
+}
+
+.yukibana-welcome-avatar.square {
+    border-radius: 8px;
+}
+
+.yukibana-welcome-avatar.round {
+    border-radius: 50%;
+}
+
+.yukibana-welcome-avatar.anonymous {
+    background: var(--theia-list-hoverBackground);
+    color: var(--theia-descriptionForeground);
+}
+
+.yukibana-welcome-avatar.colour-0 { background: var(--yukibana-welcome-avatar-0); }
+.yukibana-welcome-avatar.colour-1 { background: var(--yukibana-welcome-avatar-1); }
+.yukibana-welcome-avatar.colour-2 { background: var(--yukibana-welcome-avatar-2); }
+.yukibana-welcome-avatar.colour-3 { background: var(--yukibana-welcome-avatar-3); }
+.yukibana-welcome-avatar.colour-4 { background: var(--yukibana-welcome-avatar-4); }
+
+/* Main page */
+
+.yukibana-welcome-main {
+    /* The page's content keeps to a centred column this wide; the bars around it span the page */
+    --yukibana-welcome-column: 920px;
+    --yukibana-welcome-gutter: max(28px, calc((100% - var(--yukibana-welcome-column)) / 2));
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+.yukibana-welcome-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px var(--yukibana-welcome-gutter) 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.yukibana-welcome-search {
+    position: relative;
+    flex: 1;
+    min-width: 120px;
+}
+
+.yukibana-welcome-search > .codicon {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--theia-descriptionForeground);
+    pointer-events: none;
+}
+
+.yukibana-welcome-search input.theia-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px 6px 30px;
+    border: 1px solid var(--theia-input-border, var(--theia-panel-border));
+    border-radius: var(--yukibana-welcome-radius);
+}
+
+.yukibana-welcome-search input.theia-input:focus {
+    border-color: var(--theia-focusBorder);
+}
+
+.yukibana-welcome-actions {
+    display: flex;
+    gap: 8px;
+    flex: none;
+}
+
+.yukibana-welcome-actions .theia-button {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: var(--yukibana-welcome-radius);
+    min-width: 0;
+    padding: 4px 12px;
+}
+
+.yukibana-welcome-scroll {
+    flex: 1;
+    overflow-y: auto;
+    /* Full width, so the scrollbar stays at the edge; the same gutter as the toolbar lines the list up under it */
+    padding: 0 var(--yukibana-welcome-gutter) 28px;
+    scrollbar-gutter: stable both-edges;
+    box-sizing: border-box;
+}
+
+.yukibana-welcome-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 14px 10px 6px;
+}
+
+.yukibana-welcome-section-header h3 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--theia-descriptionForeground);
+}
+
+.yukibana-welcome-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.yukibana-welcome-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: var(--yukibana-welcome-radius);
+    cursor: pointer;
+}
+
+.yukibana-welcome-row:hover {
+    background: var(--theia-list-hoverBackground);
+}
+
+.yukibana-welcome-row.disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
+.yukibana-welcome-row.disabled:hover {
+    background: transparent;
+}
+
+.yukibana-welcome-row-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.yukibana-welcome-row-title,
+.yukibana-welcome-row-detail {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.yukibana-welcome-row-title {
+    font-weight: 600;
+}
+
+.yukibana-welcome-row-detail {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--theia-descriptionForeground);
+}
+
+/* On a recent folder that is an assignment's copy: which assignment, before where it is */
+.yukibana-welcome-course::after {
+    content: ' · ';
+}
+
+/* On an assignment that has a copy on this computer: where it is */
+.yukibana-welcome-local {
+    margin-left: 10px;
+}
+
+.yukibana-welcome-local .codicon {
+    font-size: 12px;
+    vertical-align: -2px;
+}
+
+.yukibana-welcome-chip {
+    margin-left: 8px;
+    padding: 0 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    border: 1px solid var(--theia-panel-border);
+}
+
+.yukibana-welcome-row-remove {
+    visibility: hidden;
+    flex: none;
+    padding: 4px;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    color: var(--theia-descriptionForeground);
+    cursor: pointer;
+}
+
+.yukibana-welcome-row:hover .yukibana-welcome-row-remove,
+.yukibana-welcome-row:focus-within .yukibana-welcome-row-remove {
+    visibility: visible;
+}
+
+.yukibana-welcome-row-remove:hover {
+    background: var(--theia-toolbar-hoverBackground);
+    color: var(--theia-foreground);
+}
+
+.yukibana-welcome-row-status {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    font-size: 12px;
+}
+
+.yukibana-welcome-due,
+.yukibana-welcome-submitted {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.yukibana-welcome-due .codicon,
+.yukibana-welcome-submitted .codicon {
+    font-size: 14px;
+}
+
+.yukibana-welcome-due {
+    color: var(--theia-descriptionForeground);
+}
+
+.yukibana-welcome-due.urgency-late {
+    color: var(--theia-errorForeground);
+}
+
+.yukibana-welcome-due.urgency-soon {
+    color: var(--theia-editorWarning-foreground);
+}
+
+.yukibana-welcome-due.urgency-upcoming {
+    color: var(--theia-foreground);
+}
+
+.yukibana-welcome-submitted {
+    color: var(--theia-testing-iconPassed, var(--theia-charts-green));
+}
+
+.yukibana-welcome-empty-line {
+    margin: 4px 10px;
+    color: var(--theia-descriptionForeground);
+}
+
+.yukibana-welcome-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 64px 24px;
+    text-align: center;
+    color: var(--theia-descriptionForeground);
+}
+
+.yukibana-welcome-empty > .codicon {
+    font-size: 32px;
+    opacity: 0.8;
+}
+
+.yukibana-welcome-empty .theia-button {
+    margin-top: 8px;
+}
+
+/* The page shown when there is nothing yet to list */
+
+.yukibana-welcome-hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    text-align: center;
+    overflow-y: auto;
+}
+
+.yukibana-welcome-hero-logo {
+    width: 96px;
+    height: 96px;
+    margin-bottom: 16px;
+}
+
+.yukibana-welcome-hero h1 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.yukibana-welcome-hero p {
+    margin: 0 0 28px;
+    max-width: 420px;
+    color: var(--theia-descriptionForeground);
+    line-height: 1.5;
+}
+
+.yukibana-welcome-tiles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+}
+
+.yukibana-welcome-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 104px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.yukibana-welcome-tile-icon.codicon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    font-size: 24px;
+    background: var(--theia-button-secondaryBackground);
+    color: var(--theia-button-secondaryForeground);
+    transition: background 0.1s ease-in-out;
+}
+
+.yukibana-welcome-tile:hover .yukibana-welcome-tile-icon {
+    background: var(--theia-button-background);
+    color: var(--theia-button-foreground);
+}
+
+@container (max-width: 640px) {
+    .yukibana-welcome-sidebar {
+        flex-basis: 64px;
+    }
+
+    .yukibana-welcome-brand > div:last-child,
+    .yukibana-welcome-nav-label,
+    .yukibana-welcome-account-text,
+    .yukibana-welcome-account-actions,
+    .yukibana-welcome-login,
+    .yukibana-welcome-badge {
+        display: none;
+    }
+
+    .yukibana-welcome-actions .theia-button {
+        padding: 4px 8px;
+    }
+}

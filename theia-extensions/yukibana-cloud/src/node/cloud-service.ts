@@ -8,7 +8,7 @@ import { RegistryError } from '@yukibana/cli';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as tar from 'tar';
-import { CloudService, DownloadResult, ProjectLookup, SubmissionResult, SubmitAvailability } from '../common/cloud-protocol';
+import { CloudService, DownloadResult, ProjectListing, ProjectLookup, SubmissionResult, SubmitAvailability } from '../common/cloud-protocol';
 import { CloudClient, isRefused } from './cloud-client';
 import { CloudSessionManager } from './cloud-session-manager';
 
@@ -42,23 +42,44 @@ export class CloudServiceImpl implements CloudService {
             if (e instanceof RegistryError && e.status === 404) {
                 return { kind: 'not-found' };
             }
-            if (isRefused(e) || !(await this.sessions.isLoggedIn())) {
+            if (await this.isLoggedOut(e)) {
                 return { kind: 'not-logged-in' };
             }
             throw e;
         }
     }
 
-    async downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult> {
+    async listProjects(): Promise<ProjectListing> {
+        try {
+            return { kind: 'found', projects: await this.client.projects() };
+        } catch (e) {
+            if (await this.isLoggedOut(e)) {
+                return { kind: 'not-logged-in' };
+            }
+            // The welcome screen shows the reason rather than an empty list, which would read as nothing due
+            this.logger.warn(`Could not list projects: ${e instanceof Error ? e.message : String(e)}`);
+            return { kind: 'error', reason: e instanceof Error ? e.message : String(e) };
+        }
+    }
+
+    /** Returns `true` iff `e`, from a registry call, means nobody is logged in. */
+    protected async isLoggedOut(e: unknown): Promise<boolean> {
+        return isRefused(e) || !(await this.sessions.isLoggedIn());
+    }
+
+    async downloadProject(projectId: string, destinationURI: string, folderName: string): Promise<DownloadResult> {
         const destinationPath = FileUri.fsPath(destinationURI);
+        let staging: string | undefined;
 
         try {
             const starter = await this.client.downloadStarter(projectId);
             const source = Buffer.from(starter.buffer, starter.byteOffset, starter.byteLength);
             const topLevel = new Map<string, boolean>();
 
+            // Unpacked aside first, so nothing already in the destination can be written over
+            staging = await fs.promises.mkdtemp(path.join(destinationPath, '.yukibana-download-'));
             await new Promise((resolve, reject) => {
-                const extract = tar.x({ cwd: destinationPath });
+                const extract = tar.x({ cwd: staging });
                 extract.on('entry', (entry: tar.ReadEntry) => {
                     const segments = entry.path
                         .replace(/^(\.\/)+/, '')
@@ -77,10 +98,15 @@ export class CloudServiceImpl implements CloudService {
                 extract.on('close', resolve);
                 extract.end(source);
             });
+            // A starter that is one folder keeps its name; loose files get a folder named after the project
             const [topDirectory] = topLevel.size === 1 ? [...topLevel] : [];
-            const projectPath = topDirectory && topDirectory[1]
-                ? path.join(destinationPath, topDirectory[0])
-                : destinationPath;
+            const [unpacked, projectName] = topDirectory && topDirectory[1]
+                ? [path.join(staging, topDirectory[0]), topDirectory[0]]
+                : [staging, folderNameFrom(folderName)];
+            const projectPath = await claimFolder(destinationPath, projectName);
+            for (const entry of await fs.promises.readdir(unpacked)) {
+                await fs.promises.rename(path.join(unpacked, entry), path.join(projectPath, entry));
+            }
             return {
                 ok: true,
                 uri: FileUri.create(projectPath)
@@ -91,10 +117,45 @@ export class CloudServiceImpl implements CloudService {
                 ok: false,
                 reason: e instanceof Error ? e.message : String(e)
             };
+        } finally {
+            if (staging) {
+                await fs.promises.rm(staging, { recursive: true, force: true });
+            }
         }
     }
 
     canSubmitProject(projectId: string): Promise<SubmitAvailability> {
         return this.client.isProjectAcceptingSubmissions(projectId);
+    }
+}
+
+/**
+ * Returns `name` as a folder name every file system takes, or `project` if nothing of it is left.
+ *
+ * Characters some file system rejects become `-`, and leading and trailing spaces and dots go.
+ */
+export function folderNameFrom(name: string): string {
+    return name.replace(/[<>:"/\\|?*\u0000-\u001f]/g, '-').replace(/^[\s.]+|[\s.]+$/g, '') || 'project';
+}
+
+/**
+ * Creates a new, empty folder in `parent` named `name`, or `name-2`, `name-3`... if that is taken, and returns its path.
+ *
+ * Creating the folder is what claims the name, so two downloads at once cannot pick the same one,
+ * and an existing folder is never reused.
+ *
+ * - Requires: `name` is a valid folder name here, such as one `folderNameFrom` returns.
+ */
+export async function claimFolder(parent: string, name: string): Promise<string> {
+    for (let n = 1; ; n++) {
+        const candidate = path.join(parent, n === 1 ? name : `${name}-${n}`);
+        try {
+            await fs.promises.mkdir(candidate);
+            return candidate;
+        } catch (e) {
+            if ((e as NodeJS.ErrnoException).code !== 'EEXIST') {
+                throw e;
+            }
+        }
     }
 }

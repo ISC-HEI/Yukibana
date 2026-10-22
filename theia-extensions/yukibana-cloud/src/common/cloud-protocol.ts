@@ -78,6 +78,16 @@ export type ProjectLookup =
     | { readonly kind: 'not-found' }
     | { readonly kind: 'not-logged-in' };
 
+/**
+ * Projects the person can see, or why there are none to show.
+ *
+ * A student sees the published projects of their editions, staff all of their editions'; the registry decides which.
+ */
+export type ProjectListing =
+    | { readonly kind: 'found', readonly projects: readonly Project[] }
+    | { readonly kind: 'not-logged-in' }
+    | { readonly kind: 'error', readonly reason: string };
+
 /** Whether the caller may submit, with the project it was decided from when the registry answered. */
 export interface SubmitAvailability {
     readonly status: CanSubmitStatus;
@@ -87,6 +97,14 @@ export interface SubmitAvailability {
 export interface CloudService {
     submit(projectId: string, archivePath: string): Promise<SubmissionResult>
     getProjectInfo(projectId: string): Promise<ProjectLookup>
-    downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult>
+    /** Returns the projects the logged-in person can see; a failure other than being logged out is an `error`. */
+    listProjects(): Promise<ProjectListing>
+    /**
+     * Downloads the starter of `projectId` into a new folder inside `destinationURI`, and returns that folder or why it failed.
+     *
+     * The folder takes the starter's own folder name, or `folderName` if the starter is loose files,
+     * with `-2`, `-3`... added if the name is taken; nothing that exists is written to.
+     */
+    downloadProject(projectId: string, destinationURI: string, folderName: string): Promise<DownloadResult>
     canSubmitProject(projectId: string): Promise<SubmitAvailability>
 }

@@ -12,10 +12,11 @@ import * as path from 'path';
 import * as tar from 'tar';
 import { DownloadResult } from '../common/cloud-protocol';
 import { CloudClient } from './cloud-client';
-import { CloudServiceImpl } from './cloud-service';
+import { claimFolder, CloudServiceImpl, folderNameFrom } from './cloud-service';
 import { CloudSessionManager } from './cloud-session-manager';
 
-type MockClient = Partial<Pick<CloudClient, 'downloadStarter' | 'project' | 'submitArchive'>>;
+/** Registry calls a test fakes; the others are missing. */
+type MockClient = Partial<Pick<CloudClient, 'downloadStarter' | 'project' | 'projects' | 'submitArchive'>>;
 
 function setup(client: MockClient, loggedIn: boolean = true): CloudServiceImpl {
     const service = new CloudServiceImpl();
@@ -47,10 +48,9 @@ function tempDir(): string {
     return dir;
 }
 
-/** Downloads `starter` into a fresh folder. */
-async function download(starter: Uint8Array): Promise<{ result: DownloadResult, destination: string }> {
-    const destination = tempDir();
-    const result = await setup({ downloadStarter: async () => starter }).downloadProject('project', FileUri.create(destination).toString());
+/** Downloads `starter` as project `warm-up` into `destination`, a new folder unless given. */
+async function download(starter: Uint8Array, destination = tempDir()): Promise<{ result: DownloadResult, destination: string }> {
+    const result = await setup({ downloadStarter: async () => starter }).downloadProject('project', FileUri.create(destination).toString(), 'warm-up');
     return { result, destination };
 }
 
@@ -84,17 +84,50 @@ describe('CloudServiceImpl', () => {
             expect(fs.readFileSync(path.join(destination, 'warmup', 'src', 'main.rs'), 'utf8')).to.equal('fn main() {}');
         });
 
-        it('should open the destination if the starter has several top-level entries', async () => {
+        it('should put a starter with several top-level entries in a folder named after the project', async () => {
             const { result, destination } = await download(await tarball({ 'Cargo.toml': '[package]', 'src/main.rs': 'fn main() {}' }));
 
-            expectOpened(result, destination);
-            expect(fs.existsSync(path.join(destination, 'Cargo.toml'))).to.equal(true);
+            expectOpened(result, path.join(destination, 'warm-up'));
+            expect(fs.existsSync(path.join(destination, 'warm-up', 'Cargo.toml'))).to.equal(true);
         });
 
-        it('should open the destination if the starter is a single file', async () => {
+        it('should put a starter that is a single file in a folder named after the project', async () => {
             const { result, destination } = await download(await tarball({ 'README.md': '# Warm up' }));
 
-            expectOpened(result, destination);
+            expectOpened(result, path.join(destination, 'warm-up'));
+            expect(fs.existsSync(path.join(destination, 'warm-up', 'README.md'))).to.equal(true);
+        });
+
+        it('should never write into a folder that is already there, but pick the next free name', async () => {
+            const destination = tempDir();
+            fs.mkdirSync(path.join(destination, 'warmup'));
+            fs.writeFileSync(path.join(destination, 'warmup', 'Cargo.toml'), 'my work');
+            fs.mkdirSync(path.join(destination, 'warmup-2'));
+            const starter = await tarball({ 'warmup/Cargo.toml': '[package]' });
+
+            const { result } = await download(starter, destination);
+
+            expectOpened(result, path.join(destination, 'warmup-3'));
+            expect(fs.readFileSync(path.join(destination, 'warmup', 'Cargo.toml'), 'utf8')).to.equal('my work');
+            expect(fs.readdirSync(path.join(destination, 'warmup-2'))).to.deep.equal([]);
+            expect(fs.readFileSync(path.join(destination, 'warmup-3', 'Cargo.toml'), 'utf8')).to.equal('[package]');
+        });
+
+        it('should leave the loose files of the destination alone', async () => {
+            const destination = tempDir();
+            fs.writeFileSync(path.join(destination, 'Cargo.toml'), 'my work');
+
+            await download(await tarball({ 'Cargo.toml': '[package]', 'src/main.rs': 'fn main() {}' }), destination);
+
+            expect(fs.readFileSync(path.join(destination, 'Cargo.toml'), 'utf8')).to.equal('my work');
+        });
+
+        it('should leave nothing behind but the project', async () => {
+            const { destination } = await download(await tarball({ 'warmup/Cargo.toml': '[package]' }));
+            expect(fs.readdirSync(destination)).to.deep.equal(['warmup']);
+
+            const corrupt = await download(new Uint8Array([1, 2, 3, 4, 5]));
+            expect(fs.readdirSync(corrupt.destination)).to.deep.equal([]);
         });
 
         it('should report the registry error if there is no starter', async () => {
@@ -102,14 +135,14 @@ describe('CloudServiceImpl', () => {
                 downloadStarter: async () => {
                     throw new RegistryError(404, 'the registry answered 404: No starter is available for this project.');
                 }
-            }).downloadProject('project', FileUri.create(tempDir()).toString());
+            }).downloadProject('project', FileUri.create(tempDir()).toString(), 'warm-up');
 
             expect(result).to.deep.equal({ ok: false, reason: 'the registry answered 404: No starter is available for this project.' });
         });
 
         it('should report network errors', async () => {
             const result = await setup({ downloadStarter: async () => { throw new TypeError('fetch failed'); } })
-                .downloadProject('project', FileUri.create(tempDir()).toString());
+                .downloadProject('project', FileUri.create(tempDir()).toString(), 'warm-up');
 
             expect(result).to.deep.equal({ ok: false, reason: 'fetch failed' });
         });
@@ -152,6 +185,28 @@ describe('CloudServiceImpl', () => {
         });
     });
 
+    describe('listProjects', () => {
+        it('should return the projects the registry shows', async () => {
+            const projects = [{ projectId: 'project', title: 'Warm up' } as Project];
+            expect(await setup({ projects: async () => projects }).listProjects()).to.deep.equal({ kind: 'found', projects });
+        });
+
+        it('should say when nobody is logged in', async () => {
+            const listing = await setup({ projects: async () => { throw new NotLoggedIn('not logged in; run `yukibana login`'); } }, false).listProjects();
+            expect(listing).to.deep.equal({ kind: 'not-logged-in' });
+        });
+
+        it('should say when the registry refuses the session', async () => {
+            const listing = await setup({ projects: async () => { throw new RegistryError(401, 'the registry answered 401'); } }).listProjects();
+            expect(listing).to.deep.equal({ kind: 'not-logged-in' });
+        });
+
+        it('should give the reason when the registry cannot answer, rather than an empty list', async () => {
+            const listing = await setup({ projects: async () => { throw new RegistryError(500, 'the registry answered 500'); } }).listProjects();
+            expect(listing).to.deep.equal({ kind: 'error', reason: 'the registry answered 500' });
+        });
+    });
+
     describe('submit', () => {
         it('should upload the archive bytes', async () => {
             let uploaded: { projectId: string, bytes: Uint8Array } | undefined;
@@ -174,5 +229,30 @@ describe('CloudServiceImpl', () => {
 
             expect(result).to.deep.equal({ ok: false, reason: 'too large' });
         });
+    });
+});
+
+describe('folderNameFrom', () => {
+    it('should replace what a file system rejects, and keep the rest', () => {
+        expect(folderNameFrom('lab: sorting?')).to.equal('lab- sorting-');
+        expect(folderNameFrom('warm-up')).to.equal('warm-up');
+    });
+
+    it('should drop leading and trailing dots and spaces, and name an empty result project', () => {
+        expect(folderNameFrom(' .lab. ')).to.equal('lab');
+        expect(folderNameFrom('..')).to.equal('project');
+    });
+});
+
+describe('claimFolder', () => {
+    it('should make a new folder under the next free name', async () => {
+        const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'yukibana-cloud-spec-'));
+        try {
+            expect(path.basename(await claimFolder(parent, 'lab'))).to.equal('lab');
+            expect(path.basename(await claimFolder(parent, 'lab'))).to.equal('lab-2');
+            expect(fs.readdirSync(parent).sort()).to.deep.equal(['lab', 'lab-2']);
+        } finally {
+            fs.rmSync(parent, { recursive: true, force: true });
+        }
     });
 });
