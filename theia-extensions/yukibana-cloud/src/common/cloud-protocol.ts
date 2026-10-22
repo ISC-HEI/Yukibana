@@ -99,12 +99,6 @@ export interface CloudService {
     getProjectInfo(projectId: string): Promise<ProjectLookup>
     /** Returns the projects the logged-in person can see; a failure other than being logged out is an `error`. */
     listProjects(): Promise<ProjectListing>
-    /**
-     * Downloads the starter of `projectId` into a new folder inside `destinationURI`, and returns that folder or why it failed.
-     *
-     * The folder takes the starter's own folder name, or `folderName` if the starter is loose files,
-     * with `-2`, `-3`... added if the name is taken; nothing that exists is written to.
-     */
-    downloadProject(projectId: string, destinationURI: string, folderName: string): Promise<DownloadResult>
+    downloadProject(projectId: string): Promise<DownloadResult>
     canSubmitProject(projectId: string): Promise<SubmitAvailability>
 }

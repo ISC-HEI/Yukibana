@@ -1,11 +1,12 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { ILogger } from '@theia/core';
+import { ILogger, URI } from '@theia/core';
 import { FileUri } from '@theia/core/lib/node';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { RegistryError } from '@yukibana/cli';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import * as tar from 'tar';
 import { CloudService, DownloadResult, ProjectListing, ProjectLookup, SubmissionResult, SubmitAvailability } from '../common/cloud-protocol';
@@ -67,19 +68,25 @@ export class CloudServiceImpl implements CloudService {
         return isRefused(e) || !(await this.sessions.isLoggedIn());
     }
 
-    async downloadProject(projectId: string, destinationURI: string, folderName: string): Promise<DownloadResult> {
-        const destinationPath = FileUri.fsPath(destinationURI);
-        let staging: string | undefined;
+    async downloadProject(projectId: string): Promise<DownloadResult> {
+        const starter = await this.client.downloadStarter(projectId);
 
+        const source = Buffer.from(starter.buffer, starter.byteOffset, starter.byteLength);
+        const tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'yukibana-project-download-'));
+        const rootDir = await this.extractTo(source, tmpDir);
+
+        if (rootDir === undefined) {
+            return { ok: false, reason: 'error' };
+        }
+        return { ok: true, uri: rootDir };
+    }
+
+    private async extractTo(buffer: Buffer, outDir: string): Promise<URI | undefined> {
         try {
-            const starter = await this.client.downloadStarter(projectId);
-            const source = Buffer.from(starter.buffer, starter.byteOffset, starter.byteLength);
             const topLevel = new Map<string, boolean>();
 
-            // Unpacked aside first, so nothing already in the destination can be written over
-            staging = await fs.promises.mkdtemp(path.join(destinationPath, '.yukibana-download-'));
             await new Promise((resolve, reject) => {
-                const extract = tar.x({ cwd: staging });
+                const extract = tar.x({ cwd: outDir });
                 extract.on('entry', (entry: tar.ReadEntry) => {
                     const segments = entry.path
                         .replace(/^(\.\/)+/, '')
@@ -96,31 +103,17 @@ export class CloudServiceImpl implements CloudService {
                 });
                 extract.on('error', reject);
                 extract.on('close', resolve);
-                extract.end(source);
+                extract.end(buffer);
             });
             // A starter that is one folder keeps its name; loose files get a folder named after the project
             const [topDirectory] = topLevel.size === 1 ? [...topLevel] : [];
-            const [unpacked, projectName] = topDirectory && topDirectory[1]
-                ? [path.join(staging, topDirectory[0]), topDirectory[0]]
-                : [staging, folderNameFrom(folderName)];
-            const projectPath = await claimFolder(destinationPath, projectName);
-            for (const entry of await fs.promises.readdir(unpacked)) {
-                await fs.promises.rename(path.join(unpacked, entry), path.join(projectPath, entry));
-            }
-            return {
-                ok: true,
-                uri: FileUri.create(projectPath)
-            };
+            const projectPath = topDirectory && topDirectory[1]
+                ? path.join(outDir, topDirectory[0])
+                : outDir;
+            return FileUri.create(projectPath);
         } catch (e) {
             this.logger.error(e instanceof Error ? e : String(e));
-            return {
-                ok: false,
-                reason: e instanceof Error ? e.message : String(e)
-            };
-        } finally {
-            if (staging) {
-                await fs.promises.rm(staging, { recursive: true, force: true });
-            }
+            return undefined;
         }
     }
 
