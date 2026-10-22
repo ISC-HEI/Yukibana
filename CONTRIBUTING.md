@@ -53,7 +53,8 @@ what is needed.
 - `pnpm download:plugins`: download the plugins listed in `theiaPlugins`
   (done automatically by `start` and `package`; `--force` downloads them again)
 - `pnpm lint` / `pnpm lint:fix`: run the linter on the whole project
-- `pnpm test` / `pnpm test:coverage`: compile the extensions and run the unit tests
+- `pnpm test` / `pnpm test:coverage`: run the unit tests (`*.spec.ts`) with Vitest,
+  straight from the sources; `pnpm test:watch` reruns them on every change
 - `pnpm --filter yukibana-tests ui-tests`: run the Playwright UI tests against a running
   browser app (`pnpm start browser`); downloads Playwright's Chromium on first use
 - `pnpm clean`: remove all build outputs, e.g. after deleting or renaming source files,
