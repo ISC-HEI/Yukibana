@@ -72,20 +72,11 @@
     "yargs": "^17.7.3"
   },
   "scripts": {
-    "clean": "theia clean && rimraf node_modules",
     "clean:dist": "rimraf dist",
-    "bundle": "pnpm run rebuild && theia build --mode development",
-    "build": "pnpm run --loglevel silent rebuild && theia build --app-target=\"electron\" --mode development && pnpm run fix-sandbox",
-    "build:prod": "pnpm run --loglevel silent rebuild && theia build --app-target=\"electron\" && pnpm run fix-sandbox",
-    "rebuild": "theia rebuild:electron --cacheRoot ..",
-    "fix-sandbox": "node scripts/fix-chrome-sandbox.js",
-    "start": "theia start --plugins=local-dir:../plugins",
-    "watch": "pnpm run rebuild && theia build --watch --mode development",
     "prepackage": "node scripts/patch-ripgrep-asar-path.mjs",
-    "package": "pnpm run clean:dist && pnpm run rebuild && pnpm run prepackage && electron-builder -c.mac.identity=null --publish never",
-    "package:prod": "pnpm run deploy",
-    "package:preview": "pnpm run clean:dist && pnpm run rebuild && pnpm run prepackage && electron-builder -c.mac.identity=null --dir",
-    "deploy": "pnpm run clean:dist && pnpm run rebuild && pnpm run prepackage && electron-builder -c.mac.identity=null --publish always",
+    "package": "pnpm run clean:dist && pnpm run prepackage && electron-builder -c.mac.identity=null --publish never",
+    "package:preview": "pnpm run clean:dist && pnpm run prepackage && electron-builder -c.mac.identity=null --dir",
+    "deploy": "pnpm run clean:dist && pnpm run prepackage && electron-builder -c.mac.identity=null --publish always",
     "lint": "eslint --ext js,jsx,ts,tsx scripts",
     "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix"
   },

@@ -35,41 +35,26 @@ On Windows, the Visual Studio Build Tools also need the
 
 ## Building the app
 
-Several commands are provided to build, package and run different
-parts of the project (see [Architecture](#architecture)).
-Here are some of the most useful ones:
+All commands run from the repository root. Each step is skipped when its output
+is already up to date, so re-running a command after a small change only redoes
+what is needed.
 
-### General
+- `pnpm start [browser|electron]`: build in development mode, download the bundled
+  plugins if needed, and start the app (Electron by default).
+  Use `--prod` for a production build, and pass extra arguments to `theia start`
+  after `--`, e.g. `pnpm start electron -- --log-config=../log-config.json`
+- `pnpm build [browser|electron]`: build the extensions and the apps (both by default)
+  in production mode, or in development mode with `--dev`
+- `pnpm package`: build and package the Electron app into `electron-app/dist`.
+  Use `--preview` for an unpacked directory, or `--publish` to publish the release
+- `pnpm download:plugins`: download the plugins listed in `theiaPlugins`
+  (done automatically by `start` and `package`; `--force` downloads them again)
+- `pnpm lint` / `pnpm lint:fix`: run the linter on the whole project
+- `pnpm test` / `pnpm test:coverage`: compile the extensions and run the unit tests
+- `pnpm clean`: remove all build outputs, e.g. after deleting or renaming source files,
+  whose stale compiled files are otherwise left behind
 
-- `pnpm install`: install dependencies
-- `pnpm run lint`: run the linter on the whole project
-- `pnpm run lint:fix`: run the linter on the whole project and apply fixes
-- `pnpm run start:electron` or `pnpm run electron start`:
-  (after building) start the electron application
-- `pnpm run start:browser` or `pnpm run browser start`:
-  (after building) start the browser application
-
-### Development
-
-- `pnpm run build:dev`: build extensions and both apps in development mode
-- `pnpm run download:plugins`:
-  (only once and after changing `theiaPlugins` in a `package.json`) download
-  bundled plugins specified in the `theiaPlugins` section of `package.json`
-- `pnpm run package:applications:preview`:
-  (optional) package the electron application in preview mode\
-  The packaged application will be located in `electron-app/dist`
-
-### Production
-
-- `pnpm run build`: build extensions and both apps in production mode
-- `pnpm run download:plugins`: see [Development](#development)
-- `pnpm run package:applications`:
-  (optional) package the electron application in production mode\
-  The packaged application will be located in `electron-app/dist`
-
-> [!WARNING]
-> While there are some `watch` commands to recompile when changes are made,
-> running them does consume quite a lot of memory.
+To recompile an extension on every change, run `pnpm --filter <extension> watch`.
 
 ## Architecture
 
