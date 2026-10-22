@@ -13,6 +13,7 @@ import { Project } from '@yukibana/cli';
 import * as React from 'react';
 import { localizeMarkdown } from 'yukibana-common/lib/localize-markdown';
 import { CloudAccount, CloudService } from '../../common/cloud-protocol';
+import { OpenWorkspacesServer } from '../../common/open-workspaces-protocol';
 import { CloudAccountService, CloudAccountState } from '../cloud-account-service';
 import { LoginCommand, LogoutCommand, SwitchAccountCommand } from '../command-contribution';
 import {
@@ -66,6 +67,8 @@ export class WelcomeWidget extends ReactWidget {
     @inject(ApplicationServer) protected readonly application!: ApplicationServer;
     /** Notifications reporting failures. */
     @inject(MessageService) protected readonly messages!: MessageService;
+    /** Backend's registry of the workspaces all windows have open. */
+    @inject(OpenWorkspacesServer) protected readonly openWorkspaces!: OpenWorkspacesServer;
     /** Log of failures. */
     @inject(ILogger) @named('yukibana:Welcome') protected readonly logger!: ILogger;
 
@@ -75,6 +78,8 @@ export class WelcomeWidget extends ReactWidget {
     protected query = '';
     /** Recently opened workspaces, most recent first, the open one included. */
     protected recent: readonly RecentProject[] = [];
+    /** Workspaces some window has open, as the recent list writes their URIs. */
+    protected openInAWindow: ReadonlySet<string> = new Set();
     /** Assignments, or why there are none to show. */
     protected assignments: Assignments = { kind: 'loading' };
     /** Product version, once known. */
@@ -145,8 +150,15 @@ export class WelcomeWidget extends ReactWidget {
     protected async loadRecent(): Promise<void> {
         const request = ++this.recentRequest;
         let recent: RecentProject[] = [];
+        let openUris: string[] = [];
         try {
-            const [uris, home] = await Promise.all([this.workspaces.recentWorkspaces(), this.env.getHomeDirUri()]);
+            const [uris, home, openNow] = await Promise.all([
+                this.workspaces.recentWorkspaces(),
+                this.env.getHomeDirUri(),
+                // Without it every project opens as if no window had it, which is still an answer
+                this.openWorkspaces.list().catch(() => []),
+            ]);
+            openUris = openNow;
             recent = await Promise.all(uris.map(async uri => {
                 const project = recentProject(new URI(uri), new URI(home));
                 return { ...project, projectId: await this.projectIdIn(project) };
@@ -157,6 +169,7 @@ export class WelcomeWidget extends ReactWidget {
         // A newer list, from a later show, knows better
         if (request === this.recentRequest) {
             this.recent = recent;
+            this.openInAWindow = new Set(openUris);
             this.update();
         }
     }
@@ -255,16 +268,22 @@ export class WelcomeWidget extends ReactWidget {
         this.commands.executeCommand(command.id);
     };
 
-    /** Returns `true` iff this window has `uri` open. */
-    protected isOpenHere(uri: URI): boolean {
-        return uri.toString() === this.workspaces.workspace?.resource.toString();
+    /** Returns where `uri` is open, as of the last load: in this window, in another, or nowhere. */
+    protected whereOpen(uri: URI): 'here' | 'elsewhere' | undefined {
+        const key = uri.toString();
+        return key === this.workspaces.workspace?.resource.toString() ? 'here' : this.openInAWindow.has(key) ? 'elsewhere' : undefined;
     }
 
-    /** Opens `uri`, or only closes the screen iff this window has it open already. */
-    protected openFolder(uri: URI): void {
-        if (this.isOpenHere(uri)) {
+    /**
+     * Opens `uri` in the window that has it, or in a new one if none does.
+     *
+     * Other windows are asked even when the last load said none has `uri`, which may have changed since.
+     * A browser cannot raise another tab, so there `uri` opens again.
+     */
+    protected async openFolder(uri: URI): Promise<void> {
+        if (this.whereOpen(uri) === 'here') {
             this.close();
-        } else {
+        } else if (!environment.electron.is() || !await this.openWorkspaces.focus(uri.toString()).catch(() => false)) {
             this.workspaces.open(uri);
         }
     }
@@ -496,10 +515,12 @@ export class WelcomeWidget extends ReactWidget {
         </li>;
     }
 
-    /** Returns a chip saying this window has `project` open, if it does. */
+    /** Returns a chip saying which window has `project` open, if any. */
     protected renderOpenChip(project: RecentProject): React.ReactNode {
-        return this.isOpenHere(project.uri)
-            && <span className='yukibana-welcome-chip'>{nls.localize('yukibana/cloud/welcome/thisWindow', 'This window')}</span>;
+        const where = this.whereOpen(project.uri);
+        return where && <span className='yukibana-welcome-chip'>{where === 'here'
+            ? nls.localize('yukibana/cloud/welcome/thisWindow', 'This window')
+            : nls.localize('yukibana/cloud/welcome/openInWindow', 'Open')}</span>;
     }
 
     // Assignments

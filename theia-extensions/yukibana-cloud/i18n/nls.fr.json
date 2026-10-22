@@ -89,7 +89,8 @@
         "toDoCount": "Travaux à rendre",
         "openLocalCopy": "Ouvrir votre copie dans {0}",
         "teaching": "Enseignement",
-        "thisWindow": "Cette fenêtre"
+        "thisWindow": "Cette fenêtre",
+        "openInWindow": "Ouvert"
       }
     }
   }
