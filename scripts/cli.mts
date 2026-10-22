@@ -253,10 +253,10 @@ const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Pa
     },
 };
 
-const [name, ...rest] = process.argv.slice(2);
-const command = commands[name];
+const [commandName, ...rest] = process.argv.slice(2);
+const command = commands[commandName];
 if (!command) {
-    fail(`Unknown command '${name}', expected one of: ${Object.keys(commands).join(', ')}`);
+    fail(`Unknown command '${commandName}', expected one of: ${Object.keys(commands).join(', ')}`);
 }
 const separator = rest.includes('--') ? rest.indexOf('--') : rest.length;
 let parsed: ReturnType<typeof parseArgs>;
