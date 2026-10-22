@@ -18,11 +18,13 @@ import { CloudService, DownloadResult, ProjectLookup } from '../common/cloud-pro
 import { CloudTelemetry } from '../common/cloud-telemetry';
 import { CloudAccountService } from './cloud-account-service';
 import { YukibanaOpenHandler } from './yukibana-url-handler';
+import { YukibanaProjectOpener } from './yukibana-project-opener';
 
 disableJSDom();
 
-class TestOpenHandler extends YukibanaOpenHandler {
+class TestProjectOpener extends YukibanaProjectOpener {
     newWindow: boolean | undefined = false;
+    logger: ILogger = new MockLogger();
 
     protected override async askOpenInNewWindow(): Promise<boolean | undefined> {
         return this.newWindow;
@@ -44,10 +46,11 @@ const PROJECT_ID = '01a11653-0353-7389-81f4-01837a3ed666';
 const project = { projectId: PROJECT_ID, title: 'Warm up', starterReady: true } as Project;
 const found = (p: Project): ProjectLookup => ({ kind: 'found', project: p });
 const folder = new URI('file:///home/student/projects');
+const downloadUri = new URI('file:///tmp/yukibana-project-download-ABCDEF/warmup');
 const projectUri = new URI('file:///home/student/projects/warmup');
 
 interface Mocks {
-    handler: TestOpenHandler;
+    handler: YukibanaOpenHandler;
     /** Progress messages reported, and whether the notification was closed. */
     progress: { messages: string[], cancelled: number, shown: boolean };
     errors: string[];
@@ -56,6 +59,7 @@ interface Mocks {
     folderDialogs: number;
     downloads: { projectId: string, destination: string }[];
     commands: string[];
+    opener: TestProjectOpener;
 }
 
 function setup(options: Options = {}): Mocks {
@@ -67,6 +71,7 @@ function setup(options: Options = {}): Mocks {
         folderDialogs: 0,
         downloads: [],
         commands: [],
+        opener: new TestProjectOpener(),
     };
     const messages = {
         showProgress: async () => {
@@ -85,9 +90,9 @@ function setup(options: Options = {}): Mocks {
     };
     const service: Partial<CloudService> = {
         getProjectInfo: options.lookup ?? (async () => found(project)),
-        downloadProject: async (projectId, destination) => {
-            mocks.downloads.push({ projectId, destination });
-            return options.download ? options.download() : { ok: true, uri: projectUri };
+        downloadProject: async projectId => {
+            mocks.downloads.push({ projectId, destination: downloadUri.toString() });
+            return options.download ? options.download() : { ok: true, uri: downloadUri };
         },
     };
     const fileDialogs = {
@@ -112,9 +117,8 @@ function setup(options: Options = {}): Mocks {
             loggedIn ||= options.loginWorks ?? false;
         },
     };
-
-    const handler = new TestOpenHandler();
-    Object.assign(handler, {
+    const opener = new TestProjectOpener();
+    Object.assign(opener, {
         logger: new MockLogger() as ILogger,
         service: service as CloudService,
         fileDialogs: fileDialogs as unknown as FileDialogService,
@@ -123,6 +127,14 @@ function setup(options: Options = {}): Mocks {
         telemetry: telemetry as unknown as TelemetryService,
         accounts: accounts as unknown as CloudAccountService,
         commands: commands as unknown as CommandService,
+    });
+
+    const handler = new YukibanaOpenHandler();
+    Object.assign(handler, {
+        logger: new MockLogger() as ILogger,
+        accounts: accounts as unknown as CloudAccountService,
+        commands: commands as unknown as CommandService,
+        opener: opener as unknown as YukibanaProjectOpener,
     });
     return { handler, ...mocks };
 }
@@ -149,7 +161,7 @@ describe('YukibanaOpenHandler', () => {
             const mocks = setup();
             await mocks.handler.open(openUri(PROJECT_ID));
 
-            expect(mocks.downloads).to.deep.equal([{ projectId: PROJECT_ID, destination: folder.toString() }]);
+            expect(mocks.downloads).to.deep.equal([{ projectId: PROJECT_ID, destination: downloadUri.toString() }]);
             expect(mocks.opened).to.have.length(1);
             expect(mocks.opened[0].uri.toString()).to.equal(projectUri.toString());
             expect(mocks.opened[0].preserveWindow).to.equal(true);
@@ -161,7 +173,7 @@ describe('YukibanaOpenHandler', () => {
 
         it('should open the project in a new window if asked to', async () => {
             const mocks = setup();
-            mocks.handler.newWindow = true;
+            mocks.opener.newWindow = true;
             await mocks.handler.open(openUri(PROJECT_ID));
 
             expect(mocks.opened[0].preserveWindow).to.equal(false);

@@ -11,11 +11,11 @@ FrontendApplicationConfigProvider.set({});
 import { ILogger, URI } from '@theia/core';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
-import { expect } from 'chai';
 import { Project } from '@yukibana/cli';
+import { expect } from 'chai';
 import { CanSubmitStatus, CloudAccount, CloudAuth, CloudService, SubmissionResult } from '../common/cloud-protocol';
-import { CloudAccountService } from './cloud-account-service';
 import { ACCOUNT_ACTIONS_GROUP, ACCOUNT_INFO_GROUP, accountMenuItems, accountStatusBarEntry } from './cloud-account-menu';
+import { CloudAccountService } from './cloud-account-service';
 import { AuthClientImpl } from './cloud-auth-client';
 import { CloudSubmissionTarget } from './cloud-submission-target';
 

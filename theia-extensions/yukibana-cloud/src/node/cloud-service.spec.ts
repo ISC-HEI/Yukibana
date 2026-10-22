@@ -48,10 +48,10 @@ function tempDir(): string {
     return dir;
 }
 
-/** Downloads `starter` as project `warm-up` into `destination`, a new folder unless given. */
-async function download(starter: Uint8Array, destination = tempDir()): Promise<{ result: DownloadResult, destination: string }> {
-    const result = await setup({ downloadStarter: async () => starter }).downloadProject('project', FileUri.create(destination).toString(), 'warm-up');
-    return { result, destination };
+/** Downloads `starter` into a fresh folder. */
+async function download(starter: Uint8Array): Promise<{ result: DownloadResult, destination: string }> {
+    const result = await setup({ downloadStarter: async () => starter }).downloadProject('project');
+    return { result, destination: result.ok ? result.uri.parent.toString() : '' };
 }
 
 function expectOpened(result: DownloadResult, expected: string): void {
@@ -105,7 +105,7 @@ describe('CloudServiceImpl', () => {
             fs.mkdirSync(path.join(destination, 'warmup-2'));
             const starter = await tarball({ 'warmup/Cargo.toml': '[package]' });
 
-            const { result } = await download(starter, destination);
+            const { result } = await download(starter);
 
             expectOpened(result, path.join(destination, 'warmup-3'));
             expect(fs.readFileSync(path.join(destination, 'warmup', 'Cargo.toml'), 'utf8')).to.equal('my work');
@@ -117,7 +117,7 @@ describe('CloudServiceImpl', () => {
             const destination = tempDir();
             fs.writeFileSync(path.join(destination, 'Cargo.toml'), 'my work');
 
-            await download(await tarball({ 'Cargo.toml': '[package]', 'src/main.rs': 'fn main() {}' }), destination);
+            await download(await tarball({ 'Cargo.toml': '[package]', 'src/main.rs': 'fn main() {}' }));
 
             expect(fs.readFileSync(path.join(destination, 'Cargo.toml'), 'utf8')).to.equal('my work');
         });
@@ -135,14 +135,14 @@ describe('CloudServiceImpl', () => {
                 downloadStarter: async () => {
                     throw new RegistryError(404, 'the registry answered 404: No starter is available for this project.');
                 }
-            }).downloadProject('project', FileUri.create(tempDir()).toString(), 'warm-up');
+            }).downloadProject('project');
 
             expect(result).to.deep.equal({ ok: false, reason: 'the registry answered 404: No starter is available for this project.' });
         });
 
         it('should report network errors', async () => {
             const result = await setup({ downloadStarter: async () => { throw new TypeError('fetch failed'); } })
-                .downloadProject('project', FileUri.create(tempDir()).toString(), 'warm-up');
+                .downloadProject('project');
 
             expect(result).to.deep.equal({ ok: false, reason: 'fetch failed' });
         });
