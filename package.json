@@ -20,8 +20,9 @@
     "postinstall": "theia check:theia-version",
     "lint": "eslint --ext js,jsx,ts,tsx,mts scripts && pnpm run -r --if-present lint",
     "lint:fix": "eslint --ext js,jsx,ts,tsx,mts scripts --fix && pnpm run -r --if-present lint:fix",
-    "test": "node scripts/cli.mts compile && nyc mocha --config configs/mocharc.yml \"./{packages,theia-extensions}/**/lib/**/*.*spec.js\"",
-    "test:coverage": "node scripts/cli.mts compile && nyc --reporter=html --reporter=text mocha --config configs/mocharc.yml \"./{packages,theia-extensions}/**/lib/**/*.*spec.js\"",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
     "tests": "pnpm run --filter yukibana-tests",
     "dep:all": "ts-node scripts/dep-all.ts",
     "config:schema": "ts-node scripts/export-config-schema.ts"
@@ -34,6 +35,7 @@
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
+    "@vitest/coverage-v8": "5.0.3",
     "allure-playwright": "^3.12.1",
     "chai": "6.3.0",
     "eslint": "^7.32.0",
@@ -44,10 +46,9 @@
     "eslint-plugin-react": "^7.37.5",
     "ignore-styles": "5.0.1",
     "jsdom": "30.1.2",
-    "mocha": "12.0.3",
-    "nyc": "18.0.0",
     "ts-node": "^10.9.2",
     "tslint": "^5.20.1",
+    "vitest": "5.0.3",
     "yargs": "^17.7.3"
   },
   "theiaPlugins": {
@@ -65,7 +66,6 @@
   "workspaces": [
     "packages/*",
     "theia-extensions/*",
-    "dev-packages/*",
     "browser-app",
     "electron-app",
     "tests"

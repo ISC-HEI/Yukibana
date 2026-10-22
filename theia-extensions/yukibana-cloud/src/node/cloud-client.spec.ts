@@ -3,6 +3,7 @@
  */
 import { Project } from '@yukibana/cli';
 import { expect } from 'chai';
+import { describe, it } from 'vitest';
 import { CanSubmitStatus } from '../common/cloud-protocol';
 import { CloudClient } from './cloud-client';
 import { CloudSessionManager } from './cloud-session-manager';
