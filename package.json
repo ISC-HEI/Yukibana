@@ -65,6 +65,7 @@
   "workspaces": [
     "packages/*",
     "theia-extensions/*",
+    "dev-packages/*",
     "browser-app",
     "electron-app",
     "tests"
