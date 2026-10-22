@@ -12,7 +12,7 @@
     "url": "git+https://github.com/ISC-HEI/Yukibana.git"
   },
   "scripts": {
-    "prepare": "pnpm run clean && pnpm run build",
+    "prepare": "pnpm run build",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
     "build": "tsc --incremental && if-env SKIP_CHROMIUM_INSTALLATION=1 && echo 'Skipping chromium install' || pnx playwright install chromium",
     "ui-tests": "playwright test --config=../configs/playwright.config.ts --project=Browser",
