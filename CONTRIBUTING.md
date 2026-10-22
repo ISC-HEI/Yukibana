@@ -27,11 +27,14 @@ On Windows, the Visual Studio Build Tools also need the
    cd yukibana
    ```
 
-3. Download dependencies
+3. Install the dependencies, then build and start the app
 
    ```bash
    pnpm install
+   pnpm start
    ```
+
+   The first `pnpm start` also downloads the bundled plugins, which takes a while.
 
 ## Building the app
 
@@ -51,6 +54,8 @@ what is needed.
   (done automatically by `start` and `package`; `--force` downloads them again)
 - `pnpm lint` / `pnpm lint:fix`: run the linter on the whole project
 - `pnpm test` / `pnpm test:coverage`: compile the extensions and run the unit tests
+- `pnpm --filter yukibana-tests ui-tests`: run the Playwright UI tests against a running
+  browser app (`pnpm start browser`); downloads Playwright's Chromium on first use
 - `pnpm clean`: remove all build outputs, e.g. after deleting or renaming source files,
   whose stale compiled files are otherwise left behind
 

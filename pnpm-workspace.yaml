@@ -24,4 +24,5 @@ allowBuilds:
   msgpackr-extract: true
   native-keymap: true
   node-pty: true
-  puppeteer: true
+  # Only needed by `theia test`, which this project doesn't use; skips downloading two Chrome builds.
+  puppeteer: false
