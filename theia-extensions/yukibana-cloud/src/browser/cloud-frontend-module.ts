@@ -8,15 +8,16 @@ import { FrontendApplicationContribution, OpenHandler, RemoteConnectionProvider,
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { SubmissionTarget } from 'yukibana-submission-ext/lib/common/submission-target';
 import { CloudAuth, cloudAuthPath, CloudService, cloudServicePath } from '../common/cloud-protocol';
-import { OpenWorkspacesServer, openWorkspacesPath } from '../common/open-workspaces-protocol';
-import { CloudAccountService } from './cloud-account-service';
+import { openWorkspacesPath, OpenWorkspacesServer } from '../common/open-workspaces-protocol';
 import { CloudAccountMenuContribution } from './cloud-account-menu';
+import { CloudAccountService } from './cloud-account-service';
 import { AuthClientImpl } from './cloud-auth-client';
 import { CloudSubmissionTarget } from './cloud-submission-target';
 import { LoginCommandContribution } from './command-contribution';
 import { OpenWorkspacesClientImpl, OpenWorkspacesContribution } from './open-workspaces-client';
 import { WelcomeContribution } from './welcome/welcome-contribution';
 import { WelcomeWidget } from './welcome/welcome-widget';
+import { YukibanaProjectOpener } from './yukibana-project-opener';
 import { YukibanaOpenHandler } from './yukibana-url-handler';
 
 export default new ContainerModule(bind => {
@@ -64,4 +65,5 @@ export default new ContainerModule(bind => {
     bind(FrontendApplicationContribution).toService(WelcomeContribution);
     bind(CommandContribution).toService(WelcomeContribution);
     bind(MenuContribution).toService(WelcomeContribution);
+    bind(YukibanaProjectOpener).toSelf().inRequestScope();
 });
