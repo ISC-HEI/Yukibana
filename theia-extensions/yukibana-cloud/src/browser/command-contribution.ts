@@ -3,7 +3,7 @@
  */
 import { Command, CommandContribution, CommandRegistry, MessageService, nls } from '@theia/core';
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { localizeText } from 'yukibana-ext/lib/common/localize-text';
+import { localizeMarkdown } from 'yukibana-ext/lib/common/localize-markdown';
 import { CloudAccount, CloudAuth, LoginResult } from '../common/cloud-protocol';
 import { CloudAccountService } from './cloud-account-service';
 import { AuthClientImpl } from './cloud-auth-client';
@@ -36,7 +36,7 @@ export class LoginCommandContribution implements CommandContribution {
                 // Asks the registry rather than the keystore, which may hold a session the registry no longer accepts
                 const state = await this.accounts.refresh();
                 if (state.kind === 'logged-in') {
-                    this.messageService.info(localizeText('yukibana/cloud/alreadyLoggedInAs', 'Already logged in as {0}', CloudAccount.label(state.account)));
+                    this.messageService.info(localizeMarkdown('yukibana/cloud/alreadyLoggedInAs', 'Already logged in as {0}', CloudAccount.label(state.account)));
                     return;
                 }
                 await this.login(() => this.auth.login());
@@ -56,17 +56,17 @@ export class LoginCommandContribution implements CommandContribution {
     private async login(logIn: () => Promise<LoginResult>): Promise<void> {
         const progress = await this.messageService.showProgress({ text: nls.localize('yukibana/cloud/loggingIn', 'Logging in...') });
         const showCode = this.authClient.onLoginCode(code => progress.report({
-            message: nls.localize('yukibana/cloud/loginCode', 'Continue in your browser; the page there shows the code {0}', code),
+            message: localizeMarkdown('yukibana/cloud/loginCode', 'Continue in your browser; the page there shows the code {0}', code),
         }));
         try {
             const result = await logIn();
             if (!result.ok) {
-                this.messageService.error(localizeText('yukibana/cloud/loginFailed', 'Failed to log in: {0}', result.reason));
+                this.messageService.error(localizeMarkdown('yukibana/cloud/loginFailed', 'Failed to log in: {0}', result.reason));
                 return;
             }
             const state = await this.accounts.refresh();
             this.messageService.info(state.kind === 'logged-in'
-                ? localizeText('yukibana/cloud/loginSuccessfulAs', 'Logged in as {0}', CloudAccount.label(state.account))
+                ? localizeMarkdown('yukibana/cloud/loginSuccessfulAs', 'Logged in as {0}', CloudAccount.label(state.account))
                 : nls.localize('yukibana/cloud/loginSuccessful', 'Logged in successfully'));
         } finally {
             showCode.dispose();

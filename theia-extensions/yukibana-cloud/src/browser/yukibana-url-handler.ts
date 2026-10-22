@@ -8,7 +8,7 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { TelemetryService } from '@theia/telemetry/lib/common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { localizeText } from 'yukibana-ext/lib/common/localize-text';
+import { localizeMarkdown } from 'yukibana-ext/lib/common/localize-markdown';
 import { CloudService } from '../common/cloud-protocol';
 import { CloudTelemetry } from '../common/cloud-telemetry';
 import { CloudAccountService } from './cloud-account-service';
@@ -99,7 +99,7 @@ export class YukibanaOpenHandler implements OpenHandler {
             if (!info.starterReady) {
                 outcome = 'no-starter';
                 this.logger.info('Project has no starter');
-                this.messages.error(localizeText('yukibana/cloud/openProject/noStarter', 'Project \'{0}\' has no starter files to download yet', info.title));
+                this.messages.error(localizeMarkdown('yukibana/cloud/openProject/noStarter', 'Project \'{0}\' has no starter files to download yet', info.title));
                 return;
             }
 
@@ -131,7 +131,7 @@ export class YukibanaOpenHandler implements OpenHandler {
             if (!result.ok) {
                 outcome = 'download-failed';
                 this.logger.error(`Could not download project: ${result.reason}`);
-                this.messages.error(localizeText('yukibana/cloud/openProject/downloadFailReason', 'Download failed: {0}', result.reason));
+                this.messages.error(localizeMarkdown('yukibana/cloud/openProject/downloadFailReason', 'Download failed: {0}', result.reason));
                 return;
             }
 
@@ -148,7 +148,7 @@ export class YukibanaOpenHandler implements OpenHandler {
             this.workspaces.open(result.uri, { preserveWindow: !newWindow });
         } catch (e) {
             this.logger.error(`Could not open project (stage: ${stage})`, e);
-            this.messages.error(localizeText('yukibana/cloud/openProject/failed', 'Could not open project: {0}', e instanceof Error ? e.message : String(e)));
+            this.messages.error(localizeMarkdown('yukibana/cloud/openProject/failed', 'Could not open project: {0}', e instanceof Error ? e.message : String(e)));
         } finally {
             progress?.cancel();
             if (outcome !== 'opened') {
