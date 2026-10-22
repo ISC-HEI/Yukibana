@@ -8,7 +8,7 @@ import { RegistryError } from '@yukibana/cli';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as tar from 'tar';
-import { CloudService, DownloadResult, ProjectLookup, SubmissionResult, SubmitAvailability } from '../common/cloud-protocol';
+import { CloudService, DownloadResult, ProjectListing, ProjectLookup, SubmissionResult, SubmitAvailability } from '../common/cloud-protocol';
 import { CloudClient, isRefused } from './cloud-client';
 import { CloudSessionManager } from './cloud-session-manager';
 
@@ -42,11 +42,29 @@ export class CloudServiceImpl implements CloudService {
             if (e instanceof RegistryError && e.status === 404) {
                 return { kind: 'not-found' };
             }
-            if (isRefused(e) || !(await this.sessions.isLoggedIn())) {
+            if (await this.isLoggedOut(e)) {
                 return { kind: 'not-logged-in' };
             }
             throw e;
         }
+    }
+
+    async listProjects(): Promise<ProjectListing> {
+        try {
+            return { kind: 'found', projects: await this.client.projects() };
+        } catch (e) {
+            if (await this.isLoggedOut(e)) {
+                return { kind: 'not-logged-in' };
+            }
+            // The welcome screen shows the reason rather than an empty list, which would read as nothing due
+            this.logger.warn(`Could not list projects: ${e instanceof Error ? e.message : String(e)}`);
+            return { kind: 'error', reason: e instanceof Error ? e.message : String(e) };
+        }
+    }
+
+    /** Returns `true` iff `e`, from a registry call, means nobody is logged in. */
+    protected async isLoggedOut(e: unknown): Promise<boolean> {
+        return isRefused(e) || !(await this.sessions.isLoggedIn());
     }
 
     async downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult> {

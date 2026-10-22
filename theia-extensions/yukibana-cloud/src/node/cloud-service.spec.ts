@@ -15,7 +15,8 @@ import { CloudClient } from './cloud-client';
 import { CloudServiceImpl } from './cloud-service';
 import { CloudSessionManager } from './cloud-session-manager';
 
-type MockClient = Partial<Pick<CloudClient, 'downloadStarter' | 'project' | 'submitArchive'>>;
+/** Registry calls a test fakes; the others are missing. */
+type MockClient = Partial<Pick<CloudClient, 'downloadStarter' | 'project' | 'projects' | 'submitArchive'>>;
 
 function setup(client: MockClient, loggedIn: boolean = true): CloudServiceImpl {
     const service = new CloudServiceImpl();
@@ -149,6 +150,28 @@ describe('CloudServiceImpl', () => {
             const error = await setup({ project: async () => { throw new RegistryError(500, 'the registry answered 500'); } })
                 .getProjectInfo('project').then(() => undefined, e => e);
             expect(error).to.be.instanceOf(RegistryError);
+        });
+    });
+
+    describe('listProjects', () => {
+        it('should return the projects the registry shows', async () => {
+            const projects = [{ projectId: 'project', title: 'Warm up' } as Project];
+            expect(await setup({ projects: async () => projects }).listProjects()).to.deep.equal({ kind: 'found', projects });
+        });
+
+        it('should say when nobody is logged in', async () => {
+            const listing = await setup({ projects: async () => { throw new NotLoggedIn('not logged in; run `yukibana login`'); } }, false).listProjects();
+            expect(listing).to.deep.equal({ kind: 'not-logged-in' });
+        });
+
+        it('should say when the registry refuses the session', async () => {
+            const listing = await setup({ projects: async () => { throw new RegistryError(401, 'the registry answered 401'); } }).listProjects();
+            expect(listing).to.deep.equal({ kind: 'not-logged-in' });
+        });
+
+        it('should give the reason when the registry cannot answer, rather than an empty list', async () => {
+            const listing = await setup({ projects: async () => { throw new RegistryError(500, 'the registry answered 500'); } }).listProjects();
+            expect(listing).to.deep.equal({ kind: 'error', reason: 'the registry answered 500' });
         });
     });
 
