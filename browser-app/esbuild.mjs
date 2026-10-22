@@ -18,10 +18,9 @@ if (watch) {
     ]);
 } else {
     try {
-        await browserContext.rebuild();
-        await browserContext.dispose();
-        await nodeContext.rebuild();
-        await nodeContext.dispose();
+        // The builds are independent, so run them at the same time.
+        await Promise.all([browserContext.rebuild(), nodeContext.rebuild()]);
+        await Promise.all([browserContext.dispose(), nodeContext.dispose()]);
     } catch {
         process.exit(1);
     }

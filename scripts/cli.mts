@@ -108,13 +108,55 @@ function build(apps: App[], dev: boolean): void {
     }
 }
 
+// Theia backs up the browser builds of native modules in .browser_modules while they are built for Electron, but
+// discards the Electron builds when switching back. Those are kept in .electron_modules, so that switching to
+// Electron again is a copy instead of a rebuild from source.
+const browserModules = path.join(root, '.browser_modules');
+const electronModules = path.join(root, '.electron_modules');
+
+type ModuleLocations = Record<string, { originalLocation: string }>;
+
+function readJson<T>(file: string): T {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+}
+
+/** Identifies what the Electron builds were built from, so that they are only reused for the same versions. */
+function electronModulesKey(modules: ModuleLocations): string {
+    const electron = createRequire(path.join(appDir('electron'), 'package.json')).resolve('electron/package.json');
+    return JSON.stringify([readJson<{ version: string }>(electron).version, ...Object.entries(modules).map(([name, { originalLocation }]) =>
+        [name, originalLocation, readJson<{ version: string }>(path.join(originalLocation, 'package.json')).version])]);
+}
+
 function rebuildNativeModules(app: App): void {
-    // Theia backs up the browser builds of native modules in .browser_modules while they are built for Electron.
-    const current: App = fs.existsSync(path.join(root, '.browser_modules')) ? 'electron' : 'browser';
-    if (current !== app) {
-        console.log(`Rebuilding native modules for ${app}...`);
-        exec(appDir(app), theia, [`rebuild:${app}`, '--cacheRoot', '..']);
+    const current: App = fs.existsSync(browserModules) ? 'electron' : 'browser';
+    if (current === app) {
+        return;
     }
+    if (app === 'browser') {
+        const modules = readJson<ModuleLocations>(path.join(browserModules, 'modules.json'));
+        fs.rmSync(electronModules, { recursive: true, force: true });
+        for (const [name, { originalLocation }] of Object.entries(modules)) {
+            fs.cpSync(originalLocation, path.join(electronModules, name), { recursive: true });
+        }
+        fs.writeFileSync(path.join(electronModules, 'modules.json'), JSON.stringify(modules, undefined, 2));
+        fs.writeFileSync(path.join(electronModules, 'key.json'), electronModulesKey(modules));
+    } else if (fs.existsSync(path.join(electronModules, 'key.json'))) {
+        // Same layout as Theia's backup, so that `theia rebuild:browser` can switch back.
+        const modules = readJson<ModuleLocations>(path.join(electronModules, 'modules.json'));
+        if (fs.readFileSync(path.join(electronModules, 'key.json'), 'utf8') === electronModulesKey(modules)) {
+            console.log('Restoring native modules built for electron...');
+            fs.mkdirSync(browserModules);
+            for (const [name, { originalLocation }] of Object.entries(modules)) {
+                fs.cpSync(originalLocation, path.join(browserModules, name), { recursive: true });
+                fs.rmSync(originalLocation, { recursive: true });
+                fs.cpSync(path.join(electronModules, name), originalLocation, { recursive: true });
+            }
+            fs.writeFileSync(path.join(browserModules, 'modules.json'), JSON.stringify(modules, undefined, 2));
+            return;
+        }
+    }
+    console.log(`Rebuilding native modules for ${app}...`);
+    exec(appDir(app), theia, [`rebuild:${app}`, '--cacheRoot', '..']);
 }
 
 function downloadPlugins(force: boolean): void {
