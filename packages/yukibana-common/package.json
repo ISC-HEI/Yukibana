@@ -1,0 +1,22 @@
+{
+  "name": "yukibana-common",
+  "description": "Helpers shared by the Yukibana extensions",
+  "version": "0.1.0",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@theia/core": "~1.75.0"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.0",
+    "typescript": "~5.4.5"
+  },
+  "scripts": {
+    "prepare": "pnpm run clean && pnpm run build",
+    "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "build": "tsc",
+    "watch": "tsc -w"
+  }
+}

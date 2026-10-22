@@ -15,6 +15,7 @@
     "archiver": "8.0.0",
     "fast-glob": "3.3.3",
     "ignore": "7.0.12",
+    "yukibana-common": "workspace:*",
     "yukibana-ext": "workspace:*",
     "zlib": "1.0.5"
   },

@@ -3,7 +3,7 @@
  */
 import { Command, CommandContribution, CommandRegistry, MessageService, nls } from '@theia/core';
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { localizeMarkdown } from 'yukibana-ext/lib/common/localize-markdown';
+import { localizeMarkdown } from 'yukibana-common/lib/localize-markdown';
 import { CloudAccount, CloudAuth, LoginResult } from '../common/cloud-protocol';
 import { CloudAccountService } from './cloud-account-service';
 import { AuthClientImpl } from './cloud-auth-client';
