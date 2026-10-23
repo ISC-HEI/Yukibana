@@ -1,9 +1,9 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { _electron, test as base, Browser, Page } from '@playwright/test';
+import { _electron, test as base, Browser, Page, TestInfo } from '@playwright/test';
 import { TheiaApp, TheiaAppFactory, TheiaWorkspace } from '@theia/playwright';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -71,28 +71,45 @@ export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launc
             workspace.initialize();
             const page = await open(workspace);
             launched.page = page;
+            // Shorter than the test timeout, so that an app that does not start fails here, where it can be
+            // captured: the tests launch in beforeAll, which test-scoped fixtures like screenshotOnFailure skip.
+            page.setDefaultTimeout(30 * 1000);
             const theiaApp = new factory(page, workspace, app === 'electron');
-            await theiaApp.waitForShellAndInitialized();
+            try {
+                await theiaApp.waitForShellAndInitialized();
+            } catch (error) {
+                await attachScreenshot(page, base.info());
+                throw error;
+            }
             return theiaApp;
         });
 
-        await close();
-        await backend?.stop();
-        await (await browser?.catch(() => undefined))?.close();
+        try {
+            await close();
+        } finally {
+            await backend?.stop();
+            await (await browser?.catch(() => undefined))?.close();
+        }
     }, { scope: 'worker' }],
     // Playwright's own `screenshot` option only covers the pages it creates for each test.
     screenshotOnFailure: [async ({ launched }, use, testInfo) => {
         await use();
-        const { page } = launched;
-        if (testInfo.status !== testInfo.expectedStatus && page && !page.isClosed()) {
-            // Best effort: a page that crashed cannot be captured, and the test's own error is what matters.
-            const screenshot = await page.screenshot().catch(() => undefined);
-            if (screenshot) {
-                await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/png' });
-            }
+        if (testInfo.status !== testInfo.expectedStatus && launched.page) {
+            await attachScreenshot(launched.page, testInfo);
         }
     }, { auto: true }],
 });
+
+/**
+ * Attaches a screenshot of `page` to the report. Best effort: a page that closed or hangs cannot be captured,
+ * and the test's own error is what matters.
+ */
+async function attachScreenshot(page: Page, testInfo: TestInfo): Promise<void> {
+    const screenshot = page.isClosed() ? undefined : await page.screenshot({ timeout: 5000 }).catch(() => undefined);
+    if (screenshot) {
+        await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/png' });
+    }
+}
 
 /** Starts the browser app's backend on a free port. */
 function startBackend(): { url: Promise<string>, stop: () => Promise<unknown> } {
@@ -118,7 +135,13 @@ function startBackend(): { url: Promise<string>, stop: () => Promise<unknown> } 
     return {
         url,
         stop: () => {
-            backend.kill();
+            if (process.platform === 'win32') {
+                // Killing a process on Windows skips its exit handlers, so end its children too, e.g. the
+                // plugin host, as Theia does.
+                spawnSync('taskkill', ['/f', '/t', '/pid', String(backend.pid)]);
+            } else {
+                backend.kill();
+            }
             return exited;
         },
     };
