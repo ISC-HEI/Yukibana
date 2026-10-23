@@ -65,9 +65,8 @@ so only the ones that changed are recompiled.
 - `pnpm test:coverage`: run the unit tests and report their coverage, in `coverage/index.html`
 - `pnpm clean`: remove what the extensions compiled and the apps bundled, e.g. after deleting
   or renaming source files, whose stale compiled files are otherwise left behind
-- `pnpm config:schema`: regenerate [config_schema.json](config_schema.json) from the
-  configuration model in `yukibana-config.ts`. The [pre-commit](https://pre-commit.com) hooks in
-  [.pre-commit-config.yaml](.pre-commit-config.yaml) do this when it changes, once installed with `pre-commit install`
+- `pnpm config:schema`: generate `config_schema.json`, the JSON schema of the configuration
+  model in `yukibana-config.ts`
 
 To recompile an extension on every change, run `pnpm --filter <extension> watch`, and to
 rebundle an app, `pnpm --filter yukibana-browser-app watch` (or `yukibana-electron-app`).
