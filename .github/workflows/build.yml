@@ -69,12 +69,13 @@ jobs:
           retention-days: 5
 
   e2e:
-    name: E2E tests (${{ matrix.app }})
-    runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    name: E2E tests (${{ matrix.app }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-22.04, windows-2022, macos-15]
         app: [browser, electron]
 
     steps:
@@ -94,6 +95,7 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
+        shell: bash
         run: pnpm ci --fetch-timeout 100000
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -106,30 +108,27 @@ jobs:
 
       # Also done by the tests, but separately it shows how long each takes.
       - name: Build (dev) and download plugins
+        shell: bash
         run: pnpm build --dev && pnpm download:plugins
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Cache Playwright browsers
-        if: matrix.app == 'browser'
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-
+      # Not cached, as Playwright recommends: restoring takes about as long as downloading.
       - name: Install Playwright Chromium
         if: matrix.app == 'browser'
+        shell: bash
         run: pnpm --filter yukibana-tests exec playwright install --with-deps chromium
 
       - name: E2E tests
-        # Electron needs a display.
-        run: ${{ matrix.app == 'electron' && 'xvfb-run -a' || '' }} pnpm test:e2e --project=${{ matrix.app }}
+        shell: bash
+        # Electron needs a display, which Linux runners lack.
+        run: ${{ matrix.app == 'electron' && runner.os == 'Linux' && 'xvfb-run -a' || '' }} pnpm test:e2e --project=${{ matrix.app }}
 
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: e2e-report-${{ matrix.app }}
+          name: e2e-report-${{ matrix.app }}-${{ matrix.os }}
           path: |
             tests/playwright-report/
             tests/test-results/
