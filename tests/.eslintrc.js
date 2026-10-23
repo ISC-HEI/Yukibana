@@ -6,10 +6,13 @@ module.exports = {
         '../configs/errors.eslintrc.json'
     ],
     ignorePatterns: [
-        '**/{node_modules,lib}'
+        '**/{node_modules,lib}',
+        '.eslintrc.js',
+        'playwright-report',
+        'test-results'
     ],
     parserOptions: {
         tsconfigRootDir: __dirname,
-        project: 'tsconfig.eslint.json'
+        project: 'tsconfig.json'
     }
 };

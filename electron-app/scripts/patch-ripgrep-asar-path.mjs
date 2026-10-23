@@ -9,10 +9,14 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+/** Repository root. */
 const shellRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+/** The Electron app's bundled backend, which this patches in place. */
 const target = path.join(shellRoot, 'electron-app', 'lib', 'backend', 'main.js');
 
+/** Text that only a patched backend contains. */
 const PATCHED_MARKER = 'app.asar.unpacked$1';
+/** The bundle plugin's shim that computes ripgrep's path inside app.asar. */
 const SHIM_PATTERN = /require\((["'])path\1\)\s*\.\s*join\(\s*__dirname\s*,\s*`\.\/native\/rg\$\{process\.platform\s*===\s*(["'])win32\2\s*\?\s*(["'])\.exe\3\s*:\s*(["'])\4\}`\s*\)/g;
 
 const source = await readFile(target, 'utf8');

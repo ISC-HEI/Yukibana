@@ -6,6 +6,7 @@ import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { FileUri } from '@theia/core/lib/node';
 import { NotLoggedIn, Project, RegistryError } from '@yukibana/cli';
 import { expect } from 'chai';
+import { describe, it, afterAll } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -70,7 +71,7 @@ function archiveFile(): string {
 }
 
 describe('CloudServiceImpl', () => {
-    after(() => {
+    afterAll(() => {
         for (const dir of tempDirs) {
             fs.rmSync(dir, { recursive: true, force: true });
         }

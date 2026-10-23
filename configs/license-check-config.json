@@ -1,7 +1,0 @@
-{
-    "project": "ecd.theia",
-    "inputFile": "yarn.lock",
-    "batch": 50,
-    "timeout": 240,
-    "summary": "license-check-summary.txt"
-}

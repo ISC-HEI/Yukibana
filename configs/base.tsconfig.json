@@ -24,8 +24,7 @@
         "sourceMap": true,
         "composite": true,
         "types": [
-            "node",
-            "mocha"
+            "node"
         ]
     }
 }

@@ -4,7 +4,9 @@
         "noEmit": true
     },
     "include": [
-      "../scripts"
+      "../scripts",
+      "./vitest.setup.ts",
+      "../vitest.config.mts"
     ]
   }
   

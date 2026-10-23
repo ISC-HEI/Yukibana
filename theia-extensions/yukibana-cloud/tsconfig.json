@@ -10,6 +10,9 @@
     "references": [
         {
             "path": "../yukibana-submission"
+        },
+        {
+            "path": "../../packages/yukibana-common"
         }
     ]
 }

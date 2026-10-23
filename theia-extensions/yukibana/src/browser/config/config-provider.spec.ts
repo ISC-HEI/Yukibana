@@ -1,12 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
-import { enableJSDOM } from '@theia/core/lib/browser/test/jsdom';
-
-const disableJSDom = enableJSDOM();
-FrontendApplicationConfigProvider.set({});
-
+// @vitest-environment jsdom
 import { Disposable, Emitter, Event, URI } from '@theia/core';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
@@ -14,9 +9,17 @@ import { FileService, ReadTextFileOptions, TextFileContent } from '@theia/filesy
 import { FileChangesEvent, FileChangeType, FileStat, WatchOptions } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { expect } from 'chai';
+import { describe, it } from 'vitest';
 import { loadConfig } from '../../common/yukibana-config';
 import { ConfigProvider } from './config-provider';
 import { ReadOnlyPolicy } from './read-only-policy';
+
+// FileChangeType is an ambient const enum (declared only in a .d.ts), which
+// Vitest's per-file transpilation cannot inline, so spell out its values.
+// See: https://github.com/eclipse-theia/theia/issues/18240
+const UPDATED: FileChangeType = 0;
+const ADDED: FileChangeType = 1;
+const DELETED: FileChangeType = 2;
 
 interface MockFileService extends Pick<FileService, 'exists' | 'read' | 'watch' | 'onDidFilesChange'> {
     write(resource: URI, content: string): void
@@ -60,7 +63,7 @@ function createMockFileService(files: Record<string, string>): MockFileService {
             changeEmitter.fire(new FileChangesEvent([
                 {
                     resource: resource,
-                    type: added ? FileChangeType.ADDED : FileChangeType.UPDATED,
+                    type: added ? ADDED : UPDATED,
                 }
             ]));
         },
@@ -73,7 +76,7 @@ function createMockFileService(files: Record<string, string>): MockFileService {
             changeEmitter.fire(new FileChangesEvent([
                 {
                     resource: resource,
-                    type: FileChangeType.DELETED,
+                    type: DELETED,
                 }
             ]));
         }
@@ -141,8 +144,6 @@ function setup(initialRoot?: URI): MockServices {
         provider,
     };
 }
-
-disableJSDom();
 
 describe('ConfigProvider', () => {
     const root = new URI('file:///');
