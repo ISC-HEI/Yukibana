@@ -90,8 +90,11 @@ jobs:
       - name: Cache Theia plugins
         uses: actions/cache@v5
         with:
-          path: plugins
-          key: plugins-${{ runner.os }}-${{ hashFiles('package.json') }}
+          # With the stamp that pnpm download:plugins compares the plugin list with.
+          path: |
+            plugins
+            node_modules/.plugins-download-inputs
+          key: plugins-v2-${{ runner.os }}-${{ hashFiles('package.json') }}
 
       # Not cached, as Playwright recommends: restoring takes about as long as downloading.
       - name: Install Playwright Chromium
@@ -157,8 +160,11 @@ jobs:
       - name: Cache Theia plugins
         uses: actions/cache@v5
         with:
-          path: plugins
-          key: plugins-${{ runner.os }}-${{ hashFiles('package.json') }}
+          # With the stamp that pnpm download:plugins compares the plugin list with.
+          path: |
+            plugins
+            node_modules/.plugins-download-inputs
+          key: plugins-v2-${{ runner.os }}-${{ hashFiles('package.json') }}
 
       - name: Cache Electron / electron-builder downloads
         uses: actions/cache@v5

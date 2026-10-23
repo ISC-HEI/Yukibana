@@ -27,10 +27,6 @@ files:
 extraResources:
   - from: ../plugins
     to: app/plugins
-    # The stamp with which `pnpm download:plugins` skips downloads that are up to date
-    filter:
-      - "**/*"
-      - "!.download-inputs"
 
 win:
   icon: resources/icons/WindowsLauncherIcons/Yukibana.ico

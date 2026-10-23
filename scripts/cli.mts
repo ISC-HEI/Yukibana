@@ -59,16 +59,17 @@ function build(apps: App[], dev: boolean): void {
 }
 
 /**
- * Downloads the plugins listed in package.json, unless the same list was downloaded before.
+ * Downloads the plugins listed in package.json, unless the same list was downloaded into the plugins folder before.
  *
  * Theia skips every plugin that is already there, so the plugins downloaded before are deleted first.
  */
 function downloadPlugins(): void {
     const pluginsDir = path.join(root, 'plugins');
-    const stampFile = path.join(pluginsDir, '.download-inputs');
+    // Outside the plugins folder, where Theia would take it for a plugin.
+    const stampFile = path.join(root, 'node_modules', '.plugins-download-inputs');
     const { theiaPlugins, theiaPluginsExcludeIds } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
     const inputs = JSON.stringify({ theiaPlugins, theiaPluginsExcludeIds });
-    if (fs.existsSync(stampFile) && fs.readFileSync(stampFile, 'utf8') === inputs) {
+    if (fs.existsSync(pluginsDir) && fs.existsSync(stampFile) && fs.readFileSync(stampFile, 'utf8') === inputs) {
         console.log('Plugins: up to date');
         return;
     }
