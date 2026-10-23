@@ -248,6 +248,9 @@ const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Pa
     package: {
         options: { preview: { type: 'boolean' }, publish: { type: 'boolean' } },
         run: ({ values }) => {
+            if (values.preview && values.publish) {
+                fail('Use either --preview or --publish, not both');
+            }
             build(['electron'], false);
             downloadPlugins(false);
             pnpmRun(appDir('electron'), values.preview ? 'package:preview' : values.publish ? 'deploy' : 'package');
