@@ -25,28 +25,35 @@ export const test = base.extend<{}, { app: App, launch: Launch }>({
     launch: [async ({ app, playwright, headless, launchOptions }, use) => {
         let browser: Promise<Browser> | undefined;
         let backend: { url: Promise<string>, stop: () => Promise<unknown> } | undefined;
-        /** Opens a page of the app, and returns it with how to close it. */
-        const open = async (workspace: TheiaWorkspace): Promise<[Page, () => Promise<unknown>]> => {
+        /**
+         * Closes what the last `launch` opened, even if it is still starting, e.g. after a timeout. What failed
+         * to start has nothing to close, and its error was already reported by the test that launched it.
+         */
+        let close = async (): Promise<unknown> => undefined;
+        /** Opens a page of the app. */
+        const open = async (workspace: TheiaWorkspace): Promise<Page> => {
             if (app === 'browser') {
                 browser ??= playwright.chromium.launch({ ...launchOptions, headless });
                 backend ??= startBackend();
-                const tab = await (await browser).newPage({ viewport: { width: 1920, height: 1080 } });
-                await tab.goto(`${await backend.url}/#${workspace.pathAsPathComponent}`);
-                return [tab, () => tab.close()];
+                const [started, url] = await Promise.all([browser, backend.url]);
+                const tab = started.newPage({ viewport: { width: 1920, height: 1080 } });
+                close = async () => (await tab.catch(() => undefined))?.close();
+                await (await tab).goto(`${url}/#${workspace.pathAsPathComponent}`);
+                return tab;
             }
-            const electronApp = await _electron.launch({
+            const electronApp = _electron.launch({
                 args: [appDir('electron'), '--no-sandbox', '--no-cluster', `--plugins=local-dir:${plugins}`, workspace.path],
                 env: { ...process.env, THEIA_ELECTRON_DISABLE_NATIVE_ELEMENTS: '1', THEIA_ELECTRON_NO_EARLY_WINDOW: '1', THEIA_NO_SPLASH: 'true' },
             });
-            return [await electronApp.firstWindow(), () => electronApp.close()];
+            // The Electron app is single-instance, so one left open would make the next launch, e.g. a retry, quit.
+            close = async () => (await electronApp.catch(() => undefined))?.close();
+            return (await electronApp).firstWindow();
         };
 
-        let close = async (): Promise<unknown> => undefined;
         await use(async (workspace = new TheiaWorkspace(), factory = TheiaApp as TheiaAppFactory<never>) => {
             await close();
             workspace.initialize();
-            const [page, closePage] = await open(workspace);
-            close = closePage;
+            const page = await open(workspace);
             const theiaApp = new factory(page, workspace, app === 'electron');
             await theiaApp.waitForShellAndInitialized();
             return theiaApp;
@@ -54,7 +61,7 @@ export const test = base.extend<{}, { app: App, launch: Launch }>({
 
         await close();
         await backend?.stop();
-        await (await browser)?.close();
+        await (await browser?.catch(() => undefined))?.close();
     }, { scope: 'worker' }],
 });
 
@@ -69,7 +76,8 @@ function startBackend(): { url: Promise<string>, stop: () => Promise<unknown> } 
         let output = '';
         const onData = (data: Buffer): void => {
             output += data;
-            const listening = /Theia app listening on (\S+)\./.exec(output);
+            // The whole line, so that a URL split across two chunks of output is not cut short.
+            const listening = /Theia app listening on (\S+)\.\r?\n/.exec(output);
             if (listening) {
                 backend.stdout!.off('data', onData).resume();
                 resolve(listening[1]);
