@@ -19,8 +19,9 @@ if (watch) {
     ]);
 } else {
     try {
-        // The builds are independent, so run them at the same time.
-        await Promise.all([browserContext.rebuild(), nodeContext.rebuild(), electronContext.rebuild()]);
+        // The backend build is independent, so it runs at the same time. The browser and electron builds both write
+        // to lib/frontend, where each rewrites every source map when it ends, so they run one after the other.
+        await Promise.all([browserContext.rebuild().then(() => electronContext.rebuild()), nodeContext.rebuild()]);
         await Promise.all([browserContext.dispose(), nodeContext.dispose(), electronContext.dispose()]);
     } catch {
         process.exit(1);
