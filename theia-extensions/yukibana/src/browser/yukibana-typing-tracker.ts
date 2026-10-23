@@ -8,9 +8,11 @@ import { EditorManager, EditorWidget } from '@theia/editor/lib/browser';
 import { editor } from '@theia/monaco-editor-core';
 import { MonacoEditor } from '@theia/monaco/lib/browser/monaco-editor';
 import { TelemetryService } from '@theia/telemetry/lib/common/telemetry-service';
+import { Mode } from '../common/yukibana-config';
 import { TypingTelemetry } from '../common/yukibana-telemetry';
+import { ConfigProvider } from './config/config-provider';
 
-export interface EditReason {
+interface EditReason {
     metadata?: {
         source?: string
         kind?: string
@@ -23,11 +25,15 @@ export interface EditReason {
 export class YukibanaTypingTracker implements FrontendApplicationContribution {
     @inject(EditorManager) protected readonly editors!: EditorManager;
     @inject(TelemetryService) protected readonly telemetry!: TelemetryService;
+    @inject(ConfigProvider) protected readonly config!: ConfigProvider;
     @inject(ILogger) @named('yukibana:TypingTracker') protected readonly logger!: ILogger;
 
-    onStart(): void {
-        this.editors.all.forEach(w => this.attach(w));
-        this.editors.onCreated(w => this.attach(w));
+    async onStart(): Promise<void> {
+        const config = await this.config.ready;
+        if (config.mode === Mode.EXAM) {
+            this.editors.all.forEach(w => this.attach(w));
+            this.editors.onCreated(w => this.attach(w));
+        }
     }
 
     protected attach(widget: EditorWidget): void {
