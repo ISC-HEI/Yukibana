@@ -5,6 +5,7 @@ import { _electron, test as base, Browser, Page, TestInfo } from '@playwright/te
 import { TheiaApp, TheiaAppFactory, TheiaWorkspace } from '@theia/playwright';
 import { spawn, spawnSync } from 'child_process';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 
 export { expect } from '@playwright/test';
@@ -39,6 +40,8 @@ export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launc
     // The page that `launch` opened last.
     launched: [async ({}, use) => use({}), { scope: 'worker' }],
     launch: [async ({ app, playwright, headless, launchOptions, launched }, use) => {
+        // Settings and recent workspaces of their own, instead of the developer's.
+        const env = { ...process.env, THEIA_CONFIG_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'theia-config-')) };
         let browser: Promise<Browser> | undefined;
         let backend: { url: Promise<string>, stop: () => Promise<unknown> } | undefined;
         /**
@@ -50,7 +53,7 @@ export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launc
         const open = async (workspace: TheiaWorkspace): Promise<Page> => {
             if (app === 'browser') {
                 browser ??= playwright.chromium.launch({ ...launchOptions, headless });
-                backend ??= startBackend();
+                backend ??= startBackend(env);
                 const [started, url] = await Promise.all([browser, backend.url]);
                 const tab = started.newPage({ viewport: { width: 1920, height: 1080 } });
                 close = async () => (await tab.catch(() => undefined))?.close();
@@ -59,7 +62,7 @@ export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launc
             }
             const electronApp = _electron.launch({
                 args: [appDir('electron'), '--no-sandbox', '--no-cluster', `--plugins=local-dir:${plugins}`, workspace.path],
-                env: { ...process.env, THEIA_ELECTRON_DISABLE_NATIVE_ELEMENTS: '1', THEIA_ELECTRON_NO_EARLY_WINDOW: '1', THEIA_NO_SPLASH: 'true' },
+                env: { ...env, THEIA_ELECTRON_DISABLE_NATIVE_ELEMENTS: '1', THEIA_ELECTRON_NO_EARLY_WINDOW: '1', THEIA_NO_SPLASH: 'true' },
             });
             // The Electron app is single-instance, so one left open would make the next launch, e.g. a retry, quit.
             close = async () => (await electronApp.catch(() => undefined))?.close();
@@ -112,9 +115,10 @@ async function attachScreenshot(page: Page, testInfo: TestInfo): Promise<void> {
 }
 
 /** Starts the browser app's backend on a free port. */
-function startBackend(): { url: Promise<string>, stop: () => Promise<unknown> } {
+function startBackend(env: NodeJS.ProcessEnv): { url: Promise<string>, stop: () => Promise<unknown> } {
     const backend = spawn(process.execPath, ['lib/backend/main.js', '--port=0', `--plugins=local-dir:${plugins}`], {
         cwd: appDir('browser'),
+        env,
         stdio: ['ignore', 'pipe', 'inherit'],
     });
     const exited = new Promise(resolve => backend.on('exit', resolve));
