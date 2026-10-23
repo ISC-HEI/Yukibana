@@ -54,7 +54,9 @@ what is needed.
   (done automatically by `start` and `package`; `--force` downloads them again)
 - `pnpm lint` / `pnpm lint:fix`: run the linter on the whole project
 - `pnpm test`: run the unit tests (`*.spec.ts`) with Vitest, straight from the sources;
-  `pnpm test:watch` reruns them on every change. Filter by file name and test name, e.g.
+  `pnpm test:watch` reruns them on every change. What a spec imports from another extension
+  or library comes from its compiled `lib`, so rebuild that one after changing it (`pnpm install`
+  compiles them all). Filter by file name and test name, e.g.
   `pnpm test config-provider -t "should reload"`
 - `pnpm test:e2e`: build both apps in development mode and run the Playwright end-to-end
   tests ([tests/e2e](tests/e2e)) in each of them. Pick one app with `--project=browser` or
@@ -77,8 +79,8 @@ The project is separated into 4 main parts:
 - custom extensions ([theia-extensions](theia-extensions))
 - libraries shared by the extensions ([packages](packages))
 
-Each part is its own workspace and contains its own build commands.
-The top-level project also provides general commands.
+Each part is its own workspace, and the end-to-end tests ([tests](tests)) are one too.
+The commands above, run from the root, build and start them.
 
 Extensions that should be bundled with the IDE as builtin extensions
 must be added as dependencies of the application (both [browser-app](browser-app)
