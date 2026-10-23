@@ -20,8 +20,7 @@
   },
   "scripts": {
     "prepare": "tsc --build",
-    "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "watch": "tsc --build --watch"
+    "clean": "rimraf lib tsconfig.tsbuildinfo"
   },
   "theiaExtensions": [
     {

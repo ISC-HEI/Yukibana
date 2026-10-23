@@ -2,13 +2,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-// Entry point of the root `build`, `start`, `package` and `download:plugins` scripts.
+// Entry point of the root `build`, `start`, `package`, `download:plugins` and `watch` scripts.
 //
 //   pnpm build [browser|electron] [--dev]      both apps by default, production unless --dev
 //   pnpm start [browser|electron] [--prod]     electron by default, builds in development mode
 //              [-- <theia start arguments>]
 //   pnpm package [--preview]                   packages the electron app into electron-app/dist
-//   pnpm download:plugins [--force]
+//   pnpm download:plugins                      downloads the plugins listed in package.json
+//   pnpm watch                                 recompiles the extensions on every change
 //
 // The native modules (node-pty, keytar, drivelist, native-keymap) use Node-API, so the builds that pnpm installs
 // for Node.js also load in Electron, and are not rebuilt for it with `theia rebuild:electron`.
@@ -58,16 +59,16 @@ function build(apps: App[], dev: boolean): void {
 }
 
 /**
- * Downloads the plugins listed in package.json, unless the same list was downloaded before and not `force`.
+ * Downloads the plugins listed in package.json, unless the same list was downloaded before.
  *
  * Theia skips every plugin that is already there, so the plugins downloaded before are deleted first.
  */
-function downloadPlugins(force: boolean): void {
+function downloadPlugins(): void {
     const pluginsDir = path.join(root, 'plugins');
     const stampFile = path.join(pluginsDir, '.download-inputs');
     const { theiaPlugins, theiaPluginsExcludeIds } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
     const inputs = JSON.stringify({ theiaPlugins, theiaPluginsExcludeIds });
-    if (!force && fs.existsSync(stampFile) && fs.readFileSync(stampFile, 'utf8') === inputs) {
+    if (fs.existsSync(stampFile) && fs.readFileSync(stampFile, 'utf8') === inputs) {
         console.log('Plugins: up to date');
         return;
     }
@@ -138,24 +139,27 @@ const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Pa
         run: ({ values, positionals, passthrough }) => {
             const [app] = parseApp(positionals, ['electron']);
             build([app], !values.prod);
-            downloadPlugins(false);
-            if (app === 'electron') {
-                exec(appDir(app), path.join(appDir(app), 'scripts', 'fix-chrome-sandbox.js'), []);
-            }
-            exec(appDir(app), theia, ['start', '--plugins=local-dir:../plugins', ...passthrough]);
+            downloadPlugins();
+            // As the packaged Linux app and the tests do: Electron's sandbox helper would need root's ownership.
+            const sandbox = app === 'electron' && process.platform === 'linux' ? ['--no-sandbox'] : [];
+            exec(appDir(app), theia, ['start', '--plugins=local-dir:../plugins', ...sandbox, ...passthrough]);
         },
     },
     package: {
         options: { preview: { type: 'boolean' } },
         run: ({ values }) => {
             build(['electron'], false);
-            downloadPlugins(false);
+            downloadPlugins();
             packageElectron(!!values.preview);
         },
     },
     'download:plugins': {
-        options: { force: { type: 'boolean' } },
-        run: ({ values }) => downloadPlugins(!!values.force),
+        options: {},
+        run: () => downloadPlugins(),
+    },
+    watch: {
+        options: {},
+        run: () => exec(root, tsc, ['--build', '--watch']),
     },
 };
 

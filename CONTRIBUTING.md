@@ -49,8 +49,8 @@ so only the ones that changed are recompiled.
   in production mode, or in development mode with `--dev`
 - `pnpm package`: build and package the Electron app into `electron-app/dist`.
   Use `--preview` for an unpacked directory
-- `pnpm download:plugins`: download the plugins listed in `theiaPlugins`
-  (done automatically by `start` and `package`; `--force` downloads them again)
+- `pnpm download:plugins`: download the plugins listed in `theiaPlugins`, again whenever
+  that list changes (done automatically by `start` and `package`; delete `plugins` to download them again)
 - `pnpm lint` / `pnpm lint:fix`: run the linter on the whole project
 - `pnpm test`: run the unit tests (`*.spec.ts`) with Vitest, straight from the sources;
   `pnpm test:watch` reruns them on every change. What a spec imports from another extension
@@ -68,8 +68,8 @@ so only the ones that changed are recompiled.
 - `pnpm config:schema`: generate `config_schema.json`, the JSON schema of the configuration
   model in `yukibana-config.ts`
 
-To recompile an extension on every change, run `pnpm --filter <extension> watch`, and to
-rebundle an app, `pnpm --filter yukibana-browser-app watch` (or `yukibana-electron-app`).
+To recompile the extensions on every change, run `pnpm watch`, and to rebundle an app,
+`pnpm --filter yukibana-browser-app watch` (or `yukibana-electron-app`).
 
 ## Architecture
 
@@ -96,15 +96,3 @@ This native module failed to compile during `pnpm install`, but since it is
 an optional dependency, the installation did not report an error.
 Install the Spectre-mitigated libraries (see [Prerequisites](#prerequisites)),
 then run `pnpm install --force`.
-
-### Invalid owner and permissions on `chrome-sandbox`
-
-> The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /path/to/node_modules/electron/dist/chrome-sandbox is owned by root and has mode 4755.
-
-Simply run the following commands to set the appropriate permissions
-for the `chrome-sandbox` executable (make sure to replace the path with the one shown in the error):
-
-```bash
-sudo chown root:root /path/to/node_modules/electron/dist/chrome-sandbox
-sudo chmod 4755 /path/to/node_modules/electron/dist/chrome-sandbox
-```

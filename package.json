@@ -16,6 +16,7 @@
     "start": "node scripts/cli.mts start",
     "package": "node scripts/cli.mts package",
     "download:plugins": "node scripts/cli.mts download:plugins",
+    "watch": "node scripts/cli.mts watch",
     "clean": "pnpm -r --if-present run clean",
     "postinstall": "theia check:theia-version",
     "lint": "eslint --ext js,jsx,ts,tsx,mts scripts packages theia-extensions tests configs vitest.config.mts && pnpm run -r --if-present lint",
