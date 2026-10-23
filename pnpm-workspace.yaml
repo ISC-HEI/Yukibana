@@ -12,10 +12,7 @@ allowBuilds:
   "@theia/ffmpeg": true
   "@vscode/windows-ca-certs": true
   "@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/37c34436a3b1a752123ab10c89be214cbe534556#path:/cli": true
-  chromedriver: true
-  core-js: true
   drivelist: true
-  electron-chromedriver: true
   electron-winstaller: true
   esbuild: true
   find-git-repositories: true
