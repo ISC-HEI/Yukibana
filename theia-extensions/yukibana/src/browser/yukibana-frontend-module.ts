@@ -9,6 +9,7 @@ import { RemoteFileSystemProvider } from '@theia/filesystem/lib/common/remote-fi
 import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
 import { ProblemManager } from '@theia/markers/lib/browser/problem/problem-manager';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
+import { YukibanaMessageService } from '../common/yukibana-message-service';
 import { AssignmentPaneContribution } from './assignment/assignment-pane-contribution';
 import { AssignmentPaneWidget } from './assignment/assignment-pane-widget';
 import { AssignmentResolver } from './assignment/assignment-resolver';
@@ -23,7 +24,7 @@ import { YukibanaProblemManager } from './yukibana-problem-manager';
 import { YukibanaRemoteFileSystemProvider } from './yukibana-remote-file-system-provider';
 import { SuggestionsContribution } from './yukibana-suggestions-contribution';
 import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
-import { YukibanaMessageService } from '../common/yukibana-message-service';
+import { YukibanaTypingTracker } from './yukibana-typing-tracker';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bindConfig(bind);
@@ -89,4 +90,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     } else {
         bind(MessageService).toService(YukibanaMessageService);
     }
+
+    bind(YukibanaTypingTracker).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(YukibanaTypingTracker);
 });
