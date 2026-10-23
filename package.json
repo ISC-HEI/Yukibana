@@ -24,8 +24,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "test:e2e": "pnpm --filter yukibana-tests exec playwright test",
-    "config:schema": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/export-config-schema.mts"
+    "test:e2e": "pnpm --filter yukibana-tests exec playwright test"
   },
   "devDependencies": {
     "@theia/cli": "~1.75.0",

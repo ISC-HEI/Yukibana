@@ -12,6 +12,5 @@
 **/test-results
 **/playwright-report
 **/coverage
-/config_schema.json
 
 .idea

@@ -65,8 +65,6 @@ so only the ones that changed are recompiled.
 - `pnpm test:coverage`: run the unit tests and report their coverage, in `coverage/index.html`
 - `pnpm clean`: remove what the extensions compiled and the apps bundled, e.g. after deleting
   or renaming source files, whose stale compiled files are otherwise left behind
-- `pnpm config:schema`: generate `config_schema.json`, the JSON schema of the configuration
-  model in `yukibana-config.ts`
 
 To recompile the extensions on every change, run `pnpm watch`, and to rebundle an app,
 `pnpm --filter yukibana-browser-app watch` (or `yukibana-electron-app`).
