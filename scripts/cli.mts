@@ -50,8 +50,8 @@ function pnpmRun(cwd: string, script: string): void {
 }
 
 /**
- * Hashes `extra` with the path and content of every file under `paths`. Contents rather than
- * modification times, since `theia rebuild:electron` rewrites the app's package.json in place.
+ * Hashes `extra` with the path and content of every file under `paths`, except in node_modules. Contents rather
+ * than modification times, since `theia rebuild:electron` rewrites the app's package.json in place.
  */
 function fingerprint(paths: string[], extra: unknown): string {
     const hash = createHash('sha1').update(JSON.stringify(extra));
@@ -59,7 +59,7 @@ function fingerprint(paths: string[], extra: unknown): string {
         const stat = fs.statSync(file, { throwIfNoEntry: false });
         hash.update(`${path.relative(root, file)}\n`);
         if (stat?.isDirectory()) {
-            fs.readdirSync(file).sort().forEach(entry => visit(path.join(file, entry)));
+            fs.readdirSync(file).sort().filter(entry => entry !== 'node_modules').forEach(entry => visit(path.join(file, entry)));
         } else if (stat) {
             hash.update(fs.readFileSync(file));
         }
@@ -91,7 +91,8 @@ function build(apps: App[], dev: boolean): void {
     const mode = dev ? 'development' : 'production';
     for (const app of apps) {
         const inputs = fingerprint([
-            ...extensions.flatMap(dir => ['package.json', 'src', 'lib'].map(entry => path.join(dir, entry))),
+            // Whole folders, since the bundles also include files that tsc does not compile, e.g. i18n/*.json.
+            ...extensions,
             path.join(appDir(app), 'package.json'),
             path.join(appDir(app), 'esbuild.mjs'),
             path.join(root, 'pnpm-lock.yaml'),
@@ -113,6 +114,11 @@ function build(apps: App[], dev: boolean): void {
 // Electron again is a copy instead of a rebuild from source.
 const browserModules = path.join(root, '.browser_modules');
 const electronModules = path.join(root, '.electron_modules');
+
+// Which install of node_modules the native modules were built for Electron in. A reinstall leaves .browser_modules
+// behind but puts browser builds back, which must not be kept as Electron builds.
+const electronInstall = path.join(browserModules, 'yukibana-install.txt');
+const installId = (): string => fingerprint([path.join(root, 'node_modules', '.modules.yaml')], 'install');
 
 type ModuleLocations = Record<string, { originalLocation: string }>;
 
@@ -142,6 +148,12 @@ function rebuildNativeModules(app: App): void {
     if (app === 'browser') {
         const modules = readJson<ModuleLocations>(path.join(browserModules, 'modules.json'));
         fs.rmSync(electronModules, { recursive: true, force: true });
+        if (!fs.existsSync(electronInstall) || fs.readFileSync(electronInstall, 'utf8') !== installId()) {
+            console.log('Not keeping the native modules: node_modules was reinstalled since they were built for electron');
+            console.log(`Rebuilding native modules for ${app}...`);
+            exec(appDir(app), theia, [`rebuild:${app}`, '--cacheRoot', '..']);
+            return;
+        }
         for (const [name, { originalLocation }] of Object.entries(modules)) {
             fs.cpSync(originalLocation, path.join(electronModules, name), { recursive: true });
         }
@@ -166,11 +178,15 @@ function rebuildNativeModules(app: App): void {
                 fs.rmSync(originalLocation, { recursive: true });
                 fs.cpSync(path.join(electronModules, name), originalLocation, { recursive: true });
             }
+            fs.writeFileSync(electronInstall, installId());
             return;
         }
     }
     console.log(`Rebuilding native modules for ${app}...`);
     exec(appDir(app), theia, [`rebuild:${app}`, '--cacheRoot', '..']);
+    if (app === 'electron') {
+        fs.writeFileSync(electronInstall, installId());
+    }
 }
 
 function downloadPlugins(force: boolean): void {
