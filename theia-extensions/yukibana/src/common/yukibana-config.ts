@@ -3,6 +3,11 @@
  */
 import { z } from 'zod';
 
+export enum Mode {
+    LAB = 'lab',
+    EXAM = 'exam',
+}
+
 // TODO: extract constant strings
 const ConfigSchema = z.object({
     assignmentFile: z.string().default('ASSIGNMENT.md'),
@@ -33,6 +38,8 @@ const ConfigSchema = z.object({
         target: z.string().default('cloud'),
     }).prefault({}),
     projectId: z.string().default(''),
+    // Deprecated but z.enum(Mode) doesn't seem to work
+    mode: z.nativeEnum(Mode).default(Mode.LAB),
 }).prefault({});
 
 export type YukibanaConfig = z.infer<typeof ConfigSchema>;

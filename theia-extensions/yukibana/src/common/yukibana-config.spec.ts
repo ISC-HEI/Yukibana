@@ -41,6 +41,7 @@ describe('loadConfig', () => {
                 target: 'cloud',
             },
             projectId: '',
+            mode: 'lab',
         });
     });
 
@@ -69,6 +70,8 @@ describe('loadConfig', () => {
         { key: ['submission', 'respectGitignore'], value: 0 },
         { key: ['submission', 'target'], value: null },
         { key: ['projectId'], value: null },
+        { key: ['mode'], value: null },
+        { key: ['mode'], value: 'invalid' },
     ];
 
     errors.forEach(({ key, value }) => {
@@ -127,6 +130,7 @@ describe('loadConfig', () => {
                 target: 'custom',
             },
             projectId: 'a-project-id',
+            mode: 'exam'
         };
         const toLoad = { ...config, extraParameter: 'value' };
         expect(loadConfig(toLoad)).to.deep.equal(config);

@@ -128,6 +128,14 @@
     "projectId": {
       "default": "",
       "type": "string"
+    },
+    "mode": {
+      "default": "lab",
+      "type": "string",
+      "enum": [
+        "lab",
+        "exam"
+      ]
     }
   }
 }
