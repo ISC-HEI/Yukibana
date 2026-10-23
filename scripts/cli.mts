@@ -120,11 +120,18 @@ function readJson<T>(file: string): T {
     return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
-/** Identifies what the Electron builds were built from, so that they are only reused for the same versions. */
-function electronModulesKey(modules: ModuleLocations): string {
-    const electron = createRequire(path.join(appDir('electron'), 'package.json')).resolve('electron/package.json');
-    return JSON.stringify([readJson<{ version: string }>(electron).version, ...Object.entries(modules).map(([name, { originalLocation }]) =>
-        [name, originalLocation, readJson<{ version: string }>(path.join(originalLocation, 'package.json')).version])]);
+/**
+ * Identifies what the Electron builds were built from, so that they are only reused for the same versions.
+ * Undefined when a module is missing, e.g. after it was uninstalled or the repository moved.
+ */
+function electronModulesKey(modules: ModuleLocations): string | undefined {
+    try {
+        const electron = createRequire(path.join(appDir('electron'), 'package.json')).resolve('electron/package.json');
+        return JSON.stringify([readJson<{ version: string }>(electron).version, ...Object.entries(modules).map(([name, { originalLocation }]) =>
+            [name, originalLocation, readJson<{ version: string }>(path.join(originalLocation, 'package.json')).version])]);
+    } catch {
+        return undefined;
+    }
 }
 
 function rebuildNativeModules(app: App): void {
@@ -139,19 +146,26 @@ function rebuildNativeModules(app: App): void {
             fs.cpSync(originalLocation, path.join(electronModules, name), { recursive: true });
         }
         fs.writeFileSync(path.join(electronModules, 'modules.json'), JSON.stringify(modules, undefined, 2));
-        fs.writeFileSync(path.join(electronModules, 'key.json'), electronModulesKey(modules));
+        const key = electronModulesKey(modules);
+        if (key) {
+            fs.writeFileSync(path.join(electronModules, 'key.json'), key);
+        }
     } else if (fs.existsSync(path.join(electronModules, 'key.json'))) {
         // Same layout as Theia's backup, so that `theia rebuild:browser` can switch back.
         const modules = readJson<ModuleLocations>(path.join(electronModules, 'modules.json'));
         if (fs.readFileSync(path.join(electronModules, 'key.json'), 'utf8') === electronModulesKey(modules)) {
             console.log('Restoring native modules built for electron...');
+            // Back up all browser builds before replacing any, and write the manifest first, as Theia does, so
+            // that an interrupted restore can still be switched back by `theia rebuild:browser`.
             fs.mkdirSync(browserModules);
+            fs.writeFileSync(path.join(browserModules, 'modules.json'), JSON.stringify(modules, undefined, 2));
             for (const [name, { originalLocation }] of Object.entries(modules)) {
                 fs.cpSync(originalLocation, path.join(browserModules, name), { recursive: true });
+            }
+            for (const [name, { originalLocation }] of Object.entries(modules)) {
                 fs.rmSync(originalLocation, { recursive: true });
                 fs.cpSync(path.join(electronModules, name), originalLocation, { recursive: true });
             }
-            fs.writeFileSync(path.join(browserModules, 'modules.json'), JSON.stringify(modules, undefined, 2));
             return;
         }
     }
@@ -195,6 +209,8 @@ function clean(): void {
     for (const app of APPS) {
         exec(appDir(app), theia, ['clean']);
     }
+    // The Electron builds of the native modules, which a reinstall of node_modules can make stale.
+    fs.rmSync(electronModules, { recursive: true, force: true });
 }
 
 function fail(message: string): never {
@@ -233,8 +249,6 @@ const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Pa
         options: { preview: { type: 'boolean' }, publish: { type: 'boolean' } },
         run: ({ values }) => {
             build(['electron'], false);
-            // electron-builder also packages node_modules, whose native modules must be built for Electron.
-            rebuildNativeModules('electron');
             downloadPlugins(false);
             pnpmRun(appDir('electron'), values.preview ? 'package:preview' : values.publish ? 'deploy' : 'package');
         },
