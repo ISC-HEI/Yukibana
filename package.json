@@ -18,8 +18,8 @@
     "download:plugins": "node scripts/cli.mts download:plugins",
     "clean": "node scripts/cli.mts clean",
     "postinstall": "theia check:theia-version",
-    "lint": "eslint --ext js,jsx,ts,tsx,mts scripts packages theia-extensions tests && pnpm run -r --if-present lint",
-    "lint:fix": "eslint --ext js,jsx,ts,tsx,mts scripts packages theia-extensions tests --fix && pnpm run -r --if-present lint:fix",
+    "lint": "eslint --ext js,jsx,ts,tsx,mts scripts packages theia-extensions tests configs vitest.config.mts && pnpm run -r --if-present lint",
+    "lint:fix": "eslint --ext js,jsx,ts,tsx,mts scripts packages theia-extensions tests configs vitest.config.mts --fix && pnpm run -r --if-present lint:fix",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
@@ -29,6 +29,7 @@
   "devDependencies": {
     "@eclipse-dash/nodejs-wrapper": "^0.0.1",
     "@theia/cli": "~1.75.0",
+    "@theia/core": "~1.75.0",
     "@types/node": "26.6.3",
     "@types/yargs": "^17.0.35",
     "@typescript-eslint/eslint-plugin": "^4.33.0",

@@ -3,7 +3,7 @@
  *
  * Runs in every Vitest worker before a spec file is loaded.
  */
-import { createRequire, registerHooks } from 'node:module';
+import { createRequire, registerHooks, type LoadFnOutput } from 'node:module';
 
 // Theia's packages are CommonJS and load through Node, outside Vite's
 // pipeline, so their `require('./style.css')` calls need ignoring there.
@@ -12,7 +12,7 @@ createRequire(import.meta.url)('ignore-styles');
 // The same for ESM imports of styles, e.g. in @theia/monaco-editor-core.
 const STYLE_EXTENSIONS = ['.css', '.scss', '.sass', '.less'];
 registerHooks({
-    load(url, context, nextLoad) {
+    load(url, context, nextLoad): LoadFnOutput {
         if (STYLE_EXTENSIONS.some(ext => url.endsWith(ext))) {
             return { format: 'module', source: 'export default {};', shortCircuit: true };
         }
