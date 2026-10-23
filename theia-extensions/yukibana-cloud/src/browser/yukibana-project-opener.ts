@@ -9,15 +9,16 @@ import { TelemetryService } from '@theia/telemetry/lib/common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { Project } from '@yukibana/cli';
 import { localizeMarkdown } from 'yukibana-common/lib/localize-markdown';
-import { CloudService, DownloadResult } from '../common/cloud-protocol';
+import { CloudService } from '../common/cloud-protocol';
 import { CloudTelemetry } from '../common/cloud-telemetry';
 import { CloudAccountService } from './cloud-account-service';
 import { LoginCommand } from './command-contribution';
 import { ConflictResolutionStrategy, OpenProjectConflictDialog } from './open-project-conflict-dialog';
 import { OpenProjectNewWindowDialog } from './open-project-window-dialog';
 
+/** Where a project goes: a folder to download the starter into, or one that already holds the project, to open. */
 interface ResolvedConflict {
-    readonly strategy: 'open' | 'copy'
+    readonly strategy: 'open' | 'download'
     readonly destination: URI
 }
 
@@ -48,7 +49,6 @@ export class YukibanaProjectOpener {
         this.progress = undefined;
         let projectId: string | undefined = undefined;
         let newWindow: boolean | undefined = undefined;
-        let downloadURI: URI | undefined = undefined;
 
         try {
             projectId = this.parseURI(uri);
@@ -71,18 +71,16 @@ export class YukibanaProjectOpener {
             if (!folder) {
                 return;
             }
-
-            stage = 'download';
-            const downloadResult = await this.downloadStarter(projectId);
-            if (!downloadResult.ok) {
+            const target = await this.chooseDestination(project, folder);
+            if (!target) {
                 return;
             }
-            downloadURI = downloadResult.uri;
 
-            stage = 'copy';
-            const projectURI = await this.copyStarter(project, downloadResult.uri, folder);
-            if (!projectURI) {
-                return;
+            if (target.strategy === 'download') {
+                stage = 'download';
+                if (!await this.downloadStarter(projectId, target.destination)) {
+                    return;
+                }
             }
 
             this.progress.report({
@@ -94,15 +92,11 @@ export class YukibanaProjectOpener {
 
             this.outcome = 'opened';
             this.report(this.outcome, stage, start, projectId, newWindow);
-            this.workspaces.open(projectURI, { preserveWindow: !newWindow });
+            this.workspaces.open(target.destination, { preserveWindow: !newWindow });
         } catch (e) {
             this.logger.error(`Could not open project (stage: ${stage})`, e);
             this.messages.error(localizeMarkdown('yukibana/cloud/openProject/failed', 'Could not open project: {0}', e instanceof Error ? e.message : String(e)));
         } finally {
-            if (downloadURI !== undefined) {
-                await this.tryCleanDownload(downloadURI.parent);
-            }
-
             this.progress?.cancel();
             if (this.outcome !== 'opened') {
                 this.report(this.outcome, stage, start, projectId, newWindow);
@@ -167,37 +161,37 @@ export class YukibanaProjectOpener {
         return folder;
     }
 
-    protected async downloadStarter(projectId: string): Promise<DownloadResult> {
+    /**
+     * Unpacks the starter of `projectId` straight into `destination` and returns `true` iff it did, telling the person
+     * about anything left out or why nothing was unpacked.
+     */
+    protected async downloadStarter(projectId: string, destination: URI): Promise<boolean> {
         this.progress?.report({
             message: nls.localize('yukibana/cloud/openProject/downloading', 'Downloading...')
         });
-        const result = await this.service.downloadProject(projectId);
+        const result = await this.service.downloadProject(projectId, destination.toString());
         if (!result.ok) {
             this.outcome = 'download-failed';
             this.logger.error(`Could not download project: ${result.reason}`);
             this.messages.error(localizeMarkdown('yukibana/cloud/openProject/downloadFailReason', 'Download failed: {0}', result.reason));
+            return false;
         }
-        return result;
+        if (result.leftOut.length > 0) {
+            this.messages.warn(localizeMarkdown('yukibana/cloud/openProject/leftOut', 'Some files of the starter were not unpacked: {0}', result.leftOut.join('; ')));
+        }
+        return true;
     }
 
-    protected async copyStarter(project: Project, starterURI: URI, selectedFolder: URI): Promise<URI | undefined> {
-        const folderName = starterURI.path.base;
-        let destination: URI = selectedFolder.resolve(folderName);
-        let copyStarter: boolean = true;
-
-        if (!await this.isDirectoryEmptyOrMissing(destination)) {
-            const resolvedConflict = await this.resolveConflict(project, destination);
-            if (!resolvedConflict) {
-                return;
-            }
-            destination = resolvedConflict.destination;
-            copyStarter = resolvedConflict.strategy === 'copy';
+    /**
+     * Returns where `project` goes in `selectedFolder`: a folder named after its slug, or, when that already holds
+     * something, what the person chose instead; `undefined` if they cancelled.
+     */
+    protected async chooseDestination(project: Project, selectedFolder: URI): Promise<ResolvedConflict | undefined> {
+        const destination = selectedFolder.resolve(project.slug);
+        if (await this.isDirectoryEmptyOrMissing(destination)) {
+            return { strategy: 'download', destination };
         }
-
-        if (copyStarter) {
-            await this.files.copy(starterURI, destination);
-        }
-        return destination;
+        return this.resolveConflict(project, destination);
     }
 
     protected async resolveConflict(project: Project, initialDestination: URI): Promise<ResolvedConflict | undefined> {
@@ -234,7 +228,7 @@ export class YukibanaProjectOpener {
             }
         }
         return {
-            strategy: 'copy',
+            strategy: 'download',
             destination: destination,
         };
     }
@@ -294,17 +288,5 @@ export class YukibanaProjectOpener {
             return false;
         }
         return stat.children === undefined || stat.children.length === 0;
-    }
-
-    protected async tryCleanDownload(downloadURI: URI): Promise<void> {
-        // Best effort, ignore fail
-        try {
-            await this.files.delete(downloadURI, {
-                recursive: true,
-                useTrash: false,
-            });
-        } catch (e) {
-            this.logger.error(`Failed to clean download: ${e instanceof Error ? e.message : String(e)}`);
-        }
     }
 }

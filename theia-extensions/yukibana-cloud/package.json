@@ -13,8 +13,7 @@
     "@theia/filesystem": "~1.75.0",
     "@theia/telemetry": "~1.75.0",
     "@theia/workspace": "~1.75.0",
-    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#path:/cli",
-    "tar": "7.5.22",
+    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#starter-unpack&path:/cli",
     "yukibana-common": "workspace:*",
     "yukibana-submission-ext": "workspace:*"
   },

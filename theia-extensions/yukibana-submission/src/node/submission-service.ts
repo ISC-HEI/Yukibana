@@ -70,7 +70,7 @@ export class SubmissionServiceImpl implements SubmissionService {
     }
 
     async prepareSubmission(options: SubmissionOptions): Promise<{ outputUri: string; fileCount: number; }> {
-        const out = path.join(os.tmpdir(), `yukibana-${Date.now()}.tar.zst`);
+        const out = path.join(os.tmpdir(), `yukibana-${Date.now()}.tar.gz`);
         const { root, entries } = await this.resolveEntries(options);
         await this.createArchive(root, out, entries);
         return { outputUri: FileUri.create(out).toString(), fileCount: entries.length };
@@ -78,9 +78,9 @@ export class SubmissionServiceImpl implements SubmissionService {
 
     async cleanSubmission(archiveURI: string): Promise<boolean> {
         const archivePath = FileUri.fsPath(archiveURI);
-        const parts = archivePath.split('/');
-        const filename = parts[parts.length - 1];
-        if (!/^yukibana-.*\.tar\.zst$/.test(filename)) {
+        // path.basename, not a split on '/': on Windows the path has backslashes, and no archive was ever cleaned
+        const filename = path.basename(archivePath);
+        if (!/^yukibana-.*\.tar\.gz$/.test(filename)) {
             this.logger.warn(`Submission archive '${archivePath}' doesn't match name pattern, not cleaning`);
             return false;
         }
@@ -119,7 +119,8 @@ export class SubmissionServiceImpl implements SubmissionService {
             const archive = new TarArchive();
             output.on('close', () => resolve());
             archive.on('error', reject);
-            archive.pipe(zlib.createZstdCompress()).pipe(output);
+            // gzip, the one format the registry accepts
+            archive.pipe(zlib.createGzip()).pipe(output);
             for (const e of entries) {
                 archive.file(path.join(root, e.path), { name: e.path });
             }

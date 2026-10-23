@@ -609,11 +609,8 @@ importers:
         specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@yukibana/cli':
-        specifier: github:tothambrus11/yukibana-cloud#path:/cli
-        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/37c34436a3b1a752123ab10c89be214cbe534556#path:/cli
-      tar:
-        specifier: 7.5.22
-        version: 7.5.22
+        specifier: github:tothambrus11/yukibana-cloud#starter-unpack&path:/cli
+        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/b2119a13acee407dc299545e37a43c6a13a45e54#path:/cli
       yukibana-common:
         specifier: workspace:*
         version: link:../../packages/yukibana-common
@@ -701,9 +698,6 @@ importers:
       yukibana-ext:
         specifier: workspace:*
         version: link:../yukibana
-      zlib:
-        specifier: 1.0.5
-        version: 1.0.5
     devDependencies:
       '@types/archiver':
         specifier: 8.0.0
@@ -2241,8 +2235,8 @@ packages:
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
 
-  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/37c34436a3b1a752123ab10c89be214cbe534556#path:/cli':
-    resolution: {gitHosted: true, integrity: sha512-n3hUVClcIMgX8xXut4b7F/UfbC+kO6PqWKbFkMo19AHnzD/5ZN6EKy2qsYR30jRsmr78WzWIpj+pdUMzvnUMoA==, path: /cli, tarball: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/37c34436a3b1a752123ab10c89be214cbe534556}
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/b2119a13acee407dc299545e37a43c6a13a45e54#path:/cli':
+    resolution: {gitHosted: true, integrity: sha512-9X15AfyQKobQ1pW5KR1/oMdcVMtWkgEbb7iPgBsacGXqMNQkcFoyY3B+evpXv3hCkfJ670QjglC0sh7C/QNblw==, path: /cli, tarball: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/b2119a13acee407dc299545e37a43c6a13a45e54}
     version: 0.1.0
     engines: {node: '>=22.15'}
     hasBin: true
@@ -5287,6 +5281,10 @@ packages:
     resolution: {integrity: sha512-snEhs+6G5Tjd4I7tLCDOaoln2RgE0bD19RzEKgvgK2hZ5VKy3MpLhLTZ2fWpXSTg4K2cyPwp+VHATFJhxfnOeA==}
     engines: {node: '>=18.0.0'}
 
+  modern-tar@0.8.6:
+    resolution: {integrity: sha512-LYSks0tNVqbtez/9OB0YFP6qLRSqkdAxJWOQpVaR67lNTbj2zNLyYpowkRMia5lXLCZKzxwoxkxH2MbbBR2aEg==}
+    engines: {node: '>=18.0.0'}
+
   mount-point@3.0.0:
     resolution: {integrity: sha512-jAhfD7ZCG+dbESZjcY1SdFVFqSJkh/yGbdsifHcPkvuLRO5ugK0Ssmd9jdATu29BTd4JiN+vkpMzVvsUgP3SZA==}
     engines: {node: '>=0.10.0'}
@@ -6964,6 +6962,10 @@ packages:
     resolution: {integrity: sha512-xZe/16rV4aa+HGSOCiY2YeLT1OybRLrrkL/Rqaq7p7GMVXjFh+6wN4oMYgjFmnSnhY8t6Xpdl2l9qmnHYuMHwQ==}
     hasBin: true
 
+  uuid@14.0.3:
+    resolution: {integrity: sha512-Sc5u1VVln93y1Xnz4R+CunOZc7R9LUcTmhj7Rc7Eg3HVcf7rVn2FOoa812fe0W8p3jD7xeoGSYbfqCGGH2B6xw==}
+    hasBin: true
+
   uuid@7.0.3:
     resolution: {integrity: sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==}
     deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
@@ -7335,10 +7337,6 @@ packages:
   zip-stream@7.0.5:
     resolution: {integrity: sha512-dSvYKdvLsAHCDqPOhIwk/q5CvuWtTB3Dgpoe0uVEFjTzIOAmsQpprX25InCvrvJsirEbu1OHyy67n/kAj1Sw/w==}
     engines: {node: '>=18'}
-
-  zlib@1.0.5:
-    resolution: {integrity: sha512-40fpE2II+Cd3k8HWTWONfeKE2jL+P42iWJ1zzps5W51qcTsOUKM5Q5m2PFb0CLxlmFAaUuUdJGc3OfZy947v0w==}
-    engines: {node: '>=0.2.0'}
 
   zod-to-json-schema@3.25.2:
     resolution: {integrity: sha512-O/PgfnpT1xKSDeQYSCfRI5Gy3hPf91mKVDuYLUHZJMiDFptvP41MSnWofm8dnCm0256ZNfZIM7DSzuSMAFnjHA==}
@@ -10865,7 +10863,10 @@ snapshots:
 
   '@yarnpkg/lockfile@1.1.0': {}
 
-  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/37c34436a3b1a752123ab10c89be214cbe534556#path:/cli': {}
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/b2119a13acee407dc299545e37a43c6a13a45e54#path:/cli':
+    dependencies:
+      modern-tar: 0.8.6
+      uuid: 14.0.3
 
   abbrev@4.0.0: {}
 
@@ -14492,6 +14493,8 @@ snapshots:
 
   modern-tar@0.8.5: {}
 
+  modern-tar@0.8.6: {}
+
   mount-point@3.0.0:
     dependencies:
       '@sindresorhus/df': 1.0.1
@@ -16446,6 +16449,8 @@ snapshots:
 
   uuid@14.0.2: {}
 
+  uuid@14.0.3: {}
+
   uuid@7.0.3: {}
 
   uuid@8.3.2: {}
@@ -16847,8 +16852,6 @@ snapshots:
       compress-commons: 7.0.1
       normalize-path: 3.0.0
       readable-stream: 4.8.0
-
-  zlib@1.0.5: {}
 
   zod-to-json-schema@3.25.2(zod@4.6.5):
     dependencies:
