@@ -1,0 +1,21 @@
+{
+  "extends": "../configs/base.tsconfig.json",
+  "include": [],
+  "compilerOptions": {
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../theia-extensions/yukibana"
+    },
+    {
+      "path": "../theia-extensions/yukibana-submission"
+    },
+    {
+      "path": "../theia-extensions/yukibana-cloud"
+    },
+    {
+      "path": "../theia-extensions/yukibana-telemetry"
+    }
+  ]
+}

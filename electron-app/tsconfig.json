@@ -20,6 +20,9 @@
     },
     {
       "path": "../theia-extensions/yukibana-cloud"
+    },
+    {
+      "path": "../theia-extensions/yukibana-telemetry"
     }
   ]
 }

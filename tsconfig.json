@@ -29,6 +29,9 @@
     },
     {
       "path": "electron-app"
+    },
+    {
+      "path": "browser-app"
     }
   ]
 }
