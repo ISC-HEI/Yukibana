@@ -60,6 +60,7 @@
     "rimraf": "^5.0.0"
   },
   "scripts": {
+    "clean": "theia clean",
     "watch": "theia build --watch --mode development",
     "clean:dist": "rimraf dist",
     "prepackage": "node scripts/patch-ripgrep-asar-path.mjs",

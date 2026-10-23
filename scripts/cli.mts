@@ -2,14 +2,13 @@
  * SPDX-License-Identifier: MIT
  */
 
-// Entry point of the root `build`, `start`, `package`, `download:plugins` and `clean` scripts.
+// Entry point of the root `build`, `start`, `package` and `download:plugins` scripts.
 //
 //   pnpm build [browser|electron] [--dev]      both apps by default, production unless --dev
 //   pnpm start [browser|electron] [--prod]     electron by default, builds in development mode
 //              [-- <theia start arguments>]
 //   pnpm package [--preview|--publish]         packages the electron app into electron-app/dist
 //   pnpm download:plugins [--force]
-//   pnpm clean
 //
 // The native modules (node-pty, keytar, drivelist, native-keymap) use Node-API, so the builds that pnpm installs
 // for Node.js also load in Electron, and are not rebuilt for it with `theia rebuild:electron`.
@@ -20,21 +19,25 @@ import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import { parseArgs, type ParseArgsOptionsConfig } from 'node:util';
 
+/** A Theia app, in the folder `<app>-app`. */
 type App = 'browser' | 'electron';
+/** Every app. */
 const APPS: App[] = ['browser', 'electron'];
 
+/** Repository root. */
 const root = path.resolve(import.meta.dirname, '..');
-// The extensions and the libraries they share.
-const extensions = ['packages', 'theia-extensions'].flatMap(parent =>
-    fs.readdirSync(path.join(root, parent))
-        .map(entry => path.join(root, parent, entry))
-        .filter(dir => fs.existsSync(path.join(dir, 'package.json'))));
+/** Theia CLI's script. */
 const theia = createRequire(import.meta.url).resolve('@theia/cli/bin/theia.js');
-// The TypeScript hoisted to the root is the older one that @typescript-eslint needs, so use the extensions' own.
+/**
+ * The extensions' tsc script. The TypeScript hoisted to the root is the older one that @typescript-eslint needs,
+ * which fails to parse the extensions.
+ */
 const tsc = createRequire(path.join(root, 'packages', 'yukibana-common', 'package.json')).resolve('typescript/bin/tsc');
 
+/** Returns `app`'s folder. */
 const appDir = (app: App): string => path.join(root, `${app}-app`);
 
+/** Runs `script` with `args` in Node.js in `cwd`, and exits with its status if it fails. */
 function exec(cwd: string, script: string, args: string[]): void {
     const result = spawnSync(process.execPath, [script, ...args], { cwd, stdio: 'inherit' });
     if (result.status !== 0) {
@@ -42,6 +45,7 @@ function exec(cwd: string, script: string, args: string[]): void {
     }
 }
 
+/** Runs the package script `script` in `cwd`, and exits with its status if it fails. */
 function pnpmRun(cwd: string, script: string): void {
     // pnpm is a .cmd shim on Windows, which can only be started through a shell.
     const result = spawnSync(`pnpm run ${script}`, { cwd, stdio: 'inherit', shell: true });
@@ -50,8 +54,12 @@ function pnpmRun(cwd: string, script: string): void {
     }
 }
 
+/**
+ * Compiles the extensions, and bundles `apps` in development mode iff `dev`, else in production mode.
+ *
+ * Compiling is incremental; bundling takes a few seconds per app.
+ */
 function build(apps: App[], dev: boolean): void {
-    // Incremental: tsc only recompiles the projects that changed.
     exec(root, tsc, ['--build']);
     for (const app of apps) {
         exec(appDir(app), theia, ['build', `--app-target=${app}`, ...(dev ? ['--mode', 'development'] : [])]);
@@ -61,7 +69,7 @@ function build(apps: App[], dev: boolean): void {
     }
 }
 
-/** Downloads the plugins, unless the same list of plugins was downloaded before. */
+/** Downloads the plugins listed in package.json, unless the same list was downloaded before and not `force`. */
 function downloadPlugins(force: boolean): void {
     const pluginsDir = path.join(root, 'plugins');
     const stampFile = path.join(pluginsDir, '.download-inputs');
@@ -77,7 +85,11 @@ function downloadPlugins(force: boolean): void {
     fs.writeFileSync(stampFile, inputs);
 }
 
-/** Some plugin archives contain read-only files, which would make them impossible to update or delete. */
+/**
+ * Makes every read-only file under `dir` writable.
+ *
+ * Some plugin archives contain read-only files, which could not be updated or deleted otherwise.
+ */
 function makeWritable(dir: string): void {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         const file = path.join(dir, entry.name);
@@ -92,21 +104,13 @@ function makeWritable(dir: string): void {
     }
 }
 
-function clean(): void {
-    for (const dir of extensions) {
-        fs.rmSync(path.join(dir, 'lib'), { recursive: true, force: true });
-        fs.rmSync(path.join(dir, 'tsconfig.tsbuildinfo'), { force: true });
-    }
-    for (const app of APPS) {
-        exec(appDir(app), theia, ['clean']);
-    }
-}
-
+/** Prints `message` and exits with status 1. */
 function fail(message: string): never {
     console.error(message);
     process.exit(1);
 }
 
+/** Returns the app named by `positionals`, or `fallback` if they are empty; exits if they name anything else. */
 function parseApp(positionals: string[], fallback: App[]): App[] {
     if (positionals.length === 0) {
         return fallback;
@@ -118,8 +122,10 @@ function parseApp(positionals: string[], fallback: App[]): App[] {
     return [app as App];
 }
 
+/** A command's arguments: its options, its positional arguments, and the arguments after `--`. */
 interface Parsed { values: Record<string, unknown>; positionals: string[]; passthrough: string[] }
 
+/** Each command, by name: its options, and how it runs. */
 const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Parsed) => void }> = {
     build: {
         options: { dev: { type: 'boolean' } },
@@ -149,18 +155,17 @@ const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Pa
         options: { force: { type: 'boolean' } },
         run: ({ values }) => downloadPlugins(!!values.force),
     },
-    clean: {
-        options: {},
-        run: () => clean(),
-    },
 };
 
+/** The command to run, and its arguments. */
 const [commandName, ...rest] = process.argv.slice(2);
 const command = commands[commandName];
 if (!command) {
     fail(`Unknown command '${commandName}', expected one of: ${Object.keys(commands).join(', ')}`);
 }
+/** Index of `--` in the arguments, after which they pass through to `theia start`. */
 const separator = rest.includes('--') ? rest.indexOf('--') : rest.length;
+/** The arguments before `--`, parsed against the command's options. */
 let parsed: ReturnType<typeof parseArgs>;
 try {
     parsed = parseArgs({ args: rest.slice(0, separator), options: command.options, allowPositionals: true });

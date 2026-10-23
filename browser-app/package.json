@@ -35,6 +35,7 @@
     "@theia/cli": "~1.75.0"
   },
   "scripts": {
+    "clean": "theia clean",
     "watch": "theia build --watch --mode development"
   },
   "theia": {
