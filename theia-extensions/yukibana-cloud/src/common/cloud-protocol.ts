@@ -95,7 +95,11 @@ export interface SubmitAvailability {
 }
 
 export interface CloudService {
-    submit(projectId: string, archivePath: string): Promise<SubmissionResult>
+    /**
+     * Sends submission `submissionId`, as the submission service prepared it, to the registry for `projectId`, with
+     * the release its folder started from, and returns what the registry answered or why it was not sent.
+     */
+    submit(projectId: string, submissionId: string): Promise<SubmissionResult>
     getProjectInfo(projectId: string): Promise<ProjectLookup>
     /** Returns the projects the logged-in person can see; a failure other than being logged out is an `error`. */
     listProjects(): Promise<ProjectListing>

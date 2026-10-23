@@ -1,139 +1,57 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { ILogger } from '@theia/core';
 import { FileUri } from '@theia/core/lib/node';
-import { inject, injectable, named } from '@theia/core/shared/inversify';
-import { TarArchive } from 'archiver';
-import fg, { Entry } from 'fast-glob';
+import { injectable } from '@theia/core/shared/inversify';
+import { createSubmissionBundle, SubmissionBundle } from '@yukibana/cli';
+import { randomUUID } from 'crypto';
 import * as fs from 'fs';
-import ignore, { Ignore } from 'ignore';
-import * as os from 'os';
-import * as path from 'path';
-import * as zlib from 'zlib';
-import { SubmissionEntry, SubmissionOptions, SubmissionPreview, SubmissionService } from '../common/submission-protocol';
+import { SubmissionPreview, SubmissionService } from '../common/submission-protocol';
 
+/**
+ * Submissions made with the library, `yukibana submit`'s own code, held in memory until released.
+ *
+ * Until October 2026 the IDE packed submissions itself, into a temporary file: its rules differed from the CLI's
+ * (no build output, size cap or link checks, and a misspelt `node_modules`), and on Windows the file was never
+ * deleted. Now the archive exists only in memory, and only what the rules keep is ever read.
+ */
 @injectable()
 export class SubmissionServiceImpl implements SubmissionService {
-    @inject(ILogger) @named('yukibana:SubmissionService') protected readonly logger!: ILogger;
+    protected readonly prepared = new Map<string, SubmissionBundle>();
 
-    private async loadGitignores(root: string): Promise<Map<string, Ignore>> {
-        const files = await fg('**/.gitignore', {
-            cwd: root,
-            dot: true,
-            ignore: ['**/node_moules/**', '.git/**'],
-        });
-        const map = new Map<string, Ignore>();
-        for (const f of files) {
-            const dir = path.posix.dirname(f);
-            const content = await fs.promises.readFile(path.join(root, f), 'utf8');
-            map.set(dir === '.' ? '' : dir, ignore().add(content));
+    async prepare(workspaceUri: string): Promise<SubmissionPreview> {
+        const made = await createSubmissionBundle(FileUri.fsPath(workspaceUri));
+        if (!made.ok) {
+            throw new Error(made.problems.join('; '));
         }
-        return map;
-    }
-
-    private isGitignored(file: string, ignores: Map<string, Ignore>): boolean {
-        const parts = file.split('/');
-        let ignored = false;
-        for (let i = 0; i < parts.length; i++) {
-            const dirPath = parts.slice(0, i).join('/');
-            const pathInDir = parts.slice(i).join('/');
-            const ig = ignores.get(dirPath);
-            if (!ig) { continue; }
-            const result = ig.test(pathInDir);
-            if (result.ignored) {
-                ignored = true;
-            } else if (result.unignored) {
-                ignored = false;
-            }
-        }
-        return ignored;
-    }
-
-    private async resolveEntries(options: SubmissionOptions): Promise<{ root: string, entries: SubmissionEntry[] }> {
-        const root = FileUri.fsPath(options.workspaceUri);
-        const files = await this.listFiles(root, options);
-        const entries = files.map(f => ({
-            path: f.path,
-            size: f.stats?.size ?? 0,
-        }));
-        return { root, entries };
-    }
-
-    async previewSubmission(options: SubmissionOptions): Promise<SubmissionPreview> {
-        const { entries } = await this.resolveEntries(options);
-        entries.sort((a, b) => a.path.localeCompare(b.path));
+        const { bundle } = made;
+        const id = randomUUID();
+        this.prepared.set(id, bundle);
         return {
-            entries: entries,
-            totalSize: entries.reduce((total, e) => total + e.size, 0),
+            id,
+            projectId: bundle.projectId,
+            entries: bundle.files.map(f => ({ path: f.path, size: f.size })),
+            skipped: bundle.skipped,
+            problems: bundle.problems,
+            totalSize: bundle.totalBytes,
         };
     }
 
-    async prepareSubmission(options: SubmissionOptions): Promise<{ outputUri: string; fileCount: number; }> {
-        const out = path.join(os.tmpdir(), `yukibana-${Date.now()}.tar.gz`);
-        const { root, entries } = await this.resolveEntries(options);
-        await this.createArchive(root, out, entries);
-        return { outputUri: FileUri.create(out).toString(), fileCount: entries.length };
+    /** Returns submission `id` as `prepare` made it, or `undefined` once it is released. */
+    bundle(id: string): SubmissionBundle | undefined {
+        return this.prepared.get(id);
     }
 
-    async cleanSubmission(archiveURI: string): Promise<boolean> {
-        const archivePath = FileUri.fsPath(archiveURI);
-        // path.basename, not a split on '/': on Windows the path has backslashes, and no archive was ever cleaned
-        const filename = path.basename(archivePath);
-        if (!/^yukibana-.*\.tar\.gz$/.test(filename)) {
-            this.logger.warn(`Submission archive '${archivePath}' doesn't match name pattern, not cleaning`);
+    async save(id: string, destinationUri: string): Promise<boolean> {
+        const bundle = this.bundle(id);
+        if (bundle === undefined) {
             return false;
         }
-        try {
-            await fs.promises.unlink(archivePath);
-            return true;
-        } catch {
-            return false;
-        }
+        await fs.promises.writeFile(FileUri.fsPath(destinationUri), await bundle.archive());
+        return true;
     }
 
-    protected async listFiles(root: string, options: SubmissionOptions): Promise<Entry[]> {
-        let files = await fg(options.include ?? ['**/*'], {
-            cwd: root,
-            ignore: [
-                ...(options.exclude ?? []),
-                '**/node_moules/**',
-                '.git/**',
-            ],
-            dot: true,
-            onlyFiles: true,
-            followSymbolicLinks: false,
-            stats: true
-        });
-
-        if (options.respectGitignore ?? true) {
-            const ignores = await this.loadGitignores(root);
-            files = files.filter(f => !this.isGitignored(f.path, ignores));
-        }
-        return files;
-    }
-
-    protected async createArchive(root: string, out: string, entries: SubmissionEntry[]): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            const output = fs.createWriteStream(out);
-            const archive = new TarArchive();
-            output.on('close', () => resolve());
-            archive.on('error', reject);
-            // gzip, the one format the registry accepts
-            archive.pipe(zlib.createGzip()).pipe(output);
-            for (const e of entries) {
-                archive.file(path.join(root, e.path), { name: e.path });
-            }
-            archive.finalize();
-        });
-    }
-
-    async copyFile(source: string, destination: string): Promise<boolean> {
-        try {
-            await fs.promises.copyFile(FileUri.fsPath(source), FileUri.fsPath(destination));
-            return true;
-        } catch {
-            return false;
-        }
+    async release(id: string): Promise<void> {
+        this.prepared.delete(id);
     }
 }

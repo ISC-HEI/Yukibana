@@ -4,7 +4,7 @@
 import { ILogger } from '@theia/core';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { FileUri } from '@theia/core/lib/node';
-import { Entry, NotLoggedIn, Project, RegistryError, writeTar } from '@yukibana/cli';
+import { Entry, NotLoggedIn, Project, RegistryError, SubmissionBundle, writeTar } from '@yukibana/cli';
 import { expect } from 'chai';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -12,16 +12,22 @@ import * as path from 'path';
 import * as zlib from 'zlib';
 import { DownloadResult } from '../common/cloud-protocol';
 import { CloudClient } from './cloud-client';
+import { SubmissionServiceImpl } from 'yukibana-submission-ext/lib/node/submission-service';
 import { CloudServiceImpl } from './cloud-service';
 import { CloudSessionManager } from './cloud-session-manager';
 
 /** Registry calls a test fakes; the others are missing. */
-type MockClient = Partial<Pick<CloudClient, 'downloadStarter' | 'project' | 'projects' | 'submitArchive'>>;
+type MockClient = Partial<Pick<CloudClient, 'downloadStarter' | 'project' | 'projects' | 'submit'>>;
+
+/** The one submission the fake submission service holds, under `PREPARED`. */
+const prepared = { files: [], problems: [] } as unknown as SubmissionBundle;
+const PREPARED = 'submission-1';
 
 function setup(client: MockClient, loggedIn: boolean = true): CloudServiceImpl {
     const service = new CloudServiceImpl();
     Object.assign(service, {
         client: client as CloudClient,
+        submissions: { bundle: (id: string) => id === PREPARED ? prepared : undefined } as SubmissionServiceImpl,
         sessions: { isLoggedIn: async () => loggedIn } as CloudSessionManager,
         logger: new MockLogger() as ILogger,
     });
@@ -47,13 +53,6 @@ function tempDir(): string {
 async function download(starter: Uint8Array, destination = path.join(tempDir(), 'warm-up')): Promise<{ result: DownloadResult, destination: string }> {
     const result = await setup({ downloadStarter: async () => starter }).downloadProject('project', FileUri.create(destination).toString());
     return { result, destination };
-}
-
-/** A submission archive on disk, whose bytes are [1, 2, 3]. */
-function archiveFile(): string {
-    const archive = path.join(tempDir(), 'submission.tar.gz');
-    fs.writeFileSync(archive, Buffer.from([1, 2, 3]));
-    return FileUri.create(archive).toString();
 }
 
 describe('CloudServiceImpl', () => {
@@ -165,26 +164,31 @@ describe('CloudServiceImpl', () => {
     });
 
     describe('submit', () => {
-        it('should upload the archive bytes', async () => {
-            let uploaded: { projectId: string, bytes: Uint8Array } | undefined;
+        it('should send the prepared submission for the project', async () => {
+            let sent: { bundle: SubmissionBundle, projectId: string | undefined } | undefined;
             const service = setup({
-                submitArchive: (async (projectId: string, bytes: Uint8Array) => {
-                    uploaded = { projectId, bytes };
+                submit: (async (bundle: SubmissionBundle, projectId?: string) => {
+                    sent = { bundle, projectId };
                     return { submissionId: 'submission' };
-                }) as unknown as CloudClient['submitArchive']
+                }) as unknown as CloudClient['submit']
             });
 
-            const result = await service.submit('project', archiveFile());
+            const result = await service.submit('project', PREPARED);
 
             expect(result).to.deep.equal({ ok: true, submissionId: 'submission' });
-            expect(uploaded?.projectId).to.equal('project');
-            expect([...uploaded!.bytes]).to.deep.equal([1, 2, 3]);
+            expect(sent).to.deep.equal({ bundle: prepared, projectId: 'project' });
         });
 
         it('should report a failed upload', async () => {
-            const result = await setup({ submitArchive: async () => { throw new RegistryError(413, 'too large'); } }).submit('project', archiveFile());
+            const result = await setup({ submit: async () => { throw new RegistryError(413, 'too large'); } }).submit('project', PREPARED);
 
             expect(result).to.deep.equal({ ok: false, reason: 'too large' });
+        });
+
+        it('should refuse a submission that is no longer prepared', async () => {
+            const result = await setup({}).submit('project', 'gone');
+
+            expect(result.ok).to.equal(false);
         });
     });
 });
