@@ -2,9 +2,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-// Entry point of the root `build`, `start`, `package`, `download:plugins` and `clean`
-// scripts. Every step is skipped when its output is already up to date, so running a
-// command again after a small change (or none) only redoes the work that is needed.
+// Entry point of the root `build`, `start`, `package`, `download:plugins` and `clean` scripts.
 //
 //   pnpm build [browser|electron] [--dev]      both apps by default, production unless --dev
 //   pnpm start [browser|electron] [--prod]     electron by default, builds in development mode
@@ -12,10 +10,11 @@
 //   pnpm package [--preview|--publish]         packages the electron app into electron-app/dist
 //   pnpm download:plugins [--force]
 //   pnpm clean
-//   node scripts/cli.mts compile               only compiles the extensions
+//
+// The native modules (node-pty, keytar, drivelist, native-keymap) use Node-API, so the builds that pnpm installs
+// for Node.js also load in Electron, and are not rebuilt for it with `theia rebuild:electron`.
 
 import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
@@ -27,10 +26,12 @@ const APPS: App[] = ['browser', 'electron'];
 const root = path.resolve(import.meta.dirname, '..');
 // The extensions and the libraries they share.
 const extensions = ['packages', 'theia-extensions'].flatMap(parent =>
-    fs.readdirSync(path.join(root, parent)).map(entry => path.join(root, parent, entry)));
+    fs.readdirSync(path.join(root, parent))
+        .map(entry => path.join(root, parent, entry))
+        .filter(dir => fs.existsSync(path.join(dir, 'package.json'))));
 const theia = createRequire(import.meta.url).resolve('@theia/cli/bin/theia.js');
 // The TypeScript hoisted to the root is the older one that @typescript-eslint needs, so use the extensions' own.
-const tsc = createRequire(path.join(extensions[0], 'package.json')).resolve('typescript/bin/tsc');
+const tsc = createRequire(path.join(root, 'packages', 'yukibana-common', 'package.json')).resolve('typescript/bin/tsc');
 
 const appDir = (app: App): string => path.join(root, `${app}-app`);
 
@@ -49,157 +50,31 @@ function pnpmRun(cwd: string, script: string): void {
     }
 }
 
-/**
- * Hashes `extra` with the path and content of every file under `paths`, except in node_modules. Contents rather
- * than modification times, since `theia rebuild:electron` rewrites the app's package.json in place.
- */
-function fingerprint(paths: string[], extra: unknown): string {
-    const hash = createHash('sha1').update(JSON.stringify(extra));
-    const visit = (file: string): void => {
-        const stat = fs.statSync(file, { throwIfNoEntry: false });
-        hash.update(`${path.relative(root, file)}\n`);
-        if (stat?.isDirectory()) {
-            fs.readdirSync(file).sort().filter(entry => entry !== 'node_modules').forEach(entry => visit(path.join(file, entry)));
-        } else if (stat) {
-            hash.update(fs.readFileSync(file));
-        }
-    };
-    paths.forEach(visit);
-    return hash.digest('hex');
-}
-
-/** Runs `step` unless `stampFile` shows it already ran with the same `inputs`. */
-function unlessUpToDate(stampFile: string, inputs: string, description: string, step: () => void): void {
-    if (fs.existsSync(stampFile) && fs.readFileSync(stampFile, 'utf8') === inputs) {
-        console.log(`${description}: up to date`);
-        return;
-    }
-    console.log(`${description}...`);
-    fs.rmSync(stampFile, { force: true });
-    step();
-    fs.mkdirSync(path.dirname(stampFile), { recursive: true });
-    fs.writeFileSync(stampFile, inputs);
-}
-
-function compile(): void {
-    console.log('Compiling extensions...');
-    exec(root, tsc, ['--build']);
-}
-
 function build(apps: App[], dev: boolean): void {
-    compile();
-    const mode = dev ? 'development' : 'production';
+    // Incremental: tsc only recompiles the projects that changed.
+    exec(root, tsc, ['--build']);
     for (const app of apps) {
-        const inputs = fingerprint([
-            // Whole folders, since the bundles also include files that tsc does not compile, e.g. i18n/*.json.
-            ...extensions,
-            path.join(appDir(app), 'package.json'),
-            path.join(appDir(app), 'esbuild.mjs'),
-            path.join(root, 'pnpm-lock.yaml'),
-            path.join(root, 'node_modules', '.modules.yaml'),
-        ], mode);
-        // The bundle carries its own copies of the native modules, so they only need to match the app while bundling.
-        unlessUpToDate(path.join(appDir(app), 'lib', '.build-inputs'), inputs, `Bundling the ${app} app (${mode})`, () => {
-            rebuildNativeModules(app);
-            exec(appDir(app), theia, ['build', `--app-target=${app}`, ...(dev ? ['--mode', 'development'] : [])]);
-        });
+        exec(appDir(app), theia, ['build', `--app-target=${app}`, ...(dev ? ['--mode', 'development'] : [])]);
         if (app === 'electron') {
             exec(appDir(app), path.join(appDir(app), 'scripts', 'fix-chrome-sandbox.js'), []);
         }
     }
 }
 
-// Theia backs up the browser builds of native modules in .browser_modules while they are built for Electron, but
-// discards the Electron builds when switching back. Those are kept in .electron_modules, so that switching to
-// Electron again is a copy instead of a rebuild from source.
-const browserModules = path.join(root, '.browser_modules');
-const electronModules = path.join(root, '.electron_modules');
-
-// Which install of node_modules the native modules were built for Electron in. A reinstall leaves .browser_modules
-// behind but puts browser builds back, which must not be kept as Electron builds.
-const electronInstall = path.join(browserModules, 'yukibana-install.txt');
-const installId = (): string => fingerprint([path.join(root, 'node_modules', '.modules.yaml')], 'install');
-
-type ModuleLocations = Record<string, { originalLocation: string }>;
-
-function readJson<T>(file: string): T {
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
-}
-
-/**
- * Identifies what the Electron builds were built from, so that they are only reused for the same versions.
- * Undefined when a module is missing, e.g. after it was uninstalled or the repository moved.
- */
-function electronModulesKey(modules: ModuleLocations): string | undefined {
-    try {
-        const electron = createRequire(path.join(appDir('electron'), 'package.json')).resolve('electron/package.json');
-        return JSON.stringify([readJson<{ version: string }>(electron).version, ...Object.entries(modules).map(([name, { originalLocation }]) =>
-            [name, originalLocation, readJson<{ version: string }>(path.join(originalLocation, 'package.json')).version])]);
-    } catch {
-        return undefined;
-    }
-}
-
-function rebuildNativeModules(app: App): void {
-    const current: App = fs.existsSync(browserModules) ? 'electron' : 'browser';
-    if (current === app) {
-        return;
-    }
-    if (app === 'browser') {
-        const modules = readJson<ModuleLocations>(path.join(browserModules, 'modules.json'));
-        fs.rmSync(electronModules, { recursive: true, force: true });
-        if (!fs.existsSync(electronInstall) || fs.readFileSync(electronInstall, 'utf8') !== installId()) {
-            console.log('Not keeping the native modules: node_modules was reinstalled since they were built for electron');
-            console.log(`Rebuilding native modules for ${app}...`);
-            exec(appDir(app), theia, [`rebuild:${app}`, '--cacheRoot', '..']);
-            return;
-        }
-        for (const [name, { originalLocation }] of Object.entries(modules)) {
-            fs.cpSync(originalLocation, path.join(electronModules, name), { recursive: true });
-        }
-        fs.writeFileSync(path.join(electronModules, 'modules.json'), JSON.stringify(modules, undefined, 2));
-        const key = electronModulesKey(modules);
-        if (key) {
-            fs.writeFileSync(path.join(electronModules, 'key.json'), key);
-        }
-    } else if (fs.existsSync(path.join(electronModules, 'key.json'))) {
-        // Same layout as Theia's backup, so that `theia rebuild:browser` can switch back.
-        const modules = readJson<ModuleLocations>(path.join(electronModules, 'modules.json'));
-        if (fs.readFileSync(path.join(electronModules, 'key.json'), 'utf8') === electronModulesKey(modules)) {
-            console.log('Restoring native modules built for electron...');
-            // Back up all browser builds before replacing any, and write the manifest first, as Theia does, so
-            // that an interrupted restore can still be switched back by `theia rebuild:browser`.
-            fs.mkdirSync(browserModules);
-            fs.writeFileSync(path.join(browserModules, 'modules.json'), JSON.stringify(modules, undefined, 2));
-            for (const [name, { originalLocation }] of Object.entries(modules)) {
-                fs.cpSync(originalLocation, path.join(browserModules, name), { recursive: true });
-            }
-            for (const [name, { originalLocation }] of Object.entries(modules)) {
-                fs.rmSync(originalLocation, { recursive: true });
-                fs.cpSync(path.join(electronModules, name), originalLocation, { recursive: true });
-            }
-            fs.writeFileSync(electronInstall, installId());
-            return;
-        }
-    }
-    console.log(`Rebuilding native modules for ${app}...`);
-    exec(appDir(app), theia, [`rebuild:${app}`, '--cacheRoot', '..']);
-    if (app === 'electron') {
-        fs.writeFileSync(electronInstall, installId());
-    }
-}
-
+/** Downloads the plugins, unless the same list of plugins was downloaded before. */
 function downloadPlugins(force: boolean): void {
     const pluginsDir = path.join(root, 'plugins');
     const stampFile = path.join(pluginsDir, '.download-inputs');
-    if (force) {
-        fs.rmSync(stampFile, { force: true });
-    }
     const { theiaPlugins, theiaPluginsExcludeIds } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
-    unlessUpToDate(stampFile, JSON.stringify({ theiaPlugins, theiaPluginsExcludeIds }), 'Downloading plugins', () => {
-        exec(root, theia, ['download:plugins', '--rate-limit=15', '--parallel=false']);
-        makeWritable(pluginsDir);
-    });
+    const inputs = JSON.stringify({ theiaPlugins, theiaPluginsExcludeIds });
+    if (!force && fs.existsSync(stampFile) && fs.readFileSync(stampFile, 'utf8') === inputs) {
+        console.log('Plugins: up to date');
+        return;
+    }
+    fs.rmSync(stampFile, { force: true });
+    exec(root, theia, ['download:plugins', '--rate-limit=15', '--parallel=false']);
+    makeWritable(pluginsDir);
+    fs.writeFileSync(stampFile, inputs);
 }
 
 /** Some plugin archives contain read-only files, which would make them impossible to update or delete. */
@@ -225,8 +100,6 @@ function clean(): void {
     for (const app of APPS) {
         exec(appDir(app), theia, ['clean']);
     }
-    // The Electron builds of the native modules, which a reinstall of node_modules can make stale.
-    fs.rmSync(electronModules, { recursive: true, force: true });
 }
 
 function fail(message: string): never {
@@ -271,10 +144,6 @@ const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Pa
             downloadPlugins(false);
             pnpmRun(appDir('electron'), values.preview ? 'package:preview' : values.publish ? 'deploy' : 'package');
         },
-    },
-    compile: {
-        options: {},
-        run: () => compile(),
     },
     'download:plugins': {
         options: { force: { type: 'boolean' } },

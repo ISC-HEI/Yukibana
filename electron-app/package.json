@@ -64,6 +64,7 @@
     "yargs": "^17.7.3"
   },
   "scripts": {
+    "watch": "theia build --watch --mode development",
     "clean:dist": "rimraf dist",
     "prepackage": "node scripts/patch-ripgrep-asar-path.mjs",
     "package": "pnpm run clean:dist && pnpm run prepackage && electron-builder -c.mac.identity=null --publish never",

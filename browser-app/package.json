@@ -34,6 +34,9 @@
   "devDependencies": {
     "@theia/cli": "~1.75.0"
   },
+  "scripts": {
+    "watch": "theia build --watch --mode development"
+  },
   "theia": {
     "target": "browser",
     "frontend": {

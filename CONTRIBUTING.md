@@ -38,9 +38,8 @@ On Windows, the Visual Studio Build Tools also need the
 
 ## Commands
 
-All commands run from the repository root. Each step is skipped when its output
-is already up to date, so re-running a command after a small change only redoes
-what is needed.
+All commands run from the repository root. The extensions compile incrementally,
+so only the ones that changed are recompiled.
 
 - `pnpm start [browser|electron]`: build in development mode, download the bundled
   plugins if needed, and start the app (Electron by default).
@@ -70,7 +69,8 @@ what is needed.
   configuration model in `yukibana-config.ts`. The [pre-commit](https://pre-commit.com) hooks in
   [.pre-commit-config.yaml](.pre-commit-config.yaml) do this when it changes, once installed with `pre-commit install`
 
-To recompile an extension on every change, run `pnpm --filter <extension> watch`.
+To recompile an extension on every change, run `pnpm --filter <extension> watch`, and to
+rebundle an app, `pnpm --filter yukibana-browser-app watch` (or `yukibana-electron-app`).
 
 ## Architecture
 

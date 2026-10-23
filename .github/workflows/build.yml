@@ -89,14 +89,6 @@ jobs:
           cache: true
           install: false
 
-      # pnpm's Node.js on Windows comes without npx, so Theia's native module rebuild for Electron would use the
-      # runner's npx, which runs on an older Node.js than devEngines allows. setup-node adds one that matches.
-      - name: Install npx (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24.x
-
       - name: Use Python 3.13
         uses: actions/setup-python@v6
         with:
@@ -114,23 +106,19 @@ jobs:
           path: plugins
           key: plugins-${{ runner.os }}-${{ hashFiles('package.json') }}
 
-      # Also done by the tests, but separately it shows how long each takes.
-      - name: Build (dev) and download plugins
-        shell: bash
-        run: pnpm build --dev && pnpm download:plugins
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # Not cached, as Playwright recommends: restoring takes about as long as downloading.
       - name: Install Playwright Chromium
         if: matrix.app == 'browser'
         shell: bash
         run: pnpm --filter yukibana-tests exec playwright install --with-deps chromium
 
+      # Builds both apps and downloads the plugins first.
       - name: E2E tests
         shell: bash
         # Electron needs a display, which Linux runners lack.
         run: ${{ matrix.app == 'electron' && runner.os == 'Linux' && 'xvfb-run -a' || '' }} pnpm test:e2e --project=${{ matrix.app }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload test report
         if: always()
@@ -172,14 +160,6 @@ jobs:
           runtime: node@24.x
           cache: true
           install: false
-
-      # pnpm's Node.js on Windows comes without npx, so Theia's native module rebuild for Electron would use the
-      # runner's npx, which runs on an older Node.js than devEngines allows. setup-node adds one that matches.
-      - name: Install npx (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24.x
 
       - name: Use Python 3.13
         uses: actions/setup-python@v6

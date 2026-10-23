@@ -1,7 +1,6 @@
 .DS_Store
 **/node_modules
 **/.browser_modules
-**/.electron_modules
 **/dist
 **/lib
 **/src-gen
