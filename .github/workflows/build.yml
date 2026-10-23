@@ -30,7 +30,7 @@ env:
 
 jobs:
   check:
-    name: Lint and E2E browser tests
+    name: Lint and unit tests
     runs-on: ubuntu-22.04
     timeout-minutes: 30
 
@@ -58,8 +58,45 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
-      - name: Build (dev)
-        run: pnpm build --dev
+      - name: Unit tests
+        run: pnpm test:coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 5
+
+  e2e:
+    name: E2E tests (${{ matrix.app }})
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [browser, electron]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          runtime: node@24.x
+          cache: true
+          install: false
+
+      - name: Use Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pnpm ci --fetch-timeout 100000
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache Theia plugins
         uses: actions/cache@v5
@@ -67,65 +104,41 @@ jobs:
           path: plugins
           key: plugins-${{ runner.os }}-${{ hashFiles('package.json') }}
 
-      - name: Download plugins
-        run: pnpm run download:plugins
+      # Also done by the tests, but separately it shows how long each takes.
+      - name: Build (dev) and download plugins
+        run: pnpm build --dev && pnpm download:plugins
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Test (Vitest specs)
-        run: pnpm run test
-
       - name: Cache Playwright browsers
-        id: playwright-cache
+        if: matrix.app == 'browser'
         uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install Playwright Chromium
-        run: cd tests && pnpm exec playwright install --with-deps chromium
+        if: matrix.app == 'browser'
+        run: pnpm --filter yukibana-tests exec playwright install --with-deps chromium
 
-      - name: Run Yukibana
-        run: |
-          pnpm start browser &
-          # Wait for the server.
-          for i in $(seq 1 60); do
-            if curl -sf http://localhost:3000 > /dev/null; then exit 0; fi
-            sleep 2
-          done
-          echo "Server did not start in time" >&2
-          exit 1
+      - name: E2E tests
+        # Electron needs a display.
+        run: ${{ matrix.app == 'electron' && 'xvfb-run -a' || '' }} pnpm test:e2e --project=${{ matrix.app }}
 
-      - name: Test (playwright browser)
-        run: pnpm run tests ui-tests-ci
-
-      - name: Generate report
-        run: pnpm run tests ui-tests-report-generate
-
-      - name: Upload coverage report
+      - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: coverage
+          name: e2e-report-${{ matrix.app }}
           path: |
-            coverage/
-          if-no-files-found: ignore
-          retention-days: 5
-
-      - name: Upload test results (browser)
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: ui-tests-browser
-          path: |
-            test-results/
-            tests/allure-results/
+            tests/playwright-report/
+            tests/test-results/
           if-no-files-found: ignore
           retention-days: 5
 
   package:
     name: Package (${{ matrix.artifact }})
-    needs: check
+    needs: [check, e2e]
     if: >-
       github.event_name == 'workflow_dispatch' ||
       startsWith(github.ref, 'refs/tags/v')

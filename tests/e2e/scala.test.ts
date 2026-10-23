@@ -7,38 +7,28 @@
  * SPDX-License-Identifier: MIT
  ********************************************************************************/
 
-import { expect, test } from '@playwright/test';
-import { TheiaApp, TheiaAppFactory, TheiaAppLoader, TheiaTextEditor, TheiaWorkspace } from '@theia/playwright';
-import * as path from "path";
+import { TheiaApp, TheiaTextEditor, TheiaWorkspace } from '@theia/playwright';
+import * as path from 'path';
+import { expect, test } from '../src/fixtures';
 import { PatchedTheiaApp } from '../src/theia-explorer-patch';
 import { TheiaLanguageIndicator } from '../src/theia-language-indicator';
 
-
 test.describe('Scala extension', () => {
     let app: TheiaApp;
-    
-    test.beforeAll(async ({ playwright, browser }) => {
+
+    test.beforeAll(async ({ launch }) => {
         const ws = new TheiaWorkspace([
             path.resolve(__dirname, '..', 'resources')
         ]);
-        app = await TheiaAppLoader.load({
-            playwright, browser, useElectron: {
-                electronAppPath: "../electron-app",
-                pluginsPath: "../plugins"
-            }
-        }, ws, PatchedTheiaApp as TheiaAppFactory<PatchedTheiaApp>);
-    });
-    
-    test.afterAll(async () => {
-        await app.page.close();
+        app = await launch(ws, PatchedTheiaApp);
     });
 
     test('should set the language of .scala files', async () => {
         await app.openEditor('hello_world.scala', TheiaTextEditor);
         // Wait for extension to start and detect language
-        await new Promise(r => setTimeout(r, 1000))
+        await new Promise(r => setTimeout(r, 1000));
         const languageIndicator = await app.statusBar.statusIndicator(TheiaLanguageIndicator);
-        await languageIndicator.waitForVisible()
-        expect(await languageIndicator.getLanguage()).toBe('Scala')
+        await languageIndicator.waitForVisible();
+        expect(await languageIndicator.getLanguage()).toBe('Scala');
     });
 });

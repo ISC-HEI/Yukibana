@@ -36,7 +36,7 @@ On Windows, the Visual Studio Build Tools also need the
 
    The first `pnpm start` also downloads the bundled plugins, which takes a while.
 
-## Building the app
+## Commands
 
 All commands run from the repository root. Each step is skipped when its output
 is already up to date, so re-running a command after a small change only redoes
@@ -53,10 +53,15 @@ what is needed.
 - `pnpm download:plugins`: download the plugins listed in `theiaPlugins`
   (done automatically by `start` and `package`; `--force` downloads them again)
 - `pnpm lint` / `pnpm lint:fix`: run the linter on the whole project
-- `pnpm test` / `pnpm test:coverage`: run the unit tests (`*.spec.ts`) with Vitest,
-  straight from the sources; `pnpm test:watch` reruns them on every change
-- `pnpm --filter yukibana-tests ui-tests`: run the Playwright UI tests against a running
-  browser app (`pnpm start browser`); downloads Playwright's Chromium on first use
+- `pnpm test`: run the unit tests (`*.spec.ts`) with Vitest, straight from the sources;
+  `pnpm test:watch` reruns them on every change. Filter by file name and test name, e.g.
+  `pnpm test config-provider -t "should reload"`
+- `pnpm test:e2e`: build both apps in development mode and run the Playwright end-to-end
+  tests ([tests/e2e](tests/e2e)) in each of them. Pick one app with `--project=browser` or
+  `--project=electron`, and filter like `pnpm test`: `pnpm test:e2e scala -g "language"`.
+  Playwright's own options work too, e.g. `--headed`, `--debug` or `--ui`. Before the
+  first run, install Playwright's Chromium: `pnpm --filter yukibana-tests exec playwright install chromium`
+- `pnpm test:coverage`: run the unit tests and report their coverage, in `coverage/index.html`
 - `pnpm clean`: remove all build outputs, e.g. after deleting or renaming source files,
   whose stale compiled files are otherwise left behind
 - `pnpm config:schema`: regenerate [config_schema.json](config_schema.json) from the

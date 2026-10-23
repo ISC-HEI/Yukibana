@@ -11,23 +11,6 @@
     "type": "git",
     "url": "git+https://github.com/ISC-HEI/Yukibana.git"
   },
-  "scripts": {
-    "ui-tests": "playwright install chromium && playwright test --config=../configs/playwright.config.ts --project=Browser",
-    "ui-tests-electron": "cross-env USE_ELECTRON=true playwright test --config=../configs/playwright.config.ts --project=Electron",
-    "ui-tests-ci": "playwright test --config=../configs/playwright.ci.config.ts --project=Browser",
-    "ui-tests-ci-electron": "cross-env USE_ELECTRON=true playwright test --config=../configs/playwright.ci.config.ts --project=Electron",
-    "ui-tests-headful": "playwright install chromium && playwright test --config=../configs/playwright.headful.config.ts --project=Browser",
-    "ui-tests-report-generate": "allure generate ./allure-results --clean -o allure-results/allure-report",
-    "ui-tests-report": "pnpm run ui-tests-report-generate && allure open allure-results/allure-report"
-  },
-  "devDependencies": {
-    "@types/yargs": "^17.0.35",
-    "allure-commandline": "^2.46.1",
-    "allure-playwright": "^3.12.1",
-    "cross-env": "^10.1.0",
-    "if-env": "^1.0.4",
-    "yargs": "^17.7.3"
-  },
   "dependencies": {
     "@playwright/test": "^1.63.0",
     "@theia/playwright": "~1.75.0"

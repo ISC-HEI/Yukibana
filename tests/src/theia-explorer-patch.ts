@@ -1,7 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { TheiaApp, TheiaExplorerView, TheiaView } from "@theia/playwright";
+import { TheiaApp, TheiaExplorerView, TheiaView } from '@theia/playwright';
 
 export class PatchedTheiaExplorerView extends TheiaExplorerView {
     protected treeNodeSelector(filePath: string): string {

@@ -18,12 +18,12 @@
     "download:plugins": "node scripts/cli.mts download:plugins",
     "clean": "node scripts/cli.mts clean",
     "postinstall": "theia check:theia-version",
-    "lint": "eslint --ext js,jsx,ts,tsx,mts scripts packages theia-extensions && pnpm run -r --if-present lint",
-    "lint:fix": "eslint --ext js,jsx,ts,tsx,mts scripts packages theia-extensions --fix && pnpm run -r --if-present lint:fix",
+    "lint": "eslint --ext js,jsx,ts,tsx,mts scripts packages theia-extensions tests && pnpm run -r --if-present lint",
+    "lint:fix": "eslint --ext js,jsx,ts,tsx,mts scripts packages theia-extensions tests --fix && pnpm run -r --if-present lint:fix",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "tests": "pnpm run --filter yukibana-tests",
+    "test:e2e": "pnpm --filter yukibana-tests exec playwright test",
     "config:schema": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/export-config-schema.mts"
   },
   "devDependencies": {
@@ -35,7 +35,6 @@
     "@typescript-eslint/eslint-plugin-tslint": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "@vitest/coverage-v8": "5.0.3",
-    "allure-playwright": "^3.12.1",
     "chai": "6.3.0",
     "eslint": "^7.32.0",
     "eslint-plugin-deprecation": "1.2.1",
