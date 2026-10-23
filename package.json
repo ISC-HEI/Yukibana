@@ -27,7 +27,6 @@
     "config:schema": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/export-config-schema.mts"
   },
   "devDependencies": {
-    "@eclipse-dash/nodejs-wrapper": "^0.0.1",
     "@theia/cli": "~1.75.0",
     "@theia/core": "~1.75.0",
     "@types/node": "26.6.3",

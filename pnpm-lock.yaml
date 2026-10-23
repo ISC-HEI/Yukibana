@@ -166,9 +166,6 @@ importers:
 
   .:
     devDependencies:
-      '@eclipse-dash/nodejs-wrapper':
-        specifier: ^0.0.1
-        version: 0.0.1
       '@theia/cli':
         specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(proxy-agent@8.0.2(supports-color@8.1.1))(supports-color@8.1.1)
@@ -432,12 +429,6 @@ importers:
       '@theia/cli':
         specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(debug@4.4.3(supports-color@8.1.1))(proxy-agent@8.0.2(supports-color@8.1.1))(supports-color@8.1.1)
-      '@types/js-yaml':
-        specifier: ^3.12.10
-        version: 3.12.10
-      '@types/yargs':
-        specifier: ^17.0.35
-        version: 17.0.35
       app-builder-lib:
         specifier: ^26.15.3
         version: 26.15.3(dmg-builder@26.15.3)(electron-builder-squirrel-windows@26.15.3)(supports-color@8.1.1)
@@ -450,15 +441,9 @@ importers:
       electron-osx-sign:
         specifier: ^0.6.0
         version: 0.6.0(supports-color@8.1.1)
-      js-yaml:
-        specifier: ^3.15.2
-        version: 3.15.2
       rimraf:
         specifier: ^5.0.0
         version: 5.0.10
-      yargs:
-        specifier: ^17.7.3
-        version: 17.7.3
 
   packages/yukibana-common:
     dependencies:
@@ -801,10 +786,6 @@ packages:
   '@csstools/css-tokenizer@4.0.2':
     resolution: {integrity: sha512-OoKoR0f76dCY666JlcbhmVTs2drYj1GUXZTYTcbUgJjh9Nv41aFfZ21bPQTERm5+L5cBDo466NltB2lplS5GBw==}
     engines: {node: '>=20.19.0'}
-
-  '@eclipse-dash/nodejs-wrapper@0.0.1':
-    resolution: {integrity: sha512-Rkk8O8hEVi/+LC/co7ly1zGLVwCNJG3yPbalsz1FHAqk6WZyEaWNf29EX6jz4vTfR5wpv2xAfF2yokKuStiOdA==}
-    hasBin: true
 
   '@electron-internal/extract-zip@1.0.5':
     resolution: {integrity: sha512-+bqFCP98pLI0Tt0XQo1TmlXtwjWchISndDOxCkEcIuUgXWpBnLyRI+2DU+mesvnMMX6L1XDqYNA0lXNDHd/yiA==}
@@ -1801,9 +1782,6 @@ packages:
 
   '@types/http-errors@2.0.5':
     resolution: {integrity: sha512-r8Tayk8HJnX0FztbZN7oVqGccWgw98T/0neJphO91KkmOzug1KkofZURD4UaD5uH8AqcFLfdPErnBod0u71/qg==}
-
-  '@types/js-yaml@3.12.10':
-    resolution: {integrity: sha512-/Mtaq/wf+HxXpvhzFYzrzCqNRcA958sW++7JOFC8nPrZcvfi/TrzOaaGbvt27ltJB2NQbHVAg5a1wUCsyMH7NA==}
 
   '@types/js-yaml@4.0.9':
     resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
@@ -6619,8 +6597,6 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.2': {}
 
-  '@eclipse-dash/nodejs-wrapper@0.0.1': {}
-
   '@electron-internal/extract-zip@1.0.5': {}
 
   '@electron/asar@3.4.1':
@@ -9452,8 +9428,6 @@ snapshots:
   '@types/http-cache-semantics@4.2.0': {}
 
   '@types/http-errors@2.0.5': {}
-
-  '@types/js-yaml@3.12.10': {}
 
   '@types/js-yaml@4.0.9': {}
 
