@@ -1,55 +1,27 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { z } from 'zod';
+import { DEFAULT_SETTINGS, parseSettings, Settings } from '@yukibana/cli/config';
 
-// TODO: extract constant strings
-const ConfigSchema = z.object({
-    assignmentFile: z.string().default('ASSIGNMENT.md'),
-    features: z.object({
-        codeSuggestions: z.boolean().default(true),
-        squiggles: z.boolean().default(true),
-        ai: z.boolean().default(true),
-    }).prefault({}),
-    layout: z.object({
-        widgets: z.object({
-            files: z.boolean().default(true),
-            search: z.boolean().default(true),
-            vcs: z.boolean().default(true),
-            debug: z.boolean().default(true),
-            testing: z.boolean().default(true),
-            outline: z.boolean().default(true),
-            aiChat: z.boolean().default(true),
-        }).prefault({}),
-        containers: z.record(z.string(), z.boolean()).default({}),
-        views: z.record(z.string(), z.boolean()).default({}),
-    }).prefault({}),
-    openFiles: z.array(z.string()).default([]),
-    readOnly: z.array(z.string()).default([]),
-    submission: z.object({
-        include: z.array(z.string()).optional(),
-        exclude: z.array(z.string()).optional(),
-        respectGitignore: z.boolean().default(true),
-        target: z.string().default('cloud'),
-    }).prefault({}),
-    projectId: z.string().default(''),
-}).prefault({});
+/**
+ * What a workspace is set up with: its `yukibana.json`, read with the schema the CLI checks a release with, so the IDE
+ * and the CLI cannot read a field differently.
+ */
+export type YukibanaConfig = Settings;
 
-export type YukibanaConfig = z.infer<typeof ConfigSchema>;
+/** What a workspace without a `yukibana.json`, or with one that is not valid, is set up with. */
+export const DEFAULT_CONFIG: YukibanaConfig = DEFAULT_SETTINGS;
 
-export function loadConfig(raw: object): YukibanaConfig {
-    try {
-        return ConfigSchema.parse(raw);
-    } catch (e) {
-        if (e instanceof z.ZodError) {
-            throw new Error(`Invalid format: ${z.prettifyError(e)} got ${raw}`);
-        }
-        throw e;
+/**
+ * Returns the settings in `text`, a `yukibana.json`, with defaults for what it leaves out.
+ *
+ * Throws an error naming the field when `text` is not valid; a file without `version` or `kind` is valid here, since
+ * the IDE opens any folder.
+ */
+export function loadConfig(text: string): YukibanaConfig {
+    const parsed = parseSettings(text);
+    if (!parsed.ok) {
+        throw new Error(parsed.error);
     }
-}
-
-export function getJSONSchema(): object {
-    return z.toJSONSchema(ConfigSchema, {
-        io: 'input',
-    });
+    return parsed.settings;
 }

@@ -14,7 +14,7 @@ import { FileService, ReadTextFileOptions, TextFileContent } from '@theia/filesy
 import { FileChangesEvent, FileChangeType, FileStat, WatchOptions } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { expect } from 'chai';
-import { loadConfig } from '../../common/yukibana-config';
+import { DEFAULT_CONFIG } from '../../common/yukibana-config';
 import { ConfigProvider } from './config-provider';
 import { ReadOnlyPolicy } from './read-only-policy';
 
@@ -152,7 +152,7 @@ describe('ConfigProvider', () => {
         await provider.onStart();
 
         const config = await provider.ready;
-        const defaultConfig = loadConfig({});
+        const defaultConfig = DEFAULT_CONFIG;
         expect(config).to.deep.equal(defaultConfig);
     });
 
@@ -161,7 +161,7 @@ describe('ConfigProvider', () => {
         await provider.onStart();
 
         const config = await provider.ready;
-        const defaultConfig = loadConfig({});
+        const defaultConfig = DEFAULT_CONFIG;
         expect(config).to.deep.equal(defaultConfig);
     });
 
@@ -171,7 +171,7 @@ describe('ConfigProvider', () => {
         await provider.onStart();
 
         const config = await provider.ready;
-        const defaultConfig = loadConfig({});
+        const defaultConfig = DEFAULT_CONFIG;
         expect(config).to.deep.equal(defaultConfig);
     });
 
@@ -181,7 +181,7 @@ describe('ConfigProvider', () => {
         await provider.onStart();
 
         const config = await provider.ready;
-        const defaultConfig = loadConfig({});
+        const defaultConfig = DEFAULT_CONFIG;
         expect(config).to.deep.equal({ ...defaultConfig, projectId: 'valid-id' });
         expect(config).to.deep.equal(provider.config);
     });
@@ -195,7 +195,7 @@ describe('ConfigProvider', () => {
         const configChanged = Event.toPromise(provider.onConfigChanged);
         fileService.write(root.resolve('yukibana.json'), '{"projectId": "new-id"}');
         const newConfig = await configChanged;
-        const defaultConfig = loadConfig({});
+        const defaultConfig = DEFAULT_CONFIG;
         expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: 'new-id' });
         expect(newConfig).to.deep.equal(provider.config);
     });
@@ -211,7 +211,7 @@ describe('ConfigProvider', () => {
         const configChanged = Event.toPromise(provider.onConfigChanged);
         workspaceService.setRoot(root2);
         const newConfig = await configChanged;
-        const defaultConfig = loadConfig({});
+        const defaultConfig = DEFAULT_CONFIG;
         expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: 'new-id' });
         expect(newConfig).to.deep.equal(provider.config);
     });

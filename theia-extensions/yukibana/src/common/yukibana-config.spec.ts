@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: MIT
  */
 import { expect } from 'chai';
-import { loadConfig } from './yukibana-config';
+import { DEFAULT_CONFIG, loadConfig } from './yukibana-config';
 
 interface ConfigError {
     key: string[]
@@ -13,7 +13,8 @@ interface ConfigError {
 /* eslint-disable no-null/no-null */
 describe('loadConfig', () => {
     it('should provide defaults for an empty config', () => {
-        const config = loadConfig({});
+        const config = loadConfig('{}');
+        expect(config).to.be.deep.equal(DEFAULT_CONFIG);
         expect(config).to.be.deep.equal({
             assignmentFile: 'ASSIGNMENT.md',
             features: {
@@ -37,10 +38,14 @@ describe('loadConfig', () => {
             openFiles: [],
             readOnly: [],
             submission: {
+                include: null,
+                exclude: [],
                 respectGitignore: true,
                 target: 'cloud',
+                filename: 'submission.tar.gz',
+                maxBytes: 32 * 1024 * 1024,
             },
-            projectId: '',
+            projectId: null,
         });
     });
 
@@ -68,21 +73,21 @@ describe('loadConfig', () => {
         { key: ['submission', 'exclude'], value: {} },
         { key: ['submission', 'respectGitignore'], value: 0 },
         { key: ['submission', 'target'], value: null },
-        { key: ['projectId'], value: null },
+        { key: ['projectId'], value: '' },
     ];
 
     errors.forEach(({ key, value }) => {
         it(`should throw an error if ${key.join('.')} is invalid`, () => {
             let config = value;
-            key.reverse().forEach(part => {
+            [...key].reverse().forEach(part => {
                 config = { [part]: config };
             });
-            expect(() => loadConfig(config)).to.throw();
+            expect(() => loadConfig(JSON.stringify(config))).to.throw(`"${key.join('.')}"`);
         });
     });
 
     it('should accept extra parameters', () => {
-        expect(() => loadConfig({ extraParameter: 'value' })).to.not.throw();
+        expect(() => loadConfig('{"extraParameter": "value"}')).to.not.throw();
     });
 
     it('should accept a well-formed config', () => {
@@ -125,10 +130,12 @@ describe('loadConfig', () => {
                 ],
                 respectGitignore: false,
                 target: 'custom',
+                filename: 'submission.tar.gz',
+                maxBytes: 32 * 1024 * 1024,
             },
             projectId: 'a-project-id',
         };
         const toLoad = { ...config, extraParameter: 'value' };
-        expect(loadConfig(toLoad)).to.deep.equal(config);
+        expect(loadConfig(JSON.stringify(toLoad))).to.deep.equal(config);
     });
 });

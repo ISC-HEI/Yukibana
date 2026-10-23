@@ -1,8 +1,6 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { URI } from '@theia/core';
-
 export const SubmissionTarget = Symbol('SubmissionTarget');
 
 export type SubmissionResult = {
@@ -22,9 +20,11 @@ export type SubmissionTargetAvailability = {
     readonly actions: { label: string, command: string | (() => Promise<void>), args?: any[] }[]
 };
 
+/** Somewhere a submission can go: the registry, or a file the student saves. */
 export interface SubmissionTarget {
     readonly id: string;
     readonly label: string;
     getAvailability(projectId: string): Promise<SubmissionTargetAvailability>;
-    submit(projectId: string, archive: URI): Promise<SubmissionResult>;
+    /** Sends submission `submissionId`, as `SubmissionService.prepare` made it, for `projectId`, and returns whether it went. */
+    submit(projectId: string, submissionId: string): Promise<SubmissionResult>;
 }

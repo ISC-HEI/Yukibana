@@ -63,7 +63,7 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
     }
 
     protected override isValid(value: boolean, mode: DialogMode): MaybePromise<DialogError> {
-        if (this.availability?.available !== true) {
+        if (this.preview.problems.length > 0 || this.availability?.available !== true) {
             return false;
         }
         return super.isValid(value, mode);
@@ -72,7 +72,9 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
     protected render(): React.ReactNode {
         return <div className={SUBMISSION_SUMMARY_CONTENT_CLASS}>
             {this.renderHeader()}
+            {this.renderProblems()}
             {this.renderFiles()}
+            {this.renderSkipped()}
             {this.renderAvailability()}
         </div>;
     }
@@ -105,6 +107,30 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
                 </ul>
             </div>
         </>;
+    }
+
+    /** What stops this submission being sent, in the library's sentences: too large, a link out of the project. */
+    protected renderProblems(): React.ReactNode {
+        const { problems } = this.preview;
+        if (problems.length === 0) {
+            return undefined;
+        }
+        return <div className='yukibana-availability unavailable' role='alert'>
+            <h3>{nls.localize('yukibana/submission/problemsHeader', 'This cannot be submitted yet')}</h3>
+            <ul>{problems.map(p => <li key={p}>{p}</li>)}</ul>
+        </div>;
+    }
+
+    /** What the rules leave out, so a student who misses a file sees why before sending. */
+    protected renderSkipped(): React.ReactNode {
+        const { skipped } = this.preview;
+        if (skipped.length === 0) {
+            return undefined;
+        }
+        return <details>
+            <summary>{nls.localize('yukibana/submission/summarySkipped', 'Left out ({0})', skipped.length)}</summary>
+            <ul className='yukibana-submission-list'>{skipped.map(p => <li key={p}><span>{p}</span></li>)}</ul>
+        </details>;
     }
 
     protected renderAvailability(): React.ReactNode {

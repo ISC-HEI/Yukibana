@@ -5,7 +5,7 @@ import { ILogger } from '@theia/core';
 import { FileUri } from '@theia/core/lib/node';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { RegistryError, unpackStarter } from '@yukibana/cli';
-import * as fs from 'fs';
+import { SubmissionServiceImpl } from 'yukibana-submission-ext/lib/node/submission-service';
 import { CloudService, DownloadResult, ProjectListing, ProjectLookup, SubmissionResult, SubmitAvailability } from '../common/cloud-protocol';
 import { CloudClient, isRefused } from './cloud-client';
 import { CloudSessionManager } from './cloud-session-manager';
@@ -15,12 +15,15 @@ export class CloudServiceImpl implements CloudService {
     @inject(CloudClient) protected readonly client!: CloudClient;
     @inject(CloudSessionManager) protected readonly sessions!: CloudSessionManager;
     @inject(ILogger) @named('yukibana:CloudService') protected readonly logger!: ILogger;
+    @inject(SubmissionServiceImpl) protected readonly submissions!: SubmissionServiceImpl;
 
-    async submit(projectId: string, archiveURI: string): Promise<SubmissionResult> {
-        const archivePath = FileUri.fsPath(archiveURI);
-        const archiveBytes = await fs.promises.readFile(archivePath);
+    async submit(projectId: string, submissionId: string): Promise<SubmissionResult> {
+        const bundle = this.submissions.bundle(submissionId);
+        if (bundle === undefined) {
+            return { ok: false, reason: 'the submission is no longer prepared; submit again' };
+        }
         try {
-            const result = await this.client.submitArchive(projectId, archiveBytes);
+            const result = await this.client.submit(bundle, projectId);
             return {
                 ok: true,
                 ...result

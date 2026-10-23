@@ -7,7 +7,7 @@ import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
-import { loadConfig, YukibanaConfig } from '../../common/yukibana-config';
+import { DEFAULT_CONFIG, loadConfig, YukibanaConfig } from '../../common/yukibana-config';
 import { ReadOnlyPolicy } from './read-only-policy';
 
 export const YUKIBANA_CONFIG_FILENAME = 'yukibana.json';
@@ -21,7 +21,7 @@ export class ConfigProvider implements FrontendApplicationContribution {
     private readonly onConfigChangeEmitter = new Emitter<YukibanaConfig>();
     readonly onConfigChanged = this.onConfigChangeEmitter.event;
 
-    private _config: YukibanaConfig = loadConfig({});
+    private _config: YukibanaConfig = DEFAULT_CONFIG;
     private _configURI: URI = new URI(YUKIBANA_CONFIG_FILENAME);
 
     constructor(
@@ -53,7 +53,7 @@ export class ConfigProvider implements FrontendApplicationContribution {
         const read = async () => {
             try {
                 const { value } = await this.files.read(this._configURI);
-                this.apply(root, loadConfig(JSON.parse(value)));
+                this.apply(root, loadConfig(value));
             } catch (e) {
                 this.logger.error(`Failed to load Yukibana configuration from '${this._configURI}: ${e}`, e);
                 this.applyDefault();
@@ -81,7 +81,7 @@ export class ConfigProvider implements FrontendApplicationContribution {
     protected readonly _ready = new Deferred<YukibanaConfig>();
 
     protected applyDefault(): void {
-        this.apply(undefined, loadConfig({}));
+        this.apply(undefined, DEFAULT_CONFIG);
     }
 
     protected apply(root: URI | undefined, config: YukibanaConfig): void {

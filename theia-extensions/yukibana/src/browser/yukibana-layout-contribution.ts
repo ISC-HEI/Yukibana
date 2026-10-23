@@ -90,7 +90,7 @@ export class YukibanaLayoutContribution implements FrontendApplicationContributi
         await this.openFiles(root, config.openFiles);
     }
 
-    protected async openFiles(root: URI, files: Array<string>): Promise<void> {
+    protected async openFiles(root: URI, files: readonly string[]): Promise<void> {
         for (const [i, file] of files.entries()) {
             this.openFile(root, file, i === 0 ? 'activate' : 'open');
         }
