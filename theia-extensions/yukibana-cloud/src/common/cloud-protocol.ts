@@ -1,7 +1,6 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { URI } from '@theia/core';
 import { Accepted, Me, Project } from '@yukibana/cli';
 
 export const cloudAuthPath = '/services/yukibana/cloud-auth';
@@ -55,9 +54,10 @@ export type SubmissionResult = (
     readonly reason: string
 };
 
+/** A starter unpacked, with the entries left out (each `path: reason`), or why nothing was unpacked. */
 export type DownloadResult = {
     readonly ok: true;
-    readonly uri: URI;
+    readonly leftOut: readonly string[];
 } | {
     readonly ok: false;
     readonly reason: string;
@@ -99,6 +99,14 @@ export interface CloudService {
     getProjectInfo(projectId: string): Promise<ProjectLookup>
     /** Returns the projects the logged-in person can see; a failure other than being logged out is an `error`. */
     listProjects(): Promise<ProjectListing>
-    downloadProject(projectId: string): Promise<DownloadResult>
+    /**
+     * Unpacks the starter of `projectId` into `destinationURI`, creating it, and returns the entries left out, or why
+     * nothing was unpacked.
+     *
+     * Fails, having written nothing, when `destinationURI` exists and is not an empty folder, or when the download is
+     * not a whole `.tar.gz`. A starter that is one folder with a `yukibana.json` in it is unpacked without that folder,
+     * whatever its name.
+     */
+    downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult>
     canSubmitProject(projectId: string): Promise<SubmitAvailability>
 }

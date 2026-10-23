@@ -28,7 +28,7 @@ export class FileSubmissionTarget implements SubmissionTarget {
                 reason: nls.localize('yukibana/submission/fileTarget/noWorkspaceRoot', 'No workspace root'),
             };
         }
-        const out = root.resolve('submission.tar.zst').toString();
+        const out = root.resolve('submission.tar.gz').toString();
         if (await this.submissionService.copyFile(archive.toString(), out)) {
             return {
                 ok: true
