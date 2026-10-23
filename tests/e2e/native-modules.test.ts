@@ -26,12 +26,9 @@ test.describe('Native modules', () => {
             .map(file => path.join(electronApp, 'lib', file));
         expect(modules.length).toBeGreaterThan(0);
         const electron = createRequire(path.join(electronApp, 'package.json'))('electron') as string;
-        const failures = modules.flatMap(module => {
-            // Only the error's message: Electron's own trace includes its whole minified bootstrap code.
-            const script = `try { require(${JSON.stringify(module)}) } catch (error) { console.error(error.message); process.exit(1) }`;
-            const result = spawnSync(electron, ['-e', script], { env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' }, encoding: 'utf8' });
-            return result.status === 0 ? [] : [`${path.relative(electronApp, module)}: ${(result.stderr || String(result.error)).trim()}`];
-        });
-        expect(failures).toEqual([]);
+        // Prints the message of each module that fails to load, which names the module.
+        const script = `for (const m of ${JSON.stringify(modules)}) try { require(m) } catch (e) { console.log(e.message) }`;
+        const { stdout } = spawnSync(electron, ['-e', script], { env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' }, encoding: 'utf8' });
+        expect(stdout).toBe('');
     });
 });
