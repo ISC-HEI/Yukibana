@@ -11,6 +11,9 @@
     "references": [
         {
             "path": "../yukibana"
+        },
+        {
+            "path": "../../packages/yukibana-common"
         }
     ]
 }
