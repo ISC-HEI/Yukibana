@@ -135,7 +135,6 @@
   "overrides": [
     {
       "files": [
-        "dev-packages",
         "*.{spec,espec,slow-spec}.{js,ts}"
       ],
       "rules": {

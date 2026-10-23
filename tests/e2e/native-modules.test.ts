@@ -23,9 +23,7 @@ test.describe('Native modules', () => {
         test.skip(app !== 'electron', 'The browser app runs them in Node.js, which they are built for');
         const modules = fs.readdirSync(path.join(electronApp, 'lib'), { recursive: true, encoding: 'utf8' })
             .filter(file => file.endsWith('.node'))
-            .map(file => path.join(electronApp, 'lib', file))
-            // Builds for other platforms, which node-pty ships too.
-            .filter(file => !file.includes(`${path.sep}prebuilds${path.sep}`) || file.includes(`${process.platform}-${process.arch}`));
+            .map(file => path.join(electronApp, 'lib', file));
         expect(modules.length).toBeGreaterThan(0);
         const electron = createRequire(path.join(electronApp, 'package.json'))('electron') as string;
         const failures = modules.flatMap(module => {
