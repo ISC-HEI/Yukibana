@@ -11,7 +11,6 @@ import { CommandService, ILogger, MessageService, URI } from '@theia/core';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { CopyFileOptions, FileDeleteOptions, FileOperationOptions, FileStat, FileStatWithMetadata, ResolveFileOptions } from '@theia/filesystem/lib/common/files';
 import { TelemetryService } from '@theia/telemetry/lib/common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { Project } from '@yukibana/cli';
@@ -19,8 +18,8 @@ import { expect } from 'chai';
 import { CloudService, DownloadResult, ProjectLookup } from '../common/cloud-protocol';
 import { CloudTelemetry } from '../common/cloud-telemetry';
 import { CloudAccountService } from './cloud-account-service';
-import { YukibanaProjectOpener } from './yukibana-project-opener';
 import { YukibanaOpenHandler } from './yukibana-url-handler';
+import { YukibanaProjectOpener } from './yukibana-project-opener';
 
 disableJSDom();
 
@@ -45,10 +44,9 @@ interface Options {
 }
 
 const PROJECT_ID = '01a11653-0353-7389-81f4-01837a3ed666';
-const project = { projectId: PROJECT_ID, title: 'Warm up', starterReady: true } as Project;
+const project = { projectId: PROJECT_ID, slug: 'warmup', title: 'Warm up', starterReady: true } as Project;
 const found = (p: Project): ProjectLookup => ({ kind: 'found', project: p });
 const folder = new URI('file:///home/student/projects');
-const downloadUri = new URI('file:///tmp/yukibana-project-download-ABCDEF/warmup');
 const projectUri = new URI('file:///home/student/projects/warmup');
 
 interface Mocks {
@@ -56,6 +54,7 @@ interface Mocks {
     /** Progress messages reported, and whether the notification was closed. */
     progress: { messages: string[], cancelled: number, shown: boolean };
     errors: string[];
+    warnings: string[];
     reports: CloudTelemetry.OpenProjectURIData[];
     opened: { uri: URI, preserveWindow?: boolean }[];
     folderDialogs: number;
@@ -65,14 +64,16 @@ interface Mocks {
 }
 
 function setup(options: Options = {}): Mocks {
-    const mocks: Omit<Mocks, 'handler' | 'opener'> = {
+    const mocks: Omit<Mocks, 'handler'> = {
         progress: { messages: [], cancelled: 0, shown: false },
         errors: [],
+        warnings: [],
         reports: [],
         opened: [],
         folderDialogs: 0,
         downloads: [],
         commands: [],
+        opener: new TestProjectOpener(),
     };
     const messages = {
         showProgress: async () => {
@@ -88,13 +89,21 @@ function setup(options: Options = {}): Mocks {
             mocks.errors.push(message);
             return options.choice;
         },
+        warn: async (message: string) => {
+            mocks.warnings.push(message);
+            return undefined;
+        },
     };
     const service: Partial<CloudService> = {
         getProjectInfo: options.lookup ?? (async () => found(project)),
-        downloadProject: async projectId => {
-            mocks.downloads.push({ projectId, destination: downloadUri.toString() });
-            return options.download ? options.download() : { ok: true, uri: downloadUri };
+        downloadProject: async (projectId, destination) => {
+            mocks.downloads.push({ projectId, destination });
+            return options.download ? options.download() : { ok: true, leftOut: [] };
         },
+    };
+    // Every folder is missing, so no conflict is ever asked about.
+    const files = {
+        exists: async () => false,
     };
     const fileDialogs = {
         showOpenDialog: async () => {
@@ -118,23 +127,14 @@ function setup(options: Options = {}): Mocks {
             loggedIn ||= options.loginWorks ?? false;
         },
     };
-    const fileService = {
-        copy: async (source: URI, target: URI, _options?: CopyFileOptions): Promise<FileStatWithMetadata> => ({} as FileStatWithMetadata),
-        exists: async (resource: URI): Promise<boolean> => false,
-        resolve: async (resource: URI, _options?: ResolveFileOptions | undefined): Promise<FileStat> => ({
-            isDirectory: resource.path.ext === '',
-            children: undefined,
-        } as FileStat),
-        delete: async (resource: URI, _options?: FileOperationOptions & Partial<FileDeleteOptions>): Promise<void> => { },
-    };
-    const opener = new TestProjectOpener();
+    const opener = mocks.opener;
     Object.assign(opener, {
         logger: new MockLogger() as ILogger,
         service: service as CloudService,
         fileDialogs: fileDialogs as unknown as FileDialogService,
         workspaces: workspaces as unknown as WorkspaceService,
+        files: files as unknown as FileService,
         messages: messages as unknown as MessageService,
-        files: fileService as unknown as FileService,
         telemetry: telemetry as unknown as TelemetryService,
         accounts: accounts as unknown as CloudAccountService,
         commands: commands as unknown as CommandService,
@@ -147,7 +147,7 @@ function setup(options: Options = {}): Mocks {
         commands: commands as unknown as CommandService,
         opener: opener as unknown as YukibanaProjectOpener,
     });
-    return { handler, opener, ...mocks };
+    return { handler, ...mocks };
 }
 
 function openUri(id?: string): URI {
@@ -168,11 +168,11 @@ describe('YukibanaOpenHandler', () => {
     });
 
     describe('open project', () => {
-        it('should download and open the project', async () => {
+        it('should download the project straight into a folder named after its slug, and open it', async () => {
             const mocks = setup();
             await mocks.handler.open(openUri(PROJECT_ID));
 
-            expect(mocks.downloads).to.deep.equal([{ projectId: PROJECT_ID, destination: downloadUri.toString() }]);
+            expect(mocks.downloads).to.deep.equal([{ projectId: PROJECT_ID, destination: projectUri.toString() }]);
             expect(mocks.opened).to.have.length(1);
             expect(mocks.opened[0].uri.toString()).to.equal(projectUri.toString());
             expect(mocks.opened[0].preserveWindow).to.equal(true);
@@ -180,6 +180,14 @@ describe('YukibanaOpenHandler', () => {
             expect(mocks.progress.cancelled).to.equal(1);
             expect(mocks.reports).to.have.length(1);
             expect(mocks.reports[0]).to.include({ outcome: 'opened', stage: 'window', projectId: PROJECT_ID, newWindow: false });
+        });
+
+        it('should say which files of the starter were not unpacked, and still open the project', async () => {
+            const mocks = setup({ download: async () => ({ ok: true, leftOut: ['link: a symlink out of the folder'] }) });
+            await mocks.handler.open(openUri(PROJECT_ID));
+
+            expect(mocks.warnings).to.deep.equal(['Some files of the starter were not unpacked: link: a symlink out of the folder']);
+            expect(mocks.opened).to.have.length(1);
         });
 
         it('should open the project in a new window if asked to', async () => {
