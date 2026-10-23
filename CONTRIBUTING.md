@@ -48,7 +48,7 @@ so only the ones that changed are recompiled.
 - `pnpm build [browser|electron]`: build the extensions and the apps (both by default)
   in production mode, or in development mode with `--dev`
 - `pnpm package`: build and package the Electron app into `electron-app/dist`.
-  Use `--preview` for an unpacked directory, or `--publish` to publish the release
+  Use `--preview` for an unpacked directory
 - `pnpm download:plugins`: download the plugins listed in `theiaPlugins`
   (done automatically by `start` and `package`; `--force` downloads them again)
 - `pnpm lint` / `pnpm lint:fix`: run the linter on the whole project
@@ -63,8 +63,8 @@ so only the ones that changed are recompiled.
   Playwright's own options work too, e.g. `--headed`, `--debug` or `--ui`. Before the
   first run, install Playwright's Chromium: `pnpm --filter yukibana-tests exec playwright install chromium`
 - `pnpm test:coverage`: run the unit tests and report their coverage, in `coverage/index.html`
-- `pnpm clean`: remove all build outputs, e.g. after deleting or renaming source files,
-  whose stale compiled files are otherwise left behind
+- `pnpm clean`: remove what the extensions compiled and the apps bundled, e.g. after deleting
+  or renaming source files, whose stale compiled files are otherwise left behind
 - `pnpm config:schema`: regenerate [config_schema.json](config_schema.json) from the
   configuration model in `yukibana-config.ts`. The [pre-commit](https://pre-commit.com) hooks in
   [.pre-commit-config.yaml](.pre-commit-config.yaml) do this when it changes, once installed with `pre-commit install`

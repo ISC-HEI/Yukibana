@@ -3,6 +3,7 @@
  */
 import { defineConfig } from 'vitest/config';
 
+/** The unit tests: every spec of the extensions and their libraries, run from the sources. */
 export default defineConfig({
     test: {
         include: ['{packages,theia-extensions}/*/src/**/*.spec.ts'],

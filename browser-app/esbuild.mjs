@@ -7,7 +7,9 @@ import { nodeOptions } from './gen-esbuild.node.mjs';
 
 import esbuild from 'esbuild';
 
+/** Build of the frontend, into lib/frontend. */
 const browserContext = await esbuild.context(browserOptions);
+/** Build of the backend, into lib/backend. */
 const nodeContext = await esbuild.context(nodeOptions);
 
 

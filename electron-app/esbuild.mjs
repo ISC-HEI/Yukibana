@@ -7,8 +7,11 @@ import { nodeOptions } from './gen-esbuild.node.mjs';
 import { electronOptions } from './gen-esbuild.electron.mjs';
 import esbuild from 'esbuild';
 
+/** Build of the frontend, into lib/frontend. */
 const browserContext = await esbuild.context(browserOptions);
+/** Build of the backend, into lib/backend. */
 const nodeContext = await esbuild.context(nodeOptions);
+/** Build of Electron's preload script, into lib/frontend too. */
 const electronContext = await esbuild.context(electronOptions);
 
 if (watch) {

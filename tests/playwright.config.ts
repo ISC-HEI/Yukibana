@@ -4,6 +4,7 @@
 import { defineConfig } from '@playwright/test';
 import type { App } from './src/fixtures';
 
+/** The end-to-end tests, as a `browser` and an `electron` project. */
 export default defineConfig<{}, { app: App }>({
     testDir: 'e2e',
     globalSetup: './global-setup.ts',

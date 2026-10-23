@@ -11,7 +11,9 @@ if (process.platform !== 'linux') {
     process.exit(0);
 }
 
+/** Electron's chrome-sandbox helper in node_modules. */
 const DEFAULT_SANDBOX_EXECUTABLE = path.resolve(__dirname, '../../node_modules/electron/dist/chrome-sandbox');
+/** The helper to fix: the one given as argument, if any, else Electron's own. */
 const sandboxExecutable = process.argv[2] || DEFAULT_SANDBOX_EXECUTABLE;
 
 if (!fs.existsSync(sandboxExecutable)) {
@@ -25,6 +27,7 @@ if (stat.uid === 0 && stat.gid === 0 && (stat.mode & 0o7777) === 0o4755) {
     process.exit(0);
 }
 
+/** Runs `argv` as root, through sudo unless already root, and exits with its status if it fails. */
 const run = (...argv) => {
     if (process.getuid() !== 0) {
         argv.unshift('sudo');
