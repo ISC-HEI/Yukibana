@@ -1,14 +1,11 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { ILogger, URI } from '@theia/core';
+import { ILogger } from '@theia/core';
 import { FileUri } from '@theia/core/lib/node';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
-import { RegistryError } from '@yukibana/cli';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import * as tar from 'tar';
+import { RegistryError, unpackStarter } from '@yukibana/cli';
+import { SubmissionServiceImpl } from 'yukibana-submission-ext/lib/node/submission-service';
 import { CloudService, DownloadResult, ProjectListing, ProjectLookup, SubmissionResult, SubmitAvailability } from '../common/cloud-protocol';
 import { CloudClient, isRefused } from './cloud-client';
 import { CloudSessionManager } from './cloud-session-manager';
@@ -18,12 +15,15 @@ export class CloudServiceImpl implements CloudService {
     @inject(CloudClient) protected readonly client!: CloudClient;
     @inject(CloudSessionManager) protected readonly sessions!: CloudSessionManager;
     @inject(ILogger) @named('yukibana:CloudService') protected readonly logger!: ILogger;
+    @inject(SubmissionServiceImpl) protected readonly submissions!: SubmissionServiceImpl;
 
-    async submit(projectId: string, archiveURI: string): Promise<SubmissionResult> {
-        const archivePath = FileUri.fsPath(archiveURI);
-        const archiveBytes = await fs.promises.readFile(archivePath);
+    async submit(projectId: string, submissionId: string): Promise<SubmissionResult> {
+        const bundle = this.submissions.bundle(submissionId);
+        if (bundle === undefined) {
+            return { ok: false, reason: 'the submission is no longer prepared; submit again' };
+        }
         try {
-            const result = await this.client.submitArchive(projectId, archiveBytes);
+            const result = await this.client.submit(bundle, projectId);
             return {
                 ok: true,
                 ...result
@@ -68,87 +68,20 @@ export class CloudServiceImpl implements CloudService {
         return isRefused(e) || !(await this.sessions.isLoggedIn());
     }
 
-    async downloadProject(projectId: string): Promise<DownloadResult> {
-        const starter = await this.client.downloadStarter(projectId);
-
-        const source = Buffer.from(starter.buffer, starter.byteOffset, starter.byteLength);
-        const tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'yukibana-project-download-'));
-        const rootDir = await this.extractTo(source, tmpDir);
-
-        if (rootDir === undefined) {
-            return { ok: false, reason: 'error' };
-        }
-        return { ok: true, uri: rootDir };
-    }
-
-    private async extractTo(buffer: Buffer, outDir: string): Promise<URI | undefined> {
+    async downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult> {
         try {
-            const topLevel = new Map<string, boolean>();
-
-            await new Promise((resolve, reject) => {
-                const extract = tar.x({ cwd: outDir });
-                extract.on('entry', (entry: tar.ReadEntry) => {
-                    const segments = entry.path
-                        .replace(/^(\.\/)+/, '')
-                        .split('/')
-                        .filter(s => s.length > 0);
-
-                    if (segments.length === 0) {
-                        return;
-                    }
-
-                    const name = segments[0];
-                    const isDirectory = segments.length > 1 || entry.type === 'Directory';
-                    topLevel.set(name, (topLevel.get(name) ?? false) || isDirectory);
-                });
-                extract.on('error', reject);
-                extract.on('close', resolve);
-                extract.end(buffer);
-            });
-            // A starter that is one folder keeps its name; loose files get a folder named after the project
-            const [topDirectory] = topLevel.size === 1 ? [...topLevel] : [];
-            const projectPath = topDirectory && topDirectory[1]
-                ? path.join(outDir, topDirectory[0])
-                : outDir;
-            return FileUri.create(projectPath);
+            const leftOut = await unpackStarter(await this.client.downloadStarter(projectId), FileUri.fsPath(destinationURI));
+            for (const entry of leftOut) {
+                this.logger.warn(`Not unpacked from the starter of ${projectId}: ${entry}`);
+            }
+            return { ok: true, leftOut };
         } catch (e) {
             this.logger.error(e instanceof Error ? e : String(e));
-            return undefined;
+            return { ok: false, reason: e instanceof Error ? e.message : String(e) };
         }
     }
 
     canSubmitProject(projectId: string): Promise<SubmitAvailability> {
         return this.client.isProjectAcceptingSubmissions(projectId);
-    }
-}
-
-/**
- * Returns `name` as a folder name every file system takes, or `project` if nothing of it is left.
- *
- * Characters some file system rejects become `-`, and leading and trailing spaces and dots go.
- */
-export function folderNameFrom(name: string): string {
-    return name.replace(/[<>:"/\\|?*\u0000-\u001f]/g, '-').replace(/^[\s.]+|[\s.]+$/g, '') || 'project';
-}
-
-/**
- * Creates a new, empty folder in `parent` named `name`, or `name-2`, `name-3`... if that is taken, and returns its path.
- *
- * Creating the folder is what claims the name, so two downloads at once cannot pick the same one,
- * and an existing folder is never reused.
- *
- * - Requires: `name` is a valid folder name here, such as one `folderNameFrom` returns.
- */
-export async function claimFolder(parent: string, name: string): Promise<string> {
-    for (let n = 1; ; n++) {
-        const candidate = path.join(parent, n === 1 ? name : `${name}-${n}`);
-        try {
-            await fs.promises.mkdir(candidate);
-            return candidate;
-        } catch (e) {
-            if ((e as NodeJS.ErrnoException).code !== 'EEXIST') {
-                throw e;
-            }
-        }
     }
 }

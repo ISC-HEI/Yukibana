@@ -12,7 +12,7 @@ allowBuilds:
   "@parcel/watcher": true
   "@theia/ffmpeg": true
   "@vscode/windows-ca-certs": true
-  "@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/37c34436a3b1a752123ab10c89be214cbe534556#path:/cli": true
+  "@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c47a7f3626f97aafb4518829394877fdeee7b472#path:/cli": true
   chromedriver: true
   core-js: true
   drivelist: true

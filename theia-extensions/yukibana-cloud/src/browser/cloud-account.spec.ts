@@ -8,7 +8,7 @@ import { enableJSDOM } from '@theia/core/lib/browser/test/jsdom';
 const disableJSDom = enableJSDOM();
 FrontendApplicationConfigProvider.set({});
 
-import { ILogger, URI } from '@theia/core';
+import { ILogger } from '@theia/core';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { Project } from '@yukibana/cli';
@@ -235,7 +235,7 @@ describe('CloudSubmissionTarget', () => {
 
     it('should say which account a refused submission was made with', async () => {
         const target = setupTarget(account, { result: { ok: false, reason: 'the registry answered 403: This project is not accepting submissions from you now.' } });
-        const result = await target.submit('project', new URI('file:///submission.tar.zst'));
+        const result = await target.submit('project', 'submission-1');
         expect(result).to.deep.equal({
             ok: false,
             reason: 'the registry answered 403: This project is not accepting submissions from you now. (logged in as ambrus@example.com)',
@@ -244,12 +244,12 @@ describe('CloudSubmissionTarget', () => {
 
     it('should leave the reason alone if nobody is logged in', async () => {
         const target = setupTarget(undefined, { result: { ok: false, reason: 'not logged in' } });
-        expect(await target.submit('project', new URI('file:///submission.tar.zst'))).to.deep.equal({ ok: false, reason: 'not logged in' });
+        expect(await target.submit('project', 'submission-1')).to.deep.equal({ ok: false, reason: 'not logged in' });
     });
 
     it('should pass a successful submission through', async () => {
         const accepted = { ok: true, submissionId: 'submission', byteSize: 1, sha256: '00' } as SubmissionResult;
         const target = setupTarget(account, { result: accepted });
-        expect(await target.submit('project', new URI('file:///submission.tar.zst'))).to.equal(accepted);
+        expect(await target.submit('project', 'submission-1')).to.equal(accepted);
     });
 });

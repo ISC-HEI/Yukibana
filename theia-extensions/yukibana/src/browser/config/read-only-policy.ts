@@ -10,7 +10,7 @@ export class ReadOnlyPolicy {
     protected root?: URI;
     protected patterns: Record<string, boolean> = {};
 
-    update(root: URI | undefined, readOnly: string[]): void {
+    update(root: URI | undefined, readOnly: readonly string[]): void {
         this.root = root;
         this.patterns = Object.fromEntries(readOnly.map(p => [p, true]));
     }
