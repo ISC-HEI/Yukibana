@@ -3,7 +3,7 @@
  */
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { getJSONSchema } from '../theia-extensions/yukibana/src/common/yukibana-config';
+import { getJSONSchema } from '../theia-extensions/yukibana/src/common/yukibana-config.ts';
 import * as fs from 'fs';
 
 const argv = yargs(hideBin(process.argv))

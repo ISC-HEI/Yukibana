@@ -24,8 +24,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "tests": "pnpm run --filter yukibana-tests",
-    "dep:all": "ts-node scripts/dep-all.ts",
-    "config:schema": "ts-node scripts/export-config-schema.ts"
+    "config:schema": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/export-config-schema.mts"
   },
   "devDependencies": {
     "@eclipse-dash/nodejs-wrapper": "^0.0.1",
@@ -46,7 +45,6 @@
     "eslint-plugin-react": "^7.37.5",
     "ignore-styles": "5.0.1",
     "jsdom": "30.1.2",
-    "ts-node": "^10.9.2",
     "tslint": "^5.20.1",
     "vitest": "5.0.3",
     "yargs": "^17.7.3"

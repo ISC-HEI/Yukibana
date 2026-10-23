@@ -59,6 +59,8 @@ what is needed.
   browser app (`pnpm start browser`); downloads Playwright's Chromium on first use
 - `pnpm clean`: remove all build outputs, e.g. after deleting or renaming source files,
   whose stale compiled files are otherwise left behind
+- `pnpm config:schema`: regenerate [config_schema.json](config_schema.json) from the
+  configuration model in `yukibana-config.ts` (the pre-commit hook does this when it changes)
 
 To recompile an extension on every change, run `pnpm --filter <extension> watch`.
 
