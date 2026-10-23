@@ -1,7 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { nls, URI } from '@theia/core';
+import { nls } from '@theia/core';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { Project } from '@yukibana/cli';
 import { SubmissionResult, SubmissionTarget, SubmissionTargetAvailability } from 'yukibana-submission-ext/lib/common/submission-target';
@@ -99,8 +99,8 @@ export class CloudSubmissionTarget implements SubmissionTarget {
         return asAccount(notAllowed, state.account);
     }
 
-    async submit(projectId: string, archive: URI): Promise<SubmissionResult> {
-        const result = await this.service.submit(projectId, archive.toString());
+    async submit(projectId: string, submissionId: string): Promise<SubmissionResult> {
+        const result = await this.service.submit(projectId, submissionId);
         if (result.ok) {
             return result;
         }
