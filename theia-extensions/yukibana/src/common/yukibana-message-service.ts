@@ -28,6 +28,9 @@ export class YukibanaMessageService extends MessageService {
         if (/metals might not work correctly/i.test(text)) {
             return true;
         }
+        if (/multiple problems detected in your build/i.test(text)) {
+            return true;
+        }
         return false;
     }
 
