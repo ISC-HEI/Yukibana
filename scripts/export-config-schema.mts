@@ -6,6 +6,7 @@ import { hideBin } from 'yargs/helpers';
 import { getJSONSchema } from '../theia-extensions/yukibana/src/common/yukibana-config.ts';
 import * as fs from 'fs';
 
+/** The command line's options. */
 const argv = yargs(hideBin(process.argv))
     .option('output', {
         alias: 'o',
@@ -19,6 +20,7 @@ const argv = yargs(hideBin(process.argv))
 
 execute();
 
+/** Writes the JSON schema of Yukibana's configuration to the `--output` file. */
 async function execute(): Promise<void> {
     const output = argv.output;
     const schema = getJSONSchema();

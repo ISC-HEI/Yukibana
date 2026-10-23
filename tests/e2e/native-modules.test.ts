@@ -13,6 +13,7 @@ import { createRequire } from 'module';
 import * as path from 'path';
 import { expect, test } from '../src/fixtures';
 
+/** The Electron app's folder. */
 const electronApp = path.resolve(__dirname, '..', '..', 'electron-app');
 
 test.describe('Native modules', () => {

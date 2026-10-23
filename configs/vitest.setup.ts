@@ -9,9 +9,10 @@ import { createRequire, registerHooks, type LoadFnOutput } from 'node:module';
 // pipeline, so their `require('./style.css')` calls need ignoring there.
 createRequire(import.meta.url)('ignore-styles');
 
-// The same for ESM imports of styles, e.g. in @theia/monaco-editor-core.
+/** Extensions of the style files that ESM imports load, e.g. in @theia/monaco-editor-core. */
 const STYLE_EXTENSIONS = ['.css', '.scss', '.sass', '.less'];
 registerHooks({
+    /** Loads a style file as an empty module, and anything else as usual. */
     load(url, context, nextLoad): LoadFnOutput {
         if (STYLE_EXTENSIONS.some(ext => url.endsWith(ext))) {
             return { format: 'module', source: 'export default {};', shortCircuit: true };

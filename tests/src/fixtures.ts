@@ -10,46 +10,54 @@ import * as path from 'path';
 
 export { expect } from '@playwright/test';
 
+/** A Theia app, in the folder `<app>-app`, and the Playwright project that tests it. */
 export type App = 'browser' | 'electron';
 
+/** Repository root. */
 const root = path.resolve(__dirname, '..', '..');
+/** Folder of the downloaded plugins. */
 const plugins = path.join(root, 'plugins');
+/** Returns `app`'s folder. */
 const appDir = (app: App): string => path.join(root, `${app}-app`);
 
 /**
- * A workspace in a temporary folder, at a path without symbolic links. The Electron app opens a workspace at
- * its real path, so on macOS, where the temporary folder is under /var, a link to /private/var, the explorer's
- * nodes would not have the IDs that TheiaApp looks for.
+ * A workspace in a new temporary folder, at a path without symbolic links.
+ *
+ * The Electron app opens a workspace at its real path, so on macOS, where the temporary folder is under /var, a
+ * link to /private/var, the explorer's nodes would not have the IDs that TheiaApp looks for.
  */
 export class Workspace extends TheiaWorkspace {
+    /** Creates the folder, into which `initialize` copies `pathOfFilesToInitialize`. */
     constructor(pathOfFilesToInitialize?: string[]) {
         super(pathOfFilesToInitialize);
         this.workspacePath = fs.realpathSync.native(this.workspacePath);
     }
 }
 
+/** Opens the app with `workspace`, closing the one opened before, and returns it as a `factory` once initialized. */
 export type Launch = <T extends TheiaApp = TheiaApp>(workspace?: Workspace, factory?: TheiaAppFactory<T>) => Promise<T>;
 
 /**
- * `launch` opens the app of the test's project with a workspace, closing the
- * app it opened before. Each worker has its own backend. When a test fails,
- * a screenshot of the app is attached to its report.
+ * Playwright's `test`, with `launch`, which opens the app of the test's project. Each worker has its own backend
+ * and Theia config folder, and a failed test gets a screenshot of the app.
  */
 export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launch: Launch, launched: { page?: Page } }>({
+    /** App of the test's project. */
     app: ['browser', { option: true, scope: 'worker' }],
-    // The page that `launch` opened last.
+    /** Page that `launch` opened last, if any. */
     launched: [async ({}, use) => use({}), { scope: 'worker' }],
+    /** Opens the app of the test's project with a workspace. */
     launch: [async ({ app, playwright, headless, launchOptions, launched }, use) => {
         // Settings and recent workspaces of their own, instead of the developer's.
         const env = { ...process.env, THEIA_CONFIG_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'theia-config-')) };
         let browser: Promise<Browser> | undefined;
-        let backend: { url: Promise<string>, stop: () => Promise<unknown> } | undefined;
+        let backend: Backend | undefined;
         /**
          * Closes what the last `launch` opened, even if it is still starting, e.g. after a timeout. What failed
          * to start has nothing to close, and its error was already reported by the test that launched it.
          */
         let close = async (): Promise<unknown> => undefined;
-        /** Opens a page of the app. */
+        /** Opens `workspace` in the app, and returns its page. */
         const open = async (workspace: TheiaWorkspace): Promise<Page> => {
             if (app === 'browser') {
                 browser ??= playwright.chromium.launch({ ...launchOptions, headless });
@@ -94,7 +102,10 @@ export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launc
             await (await browser?.catch(() => undefined))?.close();
         }
     }, { scope: 'worker' }],
-    // Playwright's own `screenshot` option only covers the pages it creates for each test.
+    /**
+     * Attaches a screenshot of the app to a failed test's report, since Playwright's own `screenshot` option only
+     * covers the pages it creates for each test.
+     */
     screenshotOnFailure: [async ({ launched }, use, testInfo) => {
         await use();
         if (testInfo.status !== testInfo.expectedStatus && launched.page) {
@@ -104,8 +115,9 @@ export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launc
 });
 
 /**
- * Attaches a screenshot of `page` to the report. Best effort: a page that closed or hangs cannot be captured,
- * and the test's own error is what matters.
+ * Attaches a screenshot of `page` to `testInfo`'s report, if `page` can be captured within 5 seconds.
+ *
+ * Best effort: a page that closed or hangs cannot be captured, and the test's own error is what matters.
  */
 async function attachScreenshot(page: Page, testInfo: TestInfo): Promise<void> {
     const screenshot = page.isClosed() ? undefined : await page.screenshot({ timeout: 5000 }).catch(() => undefined);
@@ -114,8 +126,16 @@ async function attachScreenshot(page: Page, testInfo: TestInfo): Promise<void> {
     }
 }
 
-/** Starts the browser app's backend on a free port. */
-function startBackend(env: NodeJS.ProcessEnv): { url: Promise<string>, stop: () => Promise<unknown> } {
+/** A running backend of the browser app. */
+interface Backend {
+    /** URL it listens on, once it does; rejected if it exits first. */
+    url: Promise<string>
+    /** Stops it, with its child processes, and resolves once it exited. */
+    stop: () => Promise<unknown>
+}
+
+/** Starts the browser app's backend on a free port, with `env`. */
+function startBackend(env: NodeJS.ProcessEnv): Backend {
     const backend = spawn(process.execPath, ['lib/backend/main.js', '--port=0', `--plugins=local-dir:${plugins}`], {
         cwd: appDir('browser'),
         env,
