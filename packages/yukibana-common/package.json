@@ -16,7 +16,6 @@
   "scripts": {
     "prepare": "tsc --build",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "build": "tsc --build",
     "watch": "tsc --build --watch"
   }
 }
