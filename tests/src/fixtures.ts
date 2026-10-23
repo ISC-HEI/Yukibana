@@ -4,6 +4,7 @@
 import { _electron, test as base, Browser, Page } from '@playwright/test';
 import { TheiaApp, TheiaAppFactory, TheiaWorkspace } from '@theia/playwright';
 import { spawn } from 'child_process';
+import * as fs from 'fs';
 import * as path from 'path';
 
 export { expect } from '@playwright/test';
@@ -14,7 +15,19 @@ const root = path.resolve(__dirname, '..', '..');
 const plugins = path.join(root, 'plugins');
 const appDir = (app: App): string => path.join(root, `${app}-app`);
 
-export type Launch = <T extends TheiaApp = TheiaApp>(workspace?: TheiaWorkspace, factory?: TheiaAppFactory<T>) => Promise<T>;
+/**
+ * A workspace in a temporary folder, at a path without symbolic links. The Electron app opens a workspace at
+ * its real path, so on macOS, where the temporary folder is under /var, a link to /private/var, the explorer's
+ * nodes would not have the IDs that TheiaApp looks for.
+ */
+export class Workspace extends TheiaWorkspace {
+    constructor(pathOfFilesToInitialize?: string[]) {
+        super(pathOfFilesToInitialize);
+        this.workspacePath = fs.realpathSync.native(this.workspacePath);
+    }
+}
+
+export type Launch = <T extends TheiaApp = TheiaApp>(workspace?: Workspace, factory?: TheiaAppFactory<T>) => Promise<T>;
 
 /**
  * `launch` opens the app of the test's project with a workspace, closing the
@@ -50,7 +63,7 @@ export const test = base.extend<{}, { app: App, launch: Launch }>({
             return (await electronApp).firstWindow();
         };
 
-        await use(async (workspace = new TheiaWorkspace(), factory = TheiaApp as TheiaAppFactory<never>) => {
+        await use(async (workspace = new Workspace(), factory = TheiaApp as TheiaAppFactory<never>) => {
             await close();
             workspace.initialize();
             const page = await open(workspace);

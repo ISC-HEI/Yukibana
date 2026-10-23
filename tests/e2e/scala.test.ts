@@ -7,9 +7,9 @@
  * SPDX-License-Identifier: MIT
  ********************************************************************************/
 
-import { TheiaApp, TheiaTextEditor, TheiaWorkspace } from '@theia/playwright';
+import { TheiaApp, TheiaTextEditor } from '@theia/playwright';
 import * as path from 'path';
-import { expect, test } from '../src/fixtures';
+import { expect, test, Workspace } from '../src/fixtures';
 import { PatchedTheiaApp } from '../src/theia-explorer-patch';
 import { TheiaLanguageIndicator } from '../src/theia-language-indicator';
 
@@ -17,7 +17,7 @@ test.describe('Scala extension', () => {
     let app: TheiaApp;
 
     test.beforeAll(async ({ launch }) => {
-        const ws = new TheiaWorkspace([
+        const ws = new Workspace([
             path.resolve(__dirname, '..', 'resources')
         ]);
         app = await launch(ws, PatchedTheiaApp);
