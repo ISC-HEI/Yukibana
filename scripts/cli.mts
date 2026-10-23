@@ -7,7 +7,7 @@
 //   pnpm build [browser|electron] [--dev]      both apps by default, production unless --dev
 //   pnpm start [browser|electron] [--prod]     electron by default, builds in development mode
 //              [-- <theia start arguments>]
-//   pnpm package [--preview|--publish]         packages the electron app into electron-app/dist
+//   pnpm package [--preview]                   packages the electron app into electron-app/dist
 //   pnpm download:plugins [--force]
 //
 // The native modules (node-pty, keytar, drivelist, native-keymap) use Node-API, so the builds that pnpm installs
@@ -45,15 +45,6 @@ function exec(cwd: string, script: string, args: string[]): void {
     }
 }
 
-/** Runs the package script `script` in `cwd`, and exits with its status if it fails. */
-function pnpmRun(cwd: string, script: string): void {
-    // pnpm is a .cmd shim on Windows, which can only be started through a shell.
-    const result = spawnSync(`pnpm run ${script}`, { cwd, stdio: 'inherit', shell: true });
-    if (result.status !== 0) {
-        process.exit(result.status ?? 1);
-    }
-}
-
 /**
  * Compiles the extensions, and bundles `apps` in development mode iff `dev`, else in production mode.
  *
@@ -63,13 +54,14 @@ function build(apps: App[], dev: boolean): void {
     exec(root, tsc, ['--build']);
     for (const app of apps) {
         exec(appDir(app), theia, ['build', `--app-target=${app}`, ...(dev ? ['--mode', 'development'] : [])]);
-        if (app === 'electron') {
-            exec(appDir(app), path.join(appDir(app), 'scripts', 'fix-chrome-sandbox.js'), []);
-        }
     }
 }
 
-/** Downloads the plugins listed in package.json, unless the same list was downloaded before and not `force`. */
+/**
+ * Downloads the plugins listed in package.json, unless the same list was downloaded before and not `force`.
+ *
+ * Theia skips every plugin that is already there, so the plugins downloaded before are deleted first.
+ */
 function downloadPlugins(force: boolean): void {
     const pluginsDir = path.join(root, 'plugins');
     const stampFile = path.join(pluginsDir, '.download-inputs');
@@ -79,10 +71,20 @@ function downloadPlugins(force: boolean): void {
         console.log('Plugins: up to date');
         return;
     }
-    fs.rmSync(stampFile, { force: true });
+    fs.rmSync(pluginsDir, { recursive: true, force: true });
     exec(root, theia, ['download:plugins', '--rate-limit=15', '--parallel=false']);
     makeWritable(pluginsDir);
     fs.writeFileSync(stampFile, inputs);
+}
+
+/** Packages the Electron app into electron-app/dist, as an unpacked folder iff `preview`. */
+function packageElectron(preview: boolean): void {
+    const dir = appDir('electron');
+    fs.rmSync(path.join(dir, 'dist'), { recursive: true, force: true });
+    exec(dir, path.join(dir, 'scripts', 'patch-ripgrep-asar-path.mjs'), []);
+    const electronBuilder = createRequire(path.join(dir, 'package.json')).resolve('electron-builder/cli.js');
+    // electron-builder.yml only publishes to generic servers, to which electron-builder uploads nothing anyway.
+    exec(dir, electronBuilder, ['-c.mac.identity=null', ...(preview ? ['--dir'] : ['--publish', 'never'])]);
 }
 
 /**
@@ -137,18 +139,18 @@ const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Pa
             const [app] = parseApp(positionals, ['electron']);
             build([app], !values.prod);
             downloadPlugins(false);
+            if (app === 'electron') {
+                exec(appDir(app), path.join(appDir(app), 'scripts', 'fix-chrome-sandbox.js'), []);
+            }
             exec(appDir(app), theia, ['start', '--plugins=local-dir:../plugins', ...passthrough]);
         },
     },
     package: {
-        options: { preview: { type: 'boolean' }, publish: { type: 'boolean' } },
+        options: { preview: { type: 'boolean' } },
         run: ({ values }) => {
-            if (values.preview && values.publish) {
-                fail('Use either --preview or --publish, not both');
-            }
             build(['electron'], false);
             downloadPlugins(false);
-            pnpmRun(appDir('electron'), values.preview ? 'package:preview' : values.publish ? 'deploy' : 'package');
+            packageElectron(!!values.preview);
         },
     },
     'download:plugins': {

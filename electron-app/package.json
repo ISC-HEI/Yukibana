@@ -53,20 +53,12 @@
   "devDependencies": {
     "@theia/bundle-plugin": "~1.75.0",
     "@theia/cli": "~1.75.0",
-    "app-builder-lib": "^26.15.3",
     "electron": "42.8.1",
-    "electron-builder": "^26.15.3",
-    "electron-osx-sign": "^0.6.0",
-    "rimraf": "^5.0.0"
+    "electron-builder": "^26.15.3"
   },
   "scripts": {
     "clean": "theia clean",
     "watch": "theia build --watch --mode development",
-    "clean:dist": "rimraf dist",
-    "prepackage": "node scripts/patch-ripgrep-asar-path.mjs",
-    "package": "pnpm run clean:dist && pnpm run prepackage && electron-builder -c.mac.identity=null --publish never",
-    "package:preview": "pnpm run clean:dist && pnpm run prepackage && electron-builder -c.mac.identity=null --dir",
-    "deploy": "pnpm run clean:dist && pnpm run prepackage && electron-builder -c.mac.identity=null --publish always",
     "lint": "eslint --ext js,jsx,ts,tsx scripts",
     "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix"
   },
