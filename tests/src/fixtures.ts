@@ -31,11 +31,14 @@ export type Launch = <T extends TheiaApp = TheiaApp>(workspace?: Workspace, fact
 
 /**
  * `launch` opens the app of the test's project with a workspace, closing the
- * app it opened before. Each worker has its own backend.
+ * app it opened before. Each worker has its own backend. When a test fails,
+ * a screenshot of the app is attached to its report.
  */
-export const test = base.extend<{}, { app: App, launch: Launch }>({
+export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launch: Launch, launched: { page?: Page } }>({
     app: ['browser', { option: true, scope: 'worker' }],
-    launch: [async ({ app, playwright, headless, launchOptions }, use) => {
+    // The page that `launch` opened last.
+    launched: [async ({}, use) => use({}), { scope: 'worker' }],
+    launch: [async ({ app, playwright, headless, launchOptions, launched }, use) => {
         let browser: Promise<Browser> | undefined;
         let backend: { url: Promise<string>, stop: () => Promise<unknown> } | undefined;
         /**
@@ -67,6 +70,7 @@ export const test = base.extend<{}, { app: App, launch: Launch }>({
             await close();
             workspace.initialize();
             const page = await open(workspace);
+            launched.page = page;
             const theiaApp = new factory(page, workspace, app === 'electron');
             await theiaApp.waitForShellAndInitialized();
             return theiaApp;
@@ -76,6 +80,18 @@ export const test = base.extend<{}, { app: App, launch: Launch }>({
         await backend?.stop();
         await (await browser?.catch(() => undefined))?.close();
     }, { scope: 'worker' }],
+    // Playwright's own `screenshot` option only covers the pages it creates for each test.
+    screenshotOnFailure: [async ({ launched }, use, testInfo) => {
+        await use();
+        const { page } = launched;
+        if (testInfo.status !== testInfo.expectedStatus && page && !page.isClosed()) {
+            // Best effort: a page that crashed cannot be captured, and the test's own error is what matters.
+            const screenshot = await page.screenshot().catch(() => undefined);
+            if (screenshot) {
+                await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/png' });
+            }
+        }
+    }, { auto: true }],
 });
 
 /** Starts the browser app's backend on a free port. */
