@@ -58,9 +58,7 @@
   },
   "scripts": {
     "clean": "theia clean",
-    "watch": "theia build --watch --mode development",
-    "lint": "eslint --ext js,jsx,ts,tsx scripts",
-    "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix"
+    "watch": "theia build --watch --mode development"
   },
   "theia": {
     "target": "electron",
