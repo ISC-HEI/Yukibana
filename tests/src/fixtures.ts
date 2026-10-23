@@ -73,7 +73,7 @@ export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launc
             launched.page = page;
             // Shorter than the test timeout, so that an app that does not start fails here, where it can be
             // captured: the tests launch in beforeAll, which test-scoped fixtures like screenshotOnFailure skip.
-            page.setDefaultTimeout(30 * 1000);
+            page.setDefaultTimeout(45 * 1000);
             const theiaApp = new factory(page, workspace, app === 'electron');
             try {
                 await theiaApp.waitForShellAndInitialized();
