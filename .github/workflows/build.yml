@@ -25,9 +25,6 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  NODE_OPTIONS: --max_old_space_size=4096
-
 jobs:
   check:
     name: Lint and unit tests
@@ -44,11 +41,6 @@ jobs:
           runtime: node@24.x
           cache: true
           install: false
-
-      - name: Use Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
 
       - name: Install dependencies
         run: pnpm ci --fetch-timeout 100000
@@ -88,11 +80,6 @@ jobs:
           runtime: node@24.x
           cache: true
           install: false
-
-      - name: Use Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
 
       - name: Install dependencies
         shell: bash
@@ -160,11 +147,6 @@ jobs:
           runtime: node@24.x
           cache: true
           install: false
-
-      - name: Use Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
 
       - name: Install dependencies
         shell: bash
