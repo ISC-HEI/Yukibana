@@ -69,52 +69,53 @@ export class CloudServiceImpl implements CloudService {
     }
 
     async downloadProject(projectId: string): Promise<DownloadResult> {
-        const starter = await this.client.downloadStarter(projectId);
+        try {
+            const starter = await this.client.downloadStarter(projectId);
 
-        const source = Buffer.from(starter.buffer, starter.byteOffset, starter.byteLength);
-        const tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'yukibana-project-download-'));
-        const rootDir = await this.extractTo(source, tmpDir);
-
-        if (rootDir === undefined) {
-            return { ok: false, reason: 'error' };
+            const source = Buffer.from(starter.buffer, starter.byteOffset, starter.byteLength);
+            const tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'yukibana-project-download-'));
+            const rootDir = await this.extractTo(source, tmpDir);
+            if (rootDir === undefined) {
+                return { ok: false, reason: 'error' };
+            }
+            return { ok: true, uri: rootDir };
+        } catch (e) {
+            return {
+                ok: false,
+                reason: (e instanceof Error ? e.message : String(e)),
+            };
         }
-        return { ok: true, uri: rootDir };
     }
 
     private async extractTo(buffer: Buffer, outDir: string): Promise<URI | undefined> {
-        try {
-            const topLevel = new Map<string, boolean>();
+        const topLevel = new Map<string, boolean>();
 
-            await new Promise((resolve, reject) => {
-                const extract = tar.x({ cwd: outDir });
-                extract.on('entry', (entry: tar.ReadEntry) => {
-                    const segments = entry.path
-                        .replace(/^(\.\/)+/, '')
-                        .split('/')
-                        .filter(s => s.length > 0);
+        await new Promise((resolve, reject) => {
+            const extract = tar.x({ cwd: outDir });
+            extract.on('entry', (entry: tar.ReadEntry) => {
+                const segments = entry.path
+                    .replace(/^(\.\/)+/, '')
+                    .split('/')
+                    .filter(s => s.length > 0);
 
-                    if (segments.length === 0) {
-                        return;
-                    }
+                if (segments.length === 0) {
+                    return;
+                }
 
-                    const name = segments[0];
-                    const isDirectory = segments.length > 1 || entry.type === 'Directory';
-                    topLevel.set(name, (topLevel.get(name) ?? false) || isDirectory);
-                });
-                extract.on('error', reject);
-                extract.on('close', resolve);
-                extract.end(buffer);
+                const name = segments[0];
+                const isDirectory = segments.length > 1 || entry.type === 'Directory';
+                topLevel.set(name, (topLevel.get(name) ?? false) || isDirectory);
             });
-            // A starter that is one folder keeps its name; loose files get a folder named after the project
-            const [topDirectory] = topLevel.size === 1 ? [...topLevel] : [];
-            const projectPath = topDirectory && topDirectory[1]
-                ? path.join(outDir, topDirectory[0])
-                : outDir;
-            return FileUri.create(projectPath);
-        } catch (e) {
-            this.logger.error(e instanceof Error ? e : String(e));
-            return undefined;
-        }
+            extract.on('error', reject);
+            extract.on('close', resolve);
+            extract.end(buffer);
+        });
+        // A starter that is one folder keeps its name; loose files get a folder named after the project
+        const [topDirectory] = topLevel.size === 1 ? [...topLevel] : [];
+        const projectPath = topDirectory && topDirectory[1]
+            ? path.join(outDir, topDirectory[0])
+            : outDir;
+        return FileUri.create(projectPath);
     }
 
     canSubmitProject(projectId: string): Promise<SubmitAvailability> {
