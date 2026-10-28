@@ -9,11 +9,8 @@ import * as fs from 'fs';
 import { SubmissionPreview, SubmissionService } from '../common/submission-protocol';
 
 /**
- * Submissions made with the library, `yukibana submit`'s own code, held in memory until released.
- *
- * Until October 2026 the IDE packed submissions itself, into a temporary file: its rules differed from the CLI's
- * (no build output, size cap or link checks, and a misspelt `node_modules`), and on Windows the file was never
- * deleted. Now the archive exists only in memory, and only what the rules keep is ever read.
+ * Submissions packed by `@yukibana/cli`, so the IDE sends exactly the files `yukibana submit` would, held in memory
+ * under an id from `prepare` until `release`. Nothing is written to disk unless `save` is asked to.
  */
 @injectable()
 export class SubmissionServiceImpl implements SubmissionService {
