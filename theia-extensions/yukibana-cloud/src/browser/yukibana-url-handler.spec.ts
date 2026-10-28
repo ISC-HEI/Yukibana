@@ -10,6 +10,8 @@ FrontendApplicationConfigProvider.set({});
 import { CommandService, ILogger, MessageService, URI } from '@theia/core';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { CopyFileOptions, FileDeleteOptions, FileOperationOptions, FileStat, FileStatWithMetadata, ResolveFileOptions } from '@theia/filesystem/lib/common/files';
 import { TelemetryService } from '@theia/telemetry/lib/common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { Project } from '@yukibana/cli';
@@ -17,8 +19,8 @@ import { expect } from 'chai';
 import { CloudService, DownloadResult, ProjectLookup } from '../common/cloud-protocol';
 import { CloudTelemetry } from '../common/cloud-telemetry';
 import { CloudAccountService } from './cloud-account-service';
-import { YukibanaOpenHandler } from './yukibana-url-handler';
 import { YukibanaProjectOpener } from './yukibana-project-opener';
+import { YukibanaOpenHandler } from './yukibana-url-handler';
 
 disableJSDom();
 
@@ -63,7 +65,7 @@ interface Mocks {
 }
 
 function setup(options: Options = {}): Mocks {
-    const mocks: Omit<Mocks, 'handler'> = {
+    const mocks: Omit<Mocks, 'handler' | 'opener'> = {
         progress: { messages: [], cancelled: 0, shown: false },
         errors: [],
         reports: [],
@@ -71,7 +73,6 @@ function setup(options: Options = {}): Mocks {
         folderDialogs: 0,
         downloads: [],
         commands: [],
-        opener: new TestProjectOpener(),
     };
     const messages = {
         showProgress: async () => {
@@ -117,6 +118,15 @@ function setup(options: Options = {}): Mocks {
             loggedIn ||= options.loginWorks ?? false;
         },
     };
+    const fileService = {
+        copy: async (source: URI, target: URI, _options?: CopyFileOptions): Promise<FileStatWithMetadata> => ({} as FileStatWithMetadata),
+        exists: async (resource: URI): Promise<boolean> => false,
+        resolve: async (resource: URI, _options?: ResolveFileOptions | undefined): Promise<FileStat> => ({
+            isDirectory: resource.path.ext === '',
+            children: undefined,
+        } as FileStat),
+        delete: async (resource: URI, _options?: FileOperationOptions & Partial<FileDeleteOptions>): Promise<void> => { },
+    };
     const opener = new TestProjectOpener();
     Object.assign(opener, {
         logger: new MockLogger() as ILogger,
@@ -124,6 +134,7 @@ function setup(options: Options = {}): Mocks {
         fileDialogs: fileDialogs as unknown as FileDialogService,
         workspaces: workspaces as unknown as WorkspaceService,
         messages: messages as unknown as MessageService,
+        files: fileService as unknown as FileService,
         telemetry: telemetry as unknown as TelemetryService,
         accounts: accounts as unknown as CloudAccountService,
         commands: commands as unknown as CommandService,
@@ -136,7 +147,7 @@ function setup(options: Options = {}): Mocks {
         commands: commands as unknown as CommandService,
         opener: opener as unknown as YukibanaProjectOpener,
     });
-    return { handler, ...mocks };
+    return { handler, opener, ...mocks };
 }
 
 function openUri(id?: string): URI {
