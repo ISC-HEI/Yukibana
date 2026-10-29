@@ -1,7 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "unicorn", "oxc", "react"],
-  "jsPlugins": ["@stylistic/eslint-plugin"],
   "options": {
     "typeAware": true
   },
@@ -21,9 +20,6 @@
     "typescript/consistent-type-definitions": "error",
     "typescript/no-explicit-any": "error",
     "unicorn/no-null": "error",
-    // Single quotes, in JSX attributes too, unless another kind avoids escaping one. oxfmt picks between ' and " the same way, but leaves template literals alone.
-    "@stylistic/quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": "avoidEscape" }],
-    "@stylistic/jsx-quotes": ["error", "prefer-single"],
 
     "typescript/await-thenable": "warn",
     "typescript/no-deprecated": "warn",

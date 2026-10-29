@@ -29,7 +29,6 @@
     "test:e2e": "pnpm --filter yukibana-tests exec playwright test"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "5.10.0",
     "@theia/cli": "~1.76.0",
     "@theia/core": "~1.76.0",
     "@types/node": "26.6.5",
