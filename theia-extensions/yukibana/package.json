@@ -39,7 +39,8 @@
   },
   "theiaExtensions": [
     {
-      "frontend": "lib/browser/yukibana-frontend-module"
+      "frontend": "lib/browser/yukibana-frontend-module",
+      "backend": "lib/node/yukibana-backend-module"
     }
   ]
 }

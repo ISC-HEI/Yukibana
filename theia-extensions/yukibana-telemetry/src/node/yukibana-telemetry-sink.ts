@@ -1,9 +1,10 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { injectable } from '@theia/core/shared/inversify';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { TelemetryEvent } from '@theia/telemetry/lib/common/telemetry-protocol';
 import { TelemetrySink } from '@theia/telemetry/lib/node';
+import { IdentityService } from 'yukibana-ext/lib/node/identity-service';
 
 const BATCH_SIZE = 50;
 const MAX_DRAIN_DELAY_MS = 10_000;
@@ -17,6 +18,8 @@ export class YukibanaTelemetrySink implements TelemetrySink {
 
     private queue: TelemetryEvent[] = [];
     private timer?: NodeJS.Timeout;
+
+    @inject(IdentityService) protected readonly identityService!: IdentityService;
 
     handle(event: TelemetryEvent): void {
         this.queue.push(event);
@@ -42,12 +45,19 @@ export class YukibanaTelemetrySink implements TelemetrySink {
     }
 
     private async sendBatch(batch: TelemetryEvent[]): Promise<void> {
+        const identity = await this.identityService.getIdentity();
         const res = await fetch(ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(batch),
+            body: JSON.stringify({
+                identity: {
+                    provider: this.identityService.ID,
+                    id: identity,
+                },
+                events: batch,
+            }),
             signal: AbortSignal.timeout(5000),
         });
         if (!res.ok) {
