@@ -83,7 +83,6 @@ function downloadPlugins(): void {
 function packageElectron(preview: boolean): void {
     const dir = appDir('electron');
     fs.rmSync(path.join(dir, 'dist'), { recursive: true, force: true });
-    exec(dir, path.join(dir, 'scripts', 'patch-ripgrep-asar-path.mjs'), []);
     const electronBuilder = createRequire(path.join(dir, 'package.json')).resolve('electron-builder/cli.js');
     // electron-builder.yml only publishes to generic servers, to which electron-builder uploads nothing anyway.
     exec(dir, electronBuilder, ['-c.mac.identity=null', ...(preview ? ['--dir'] : ['--publish', 'never'])]);

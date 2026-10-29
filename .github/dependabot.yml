@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # The same age as pnpm's minimumReleaseAge in pnpm-workspace.yaml.
+    cooldown:
+      default-days: 7
+    groups:
+      # Theia's version check fails on any mix of @theia/* versions.
+      theia:
+        patterns: ["@theia/*"]
+      vitest:
+        patterns: ["vitest", "@vitest/*"]
+      react:
+        patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
+    ignore:
+      # Theia pins the Electron version as a peer dependency of @theia/electron.
+      - dependency-name: electron
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7

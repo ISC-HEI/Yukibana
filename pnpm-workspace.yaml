@@ -1,5 +1,7 @@
 saveExact: true
 linkWorkspacePackages: true
+# Resolves only versions at least 7 days old (in minutes), as Dependabot proposes them.
+minimumReleaseAge: 10080
 nodeLinker: hoisted # Needed for Theia's version check
 packages:
   - packages/*
