@@ -45,7 +45,7 @@
         "otherFiles": "'{0}' contient déjà d'autres fichiers. Choisissez un autre nom ou emplacement.",
         "notAFolder": "'{0}' n'est pas un dossier. Choisissez un autre nom ou emplacement.",
         "nameEmpty": "Saisissez un nom pour le dossier",
-        "nameSpaces": "Un nom de dossier ne peut pas commencer ni finir par une espace",
+        "nameSpaces": "Un nom de dossier ne peut pas commencer ni finir par un espace",
         "nameDots": "'{0}' ne peut pas nommer un dossier",
         "nameCharacters": "Un nom de dossier ne peut contenir aucun de ces caractères: / \\ < > : \" | ? *",
         "leftOut": "Certains fichiers de départ n'ont pas été décompressés: {0}"
