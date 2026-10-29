@@ -29,4 +29,8 @@ test.describe('Scala extension', () => {
         await languageIndicator.waitForVisible();
         expect(await languageIndicator.getLanguage()).toBe('Scala');
     });
+
+    test('should show the Run button in the toolbar', async () => {
+        await expect(app.page.locator('#main-toolbar [data-id="metals.run-current-file"]')).toBeVisible();
+    });
 });
