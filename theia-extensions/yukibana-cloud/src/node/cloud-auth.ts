@@ -44,7 +44,7 @@ export class CloudAuthImpl implements CloudAuth {
     }
 
     async whoAmI(): Promise<CloudAccount | undefined> {
-        if (!await this.service.isLoggedIn()) {
+        if (!(await this.service.isLoggedIn())) {
             return undefined;
         }
         try {

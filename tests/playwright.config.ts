@@ -11,9 +11,7 @@ export default defineConfig<{}, { app: App }>({
     timeout: 60 * 1000,
     workers: process.env.CI ? 1 : 2,
     retries: process.env.CI ? 1 : 0,
-    reporter: process.env.CI
-        ? [['github'], ['list'], ['html', { open: 'never' }]]
-        : [['list'], ['html', { open: 'on-failure' }]],
+    reporter: process.env.CI ? [['github'], ['list'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'on-failure' }]],
     projects: [
         { name: 'browser', use: { app: 'browser' } },
         // The Electron app is single-instance: a second one quits.

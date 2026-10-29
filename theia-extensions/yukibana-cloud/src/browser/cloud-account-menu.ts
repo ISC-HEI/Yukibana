@@ -8,10 +8,13 @@ import { CloudAccount } from '../common/cloud-protocol';
 import { CloudAccountService, CloudAccountState } from './cloud-account-service';
 import { LoginCommand, LogoutCommand, SwitchAccountCommand } from './command-contribution';
 
-export const RefreshAccountCommand: Command = Command.toLocalizedCommand({
-    id: 'yukibana.cloudRefreshAccount',
-    label: 'Refresh cloud registry account',
-}, 'yukibana/cloud/refreshAccount');
+export const RefreshAccountCommand: Command = Command.toLocalizedCommand(
+    {
+        id: 'yukibana.cloudRefreshAccount',
+        label: 'Refresh cloud registry account',
+    },
+    'yukibana/cloud/refreshAccount',
+);
 
 /** The dropdown that opens from the account in the status bar. */
 export const ACCOUNT_MENU: MenuPath = ['yukibana_cloud_account_menu'];
@@ -41,20 +44,19 @@ function loggedInAs(account: CloudAccount): string {
 /** What the status bar's tooltip and the menu's first line say when nobody is shown as logged in. */
 function statusLine(state: Exclude<CloudAccountState, { kind: 'logged-in' }>): string {
     switch (state.kind) {
-        case 'logged-out': return nls.localize('yukibana/cloud/account/loggedOut', 'Not logged in');
-        case 'error': return nls.localize('yukibana/cloud/account/unavailable', 'Could not check your account: {0}', state.reason);
-        case 'unknown': return nls.localize('yukibana/cloud/account/checking', 'Checking your account...');
+        case 'logged-out':
+            return nls.localize('yukibana/cloud/account/loggedOut', 'Not logged in');
+        case 'error':
+            return nls.localize('yukibana/cloud/account/unavailable', 'Could not check your account: {0}', state.reason);
+        case 'unknown':
+            return nls.localize('yukibana/cloud/account/checking', 'Checking your account...');
     }
 }
 
 export function accountMenuItems(state: CloudAccountState): AccountMenuItem[] {
     switch (state.kind) {
         case 'logged-in':
-            return [
-                info('email', loggedInAs(state.account)),
-                action(SwitchAccountCommand, nls.localize('yukibana/cloud/submission/switchAccount', 'Switch account')),
-                logOut(),
-            ];
+            return [info('email', loggedInAs(state.account)), action(SwitchAccountCommand, nls.localize('yukibana/cloud/submission/switchAccount', 'Switch account')), logOut()];
         case 'logged-out':
             return [info('status', statusLine(state)), logIn()];
         case 'error':
@@ -72,8 +74,8 @@ export function accountStatusBarEntry(state: CloudAccountState, onclick?: (e: Mo
     }
     const text = {
         'logged-out': `$(account) ${nls.localize('yukibana/cloud/account/logIn', 'Log in')}`,
-        'error': `$(warning) ${nls.localize('yukibana/cloud/account/unavailableShort', 'Account unavailable')}`,
-        'unknown': '$(sync~spin) $(account)',
+        error: `$(warning) ${nls.localize('yukibana/cloud/account/unavailableShort', 'Account unavailable')}`,
+        unknown: '$(sync~spin) $(account)',
     }[state.kind];
     return { ...base, text, tooltip: statusLine(state) };
 }
@@ -116,21 +118,31 @@ export class CloudAccountMenuContribution implements FrontendApplicationContribu
     }
 
     protected update(state: CloudAccountState): void {
-        this.statusBar.setElement(ACCOUNT_STATUS_BAR_ID, accountStatusBarEntry(state, e => this.showMenu(e)));
+        this.statusBar.setElement(
+            ACCOUNT_STATUS_BAR_ID,
+            accountStatusBarEntry(state, e => this.showMenu(e)),
+        );
         this.menuItems.dispose();
         for (const [index, item] of accountMenuItems(state).entries()) {
             if (item.group === ACCOUNT_INFO_GROUP) {
                 // Menus hide commands without a handler, so information lines get one that is never enabled
-                this.menuItems.push(this.commands.registerCommand({ id: item.commandId }, {
-                    execute: () => undefined,
-                    isEnabled: () => false,
-                }));
+                this.menuItems.push(
+                    this.commands.registerCommand(
+                        { id: item.commandId },
+                        {
+                            execute: () => undefined,
+                            isEnabled: () => false,
+                        },
+                    ),
+                );
             }
-            this.menuItems.push(this.menus.registerMenuAction(item.group, {
-                commandId: item.commandId,
-                label: item.label,
-                order: String(index),
-            }));
+            this.menuItems.push(
+                this.menus.registerMenuAction(item.group, {
+                    commandId: item.commandId,
+                    label: item.label,
+                    order: String(index),
+                }),
+            );
         }
     }
 }

@@ -17,9 +17,7 @@ const isAppImage = !!process.env.APPIMAGE;
 // When packaged with asar, __dirname is inside app.asar (e.g., .../app.asar/scripts)
 // but plugins are in extraResources at .../app/plugins (outside the asar)
 const isInsideAsar = __dirname.includes('.asar');
-const bundledPluginsDir = isInsideAsar
-    ? path.join(process.resourcesPath, 'app', 'plugins')
-    : path.resolve(__dirname, '../', 'plugins');
+const bundledPluginsDir = isInsideAsar ? path.join(process.resourcesPath, 'app', 'plugins') : path.resolve(__dirname, '../', 'plugins');
 
 if (isAppImage) {
     // When running as AppImage, use a user-writable directory for the built-in plugins
@@ -33,7 +31,6 @@ if (isAppImage) {
     const useUserDir = copyBundledPlugins(bundledPluginsDir, userPluginsDir, currentVersion);
     // If copying fails, fall back to the read-only bundled directory (will be improved in follow up of GH-630)
     process.env.THEIA_DEFAULT_PLUGINS = `local-dir:${useUserDir ? userPluginsDir : bundledPluginsDir}`;
-
 } else {
     // Use a set of builtin plugins in our application.
     process.env.THEIA_DEFAULT_PLUGINS = `local-dir:${bundledPluginsDir}`;

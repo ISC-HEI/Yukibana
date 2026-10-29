@@ -90,11 +90,13 @@ export function dueAssignments(projects: readonly Project[], now: number): Assig
             };
         })
         .filter(a => a.closesAt === undefined || a.closesAt > now)
-        .sort((a, b) =>
-            Number(a.submitted) - Number(b.submitted)
-            || URGENCY_ORDER.indexOf(a.urgency) - URGENCY_ORDER.indexOf(b.urgency)
-            || (a.deadline ?? Infinity) - (b.deadline ?? Infinity)
-            || a.project.title.localeCompare(b.project.title));
+        .sort(
+            (a, b) =>
+                Number(a.submitted) - Number(b.submitted) ||
+                URGENCY_ORDER.indexOf(a.urgency) - URGENCY_ORDER.indexOf(b.urgency) ||
+                (a.deadline ?? Infinity) - (b.deadline ?? Infinity) ||
+                a.project.title.localeCompare(b.project.title),
+        );
 }
 
 /**
@@ -103,7 +105,7 @@ export function dueAssignments(projects: readonly Project[], now: number): Assig
  * Suits `Intl.RelativeTimeFormat`: 26 hours is 1 day, 50 minutes is 50 minutes, and anything under
  * a minute is 1 minute.
  */
-export function roughly(ms: number): { readonly value: number, readonly unit: 'minute' | 'hour' | 'day' | 'week' } {
+export function roughly(ms: number): { readonly value: number; readonly unit: 'minute' | 'hour' | 'day' | 'week' } {
     const sign = ms < 0 ? -1 : 1;
     const abs = Math.abs(ms);
     const pick = (value: number, unit: 'minute' | 'hour' | 'day' | 'week') => ({ value: sign * Math.trunc(value) || 0, unit });
@@ -139,9 +141,7 @@ export function calendarDays(from: number, to: number): number {
  */
 export function initials(name: string): string {
     const words = name.split(/[\s\-_.]+/u).filter(w => w.length > 0);
-    const letters = words.length > 1
-        ? [...words[0]].slice(0, 1).concat([...words[1]].slice(0, 1))
-        : [...(words[0] ?? '?')].slice(0, 2);
+    const letters = words.length > 1 ? [...words[0]].slice(0, 1).concat([...words[1]].slice(0, 1)) : [...(words[0] ?? '?')].slice(0, 2);
     return letters.join('').toUpperCase();
 }
 
@@ -183,9 +183,7 @@ export function recentProject(uri: URI, home?: URI, format = OS.backend.isWindow
     const workspaceFile = WORKSPACE_FILE.test(uri.path.base);
     const name = uri.path.base.replace(WORKSPACE_FILE, '') || uri.path.toString();
     const relative = home?.path.relative(uri.path);
-    const path = relative !== undefined && home?.scheme === uri.scheme
-        ? new Path(relative.toString() ? `~/${relative.toString()}` : '~')
-        : uri.path;
+    const path = relative !== undefined && home?.scheme === uri.scheme ? new Path(relative.toString() ? `~/${relative.toString()}` : '~') : uri.path;
     return { uri, name, location: path.fsPath(format), workspaceFile };
 }
 
@@ -211,5 +209,9 @@ export function projectIdOf(configText: string): string | undefined {
 /** Returns `true` iff every word of `query` appears in `fields`, ignoring case: "lab 3 cs" finds "Lab 3" of CS101. */
 export function matches(query: string, ...fields: readonly string[]): boolean {
     const haystack = fields.join(' ').toLocaleLowerCase();
-    return query.toLocaleLowerCase().split(/\s+/).filter(w => w.length > 0).every(w => haystack.includes(w));
+    return query
+        .toLocaleLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 0)
+        .every(w => haystack.includes(w));
 }

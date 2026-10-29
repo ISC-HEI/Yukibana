@@ -10,38 +10,33 @@ export enum ConflictResolutionStrategy {
     CANCEL,
     RELOCATE,
     RENAME,
-    OPEN
+    OPEN,
 }
 
-export type ConflictResolution = {
-    strategy: ConflictResolutionStrategy.RENAME,
-    newName: string
-} | {
-    strategy: Exclude<ConflictResolutionStrategy, ConflictResolutionStrategy.RENAME>
-};
+export type ConflictResolution =
+    | {
+          strategy: ConflictResolutionStrategy.RENAME;
+          newName: string;
+      }
+    | {
+          strategy: Exclude<ConflictResolutionStrategy, ConflictResolutionStrategy.RENAME>;
+      };
 
 export class OpenProjectConflictDialog extends ReactDialog<ConflictResolution> {
     protected strategy: ConflictResolutionStrategy = ConflictResolutionStrategy.CANCEL;
     protected readonly buttons = new Map<ConflictResolutionStrategy, HTMLButtonElement>();
 
-    constructor(protected originalName: string, protected newName: string) {
+    constructor(
+        protected originalName: string,
+        protected newName: string,
+    ) {
         super({
             title: nls.localize('yukibana/cloud/openProject/conflictTitle', 'Project already exists'),
         });
         this.appendCloseButton(nls.localize('yukibana/cloud/openProject/conflictCancel', 'Cancel'));
-        this.appendStrategyButton(
-            nls.localize('yukibana/cloud/openProject/conflictRelocate', 'Choose another location'),
-            ConflictResolutionStrategy.RELOCATE,
-        );
-        this.appendStrategyButton(
-            nls.localize('yukibana/cloud/openProject/conflictRename', 'Rename'),
-            ConflictResolutionStrategy.RENAME,
-        );
-        this.appendStrategyButton(
-            nls.localize('yukibana/cloud/openProject/conflictOpenExisting', 'Open existing'),
-            ConflictResolutionStrategy.OPEN,
-            true,
-        );
+        this.appendStrategyButton(nls.localize('yukibana/cloud/openProject/conflictRelocate', 'Choose another location'), ConflictResolutionStrategy.RELOCATE);
+        this.appendStrategyButton(nls.localize('yukibana/cloud/openProject/conflictRename', 'Rename'), ConflictResolutionStrategy.RENAME);
+        this.appendStrategyButton(nls.localize('yukibana/cloud/openProject/conflictOpenExisting', 'Open existing'), ConflictResolutionStrategy.OPEN, true);
     }
 
     protected appendStrategyButton(label: string, strategy: ConflictResolutionStrategy, primary: boolean = false): void {
@@ -70,26 +65,19 @@ export class OpenProjectConflictDialog extends ReactDialog<ConflictResolution> {
     protected render(): React.ReactNode {
         const details = nls.localize(
             'yukibana/cloud/openProject/conflictDetails',
-            'A project named \'{0}\' already exists in this folder. What do you want to do?',
+            "A project named '{0}' already exists in this folder. What do you want to do?",
             this.originalName,
         );
-        const projectNameLabel = nls.localize(
-            'yukibana/cloud/openProject/conflictName',
-            'Rename to:',
-        );
-        return <div>
-            <p>{details}</p>
+        const projectNameLabel = nls.localize('yukibana/cloud/openProject/conflictName', 'Rename to:');
+        return (
             <div>
-                <label>{projectNameLabel}</label>
-                <input
-                    type='text'
-                    className='theia-input'
-                    defaultValue={this.newName}
-                    onChange={e => this.handleNameChange(e.target.value)}
-                    spellCheck={false}
-                />
+                <p>{details}</p>
+                <div>
+                    <label>{projectNameLabel}</label>
+                    <input type="text" className="theia-input" defaultValue={this.newName} onChange={e => this.handleNameChange(e.target.value)} spellCheck={false} />
+                </div>
             </div>
-        </div>;
+        );
     }
 
     protected handleNameChange(newName: string): void {

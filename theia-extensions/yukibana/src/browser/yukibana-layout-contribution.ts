@@ -23,7 +23,7 @@ import { YukibanaPluginViewRegistry } from './yukibana-plugin-view-registry';
 
 interface WithLayout {
     initializeLayout?(app: FrontendApplication): MaybePromise<void>;
-};
+}
 
 type ConfigWidgetKey = keyof YukibanaConfig['layout']['widgets'];
 
@@ -67,7 +67,7 @@ export class YukibanaLayoutContribution implements FrontendApplicationContributi
         @inject(EditorManager) protected readonly editorManager: EditorManager,
         @inject(AssignmentPaneContribution) protected readonly assignmentPane: AssignmentPaneContribution,
         @inject(AssignmentResolver) protected readonly assignmentResolver: AssignmentResolver,
-    ) { }
+    ) {}
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
         this.logger.debug('Initializing layout');
@@ -111,7 +111,7 @@ export function rebindWithLayoutToggle<T extends WithLayout>(
     isBound: interfaces.IsBound,
     rebind: interfaces.Rebind,
     id: interfaces.ServiceIdentifier<T>,
-    isEnabled: (config: YukibanaConfig) => boolean
+    isEnabled: (config: YukibanaConfig) => boolean,
 ): void {
     if (!isBound(id)) {
         console.log(`rebindWithLayoutToggle: ${String(id)} is not bound`);

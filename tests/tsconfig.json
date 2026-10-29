@@ -6,15 +6,7 @@
     "composite": false,
     "declaration": false,
     "declarationMap": false,
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ]
+    "lib": ["DOM", "DOM.Iterable", "ESNext"]
   },
-  "include": [
-    "*.ts",
-    "src/**/*",
-    "e2e/**/*"
-  ]
+  "include": ["*.ts", "src/**/*", "e2e/**/*"]
 }

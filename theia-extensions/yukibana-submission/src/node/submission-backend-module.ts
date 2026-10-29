@@ -11,9 +11,9 @@ import { SubmissionServiceImpl } from './submission-service';
 export default new ContainerModule(bind => {
     bind(SubmissionServiceImpl).toSelf().inSingletonScope();
     bind(SubmissionService).toService(SubmissionServiceImpl);
-    bind(ConnectionHandler).toDynamicValue(
-        ctx => new RpcConnectionHandler(submissionServicePath, () => ctx.container.get(SubmissionService))
-    ).inSingletonScope();
+    bind(ConnectionHandler)
+        .toDynamicValue(ctx => new RpcConnectionHandler(submissionServicePath, () => ctx.container.get(SubmissionService)))
+        .inSingletonScope();
 
     bind(YukibanaSubmissionLocalizationContribution).toSelf().inSingletonScope();
     bind(LocalizationContribution).toService(YukibanaSubmissionLocalizationContribution);

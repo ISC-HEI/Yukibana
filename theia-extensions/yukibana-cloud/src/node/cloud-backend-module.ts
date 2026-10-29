@@ -17,33 +17,39 @@ export default new ContainerModule(bind => {
     bind(CloudSessionManager).toSelf().inSingletonScope();
 
     bind(CloudAuthImpl).toSelf().inTransientScope();
-    bind(ConnectionHandler).toDynamicValue(
-        ctx => new RpcConnectionHandler<AuthClient>(cloudAuthPath, client => {
-            const server = ctx.container.get(CloudAuthImpl);
-            server.setClient(client);
-            client.onDidCloseConnection(() => server.dispose());
-            return server;
-        })
-    ).inSingletonScope();
+    bind(ConnectionHandler)
+        .toDynamicValue(
+            ctx =>
+                new RpcConnectionHandler<AuthClient>(cloudAuthPath, client => {
+                    const server = ctx.container.get(CloudAuthImpl);
+                    server.setClient(client);
+                    client.onDidCloseConnection(() => server.dispose());
+                    return server;
+                }),
+        )
+        .inSingletonScope();
 
     bind(CloudServiceImpl).toSelf().inSingletonScope();
     bind(CloudService).toService(CloudServiceImpl);
-    bind(ConnectionHandler).toDynamicValue(
-        ctx => new RpcConnectionHandler(cloudServicePath, () => ctx.container.get(CloudService))
-    ).inSingletonScope();
+    bind(ConnectionHandler)
+        .toDynamicValue(ctx => new RpcConnectionHandler(cloudServicePath, () => ctx.container.get(CloudService)))
+        .inSingletonScope();
 
     bind(CloudClient).toSelf().inSingletonScope();
 
     bind(OpenWorkspaces).toSelf().inSingletonScope();
     bind(OpenWorkspacesServerImpl).toSelf().inTransientScope();
-    bind(ConnectionHandler).toDynamicValue(
-        ctx => new RpcConnectionHandler<OpenWorkspacesClient>(openWorkspacesPath, client => {
-            const server = ctx.container.get(OpenWorkspacesServerImpl);
-            server.setClient(client);
-            client.onDidCloseConnection(() => server.dispose());
-            return server;
-        })
-    ).inSingletonScope();
+    bind(ConnectionHandler)
+        .toDynamicValue(
+            ctx =>
+                new RpcConnectionHandler<OpenWorkspacesClient>(openWorkspacesPath, client => {
+                    const server = ctx.container.get(OpenWorkspacesServerImpl);
+                    server.setClient(client);
+                    client.onDidCloseConnection(() => server.dispose());
+                    return server;
+                }),
+        )
+        .inSingletonScope();
 
     bind(YukibanaCloudLocalizationContribution).toSelf().inSingletonScope();
     bind(LocalizationContribution).toService(YukibanaCloudLocalizationContribution);

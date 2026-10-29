@@ -26,7 +26,7 @@ function readPluginCopyMetadata(metadataPath) {
 function writePluginCopyMetadata(metadataPath, version) {
     const metadata = {
         version: version,
-        copiedAt: new Date().toISOString()
+        copiedAt: new Date().toISOString(),
     };
     fs.writeFileSync(metadataPath, JSON.stringify(metadata, undefined, 2));
 }

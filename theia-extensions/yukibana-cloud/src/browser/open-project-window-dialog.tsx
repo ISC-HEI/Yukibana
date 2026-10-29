@@ -19,5 +19,7 @@ export class OpenProjectNewWindowDialog extends ReactDialog<boolean> {
         return <p>{details}</p>;
     }
 
-    get value(): boolean { return true; }
+    get value(): boolean {
+        return true;
+    }
 }

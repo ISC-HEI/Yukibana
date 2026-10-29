@@ -65,17 +65,19 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(FrontendApplicationContribution).toService(AssignmentPaneContribution);
 
     bind(AssignmentPaneWidget).toSelf();
-    bind(WidgetFactory).toDynamicValue(ctx => ({
-        id: AssignmentPaneWidget.ID,
-        createWidget: () => ctx.container.get(AssignmentPaneWidget)
-    })).inSingletonScope();
+    bind(WidgetFactory)
+        .toDynamicValue(ctx => ({
+            id: AssignmentPaneWidget.ID,
+            createWidget: () => ctx.container.get(AssignmentPaneWidget),
+        }))
+        .inSingletonScope();
 
     const shellOptions = {
         ...ApplicationShell.DEFAULT_OPTIONS,
         leftPanel: {
             ...ApplicationShell.DEFAULT_OPTIONS.leftPanel,
-            initialSizeRatio: 0.3
-        }
+            initialSizeRatio: 0.3,
+        },
     };
     if (isBound(ApplicationShellOptions)) {
         rebind(ApplicationShellOptions).toConstantValue(shellOptions);

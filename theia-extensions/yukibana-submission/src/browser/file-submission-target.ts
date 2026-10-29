@@ -26,17 +26,20 @@ export class FileSubmissionTarget implements SubmissionTarget {
 
     async getAvailability(): Promise<SubmissionTargetAvailability> {
         return {
-            available: true
+            available: true,
         };
     }
 
     async submit(_projectId: string, submissionId: string): Promise<SubmissionResult> {
         const root = this.workspaceService.tryGetRoots()[0]?.resource;
         const beside = root === undefined ? undefined : await this.files.resolve(root.parent).catch(() => undefined);
-        const destination = await this.fileDialogs.showSaveDialog({
-            title: nls.localize('yukibana/submission/fileTarget/saveTitle', 'Save submission'),
-            inputValue: 'submission.tar.gz',
-        }, beside);
+        const destination = await this.fileDialogs.showSaveDialog(
+            {
+                title: nls.localize('yukibana/submission/fileTarget/saveTitle', 'Save submission'),
+                inputValue: 'submission.tar.gz',
+            },
+            beside,
+        );
         if (destination === undefined) {
             return {
                 ok: false,
@@ -45,7 +48,7 @@ export class FileSubmissionTarget implements SubmissionTarget {
         }
         if (await this.submissionService.save(submissionId, destination.toString())) {
             return {
-                ok: true
+                ok: true,
             };
         }
         return {

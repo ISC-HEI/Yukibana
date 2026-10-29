@@ -10,7 +10,7 @@ import {
     FilePermission,
     FileSystemProviderErrorCode,
     FileWriteOptions,
-    Stat
+    Stat,
 } from '@theia/filesystem/lib/common/files';
 import { RemoteFileSystemProvider } from '@theia/filesystem/lib/common/remote-file-system-provider';
 import { ReadOnlyPolicy } from './config/read-only-policy';
@@ -37,9 +37,7 @@ export class YukibanaRemoteFileSystemProvider extends RemoteFileSystemProvider {
 
     override async stat(resource: URI): Promise<Stat> {
         const stat = await super.stat(resource);
-        return this.isFileReadonly(resource)
-            ? { ...stat, permissions: FilePermission.Readonly }
-            : stat;
+        return this.isFileReadonly(resource) ? { ...stat, permissions: FilePermission.Readonly } : stat;
     }
 
     override async writeFile(resource: URI, content: Uint8Array, opts: FileWriteOptions): Promise<void> {

@@ -35,15 +35,21 @@ export class AssignmentPaneWidget extends BaseWidget {
         this.node.style.overflow = 'auto';
         this.node.style.padding = '8px 16px';
         this.toDispose.push(this.resolver.onDidChange(() => this.refresh()));
-        this.toDispose.push(this.fileService.onDidFilesChange(e => {
-            if (this.uri && e.contains(this.uri)) { this.refresh(); }
-        }));
+        this.toDispose.push(
+            this.fileService.onDidFilesChange(e => {
+                if (this.uri && e.contains(this.uri)) {
+                    this.refresh();
+                }
+            }),
+        );
         this.refresh();
     }
 
     protected async refresh(): Promise<void> {
         this.uri = await this.resolver.resolve();
-        if (!this.uri) { return; }
+        if (!this.uri) {
+            return;
+        }
         await this.showFile(this.uri);
     }
 

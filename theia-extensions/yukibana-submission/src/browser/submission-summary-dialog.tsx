@@ -10,8 +10,7 @@ import { SubmissionTarget, SubmissionTargetAvailability } from '../common/submis
 
 export const SUBMISSION_SUMMARY_CONTENT_CLASS = 'yukibana-submissionSummaryDialog';
 
-const formatSize = (n: number): string =>
-    n < 1024 ? `${n} B` : n < 1024 ** 2 ? `${(n / 1024).toFixed(1)} KB` : `${(n / 1024 ** 2).toFixed(1)} MB`;
+const formatSize = (n: number): string => (n < 1024 ? `${n} B` : n < 1024 ** 2 ? `${(n / 1024).toFixed(1)} KB` : `${(n / 1024 ** 2).toFixed(1)} MB`);
 
 export class SubmissionSummaryDialog extends ReactDialog<boolean> {
     private availability: SubmissionTargetAvailability | undefined;
@@ -49,7 +48,7 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
                         label: nls.localize('yukibana/submission/checkRetry', 'Retry'),
                         // Every action is followed by a fresh check, which is all retrying needs
                         command: async () => undefined,
-                    }
+                    },
                 ],
             };
         }
@@ -70,43 +69,50 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
     }
 
     protected render(): React.ReactNode {
-        return <div className={SUBMISSION_SUMMARY_CONTENT_CLASS}>
-            {this.renderHeader()}
-            {this.renderProblems()}
-            {this.renderFiles()}
-            {this.renderSkipped()}
-            {this.renderAvailability()}
-        </div>;
+        return (
+            <div className={SUBMISSION_SUMMARY_CONTENT_CLASS}>
+                {this.renderHeader()}
+                {this.renderProblems()}
+                {this.renderFiles()}
+                {this.renderSkipped()}
+                {this.renderAvailability()}
+            </div>
+        );
     }
 
     protected renderHeader(): React.ReactNode {
         const title = nls.localize('yukibana/submission/summaryHeader', 'Are you ready to submit?');
         const fileCountLabel = nls.localize('yukibana/submission/summaryFileCount', 'Number of files');
         const totalSizeLabel = nls.localize('yukibana/submission/summaryTotalSize', 'Total size');
-        return <>
-            <h3>{title}</h3>
-            <p>
-                {`${fileCountLabel}: ${this.preview.entries.length}`}<br />
-                {`${totalSizeLabel}: ${formatSize(this.preview.totalSize)}`}
-            </p>
-        </>;
+        return (
+            <>
+                <h3>{title}</h3>
+                <p>
+                    {`${fileCountLabel}: ${this.preview.entries.length}`}
+                    <br />
+                    {`${totalSizeLabel}: ${formatSize(this.preview.totalSize)}`}
+                </p>
+            </>
+        );
     }
     protected renderFiles(): React.ReactNode {
         const filesLabel = nls.localize('yukibana/submission/summaryFiles', 'Submitted files');
         const { entries } = this.preview;
-        return <>
-            <h3>{filesLabel}</h3>
-            <div>
-                <ul className='yukibana-submission-list'>
-                    {entries.map(e => (
-                        <li key={e.path}>
-                            <span>{e.path}</span>
-                            <span className='size'>{formatSize(e.size)}</span>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </>;
+        return (
+            <>
+                <h3>{filesLabel}</h3>
+                <div>
+                    <ul className="yukibana-submission-list">
+                        {entries.map(e => (
+                            <li key={e.path}>
+                                <span>{e.path}</span>
+                                <span className="size">{formatSize(e.size)}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </>
+        );
     }
 
     /** What stops this submission being sent, in the library's sentences: too large, a link out of the project. */
@@ -115,10 +121,16 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
         if (problems.length === 0) {
             return undefined;
         }
-        return <div className='yukibana-availability unavailable' role='alert'>
-            <h3>{nls.localize('yukibana/submission/problemsHeader', 'This cannot be submitted yet')}</h3>
-            <ul>{problems.map(p => <li key={p}>{p}</li>)}</ul>
-        </div>;
+        return (
+            <div className="yukibana-availability unavailable" role="alert">
+                <h3>{nls.localize('yukibana/submission/problemsHeader', 'This cannot be submitted yet')}</h3>
+                <ul>
+                    {problems.map(p => (
+                        <li key={p}>{p}</li>
+                    ))}
+                </ul>
+            </div>
+        );
     }
 
     /** What the rules leave out, so a student who misses a file sees why before sending. */
@@ -127,50 +139,60 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
         if (skipped.length === 0) {
             return undefined;
         }
-        return <details>
-            <summary>{nls.localize('yukibana/submission/summarySkipped', 'Left out ({0})', skipped.length)}</summary>
-            <ul className='yukibana-submission-list'>{skipped.map(p => <li key={p}><span>{p}</span></li>)}</ul>
-        </details>;
+        return (
+            <details>
+                <summary>{nls.localize('yukibana/submission/summarySkipped', 'Left out ({0})', skipped.length)}</summary>
+                <ul className="yukibana-submission-list">
+                    {skipped.map(p => (
+                        <li key={p}>
+                            <span>{p}</span>
+                        </li>
+                    ))}
+                </ul>
+            </details>
+        );
     }
 
     protected renderAvailability(): React.ReactNode {
         const a = this.availability;
         if (a === undefined) {
-            return <div className='yukibana-availability checking'>
-                {nls.localize('yukibana/submission/checking', 'Checking target availability...')}
-            </div>;
+            return <div className="yukibana-availability checking">{nls.localize('yukibana/submission/checking', 'Checking target availability...')}</div>;
         }
         if (a.available) {
             if (a.message !== undefined) {
-                return <div>
-                    <p className='yukibana-availability-message'>{a.message}</p>
-                </div>;
+                return (
+                    <div>
+                        <p className="yukibana-availability-message">{a.message}</p>
+                    </div>
+                );
             }
             return undefined;
         }
         const title = nls.localize('yukibana/submission/unavailabilityHeader', 'There might be an issue');
-        return <div className='yukibana-availability unavailable' role='alert'>
-            <h3>{title}</h3>
-            <div className='yukibana-availability-info'>
-                <p className='yukibana-availability-reason'>{a.reason}</p>
-                {a.actions?.length ? (
-                    <div className='yukibana-availability-actions'>
-                        {a.actions.map(action => (
-                            <button
-                                key={action.label}
-                                className='theia-button secondary'
-                                onClick={async () => {
-                                    await this.runCommand(action.command);
-                                    await this.refreshAvailability();
-                                }}
-                            >
-                                {action.label}
-                            </button>
-                        ))}
-                    </div>
-                ) : undefined}
+        return (
+            <div className="yukibana-availability unavailable" role="alert">
+                <h3>{title}</h3>
+                <div className="yukibana-availability-info">
+                    <p className="yukibana-availability-reason">{a.reason}</p>
+                    {a.actions?.length ? (
+                        <div className="yukibana-availability-actions">
+                            {a.actions.map(action => (
+                                <button
+                                    key={action.label}
+                                    className="theia-button secondary"
+                                    onClick={async () => {
+                                        await this.runCommand(action.command);
+                                        await this.refreshAvailability();
+                                    }}
+                                >
+                                    {action.label}
+                                </button>
+                            ))}
+                        </div>
+                    ) : undefined}
+                </div>
             </div>
-        </div>;
+        );
     }
 
     private runCommand(command: string | (() => Promise<void>)): Promise<void> {
@@ -181,5 +203,7 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
         }
     }
 
-    get value(): boolean { return true; }
+    get value(): boolean {
+        return true;
+    }
 }

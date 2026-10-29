@@ -27,9 +27,7 @@ export const YukibanaToolbarDefaults: () => DeflatedToolbarTree = () => ({
                 },
             ],
         ],
-        [ToolbarAlignment.CENTER]: [
-            []
-        ],
+        [ToolbarAlignment.CENTER]: [[]],
         [ToolbarAlignment.RIGHT]: [
             [
                 {
@@ -38,7 +36,7 @@ export const YukibanaToolbarDefaults: () => DeflatedToolbarTree = () => ({
                     icon: 'codicon codicon-send',
                     tooltip: nls.localize('yukibana/submission/submitAssignment', 'Submit assignment...'),
                 },
-            ]
+            ],
         ],
-    }
+    },
 });

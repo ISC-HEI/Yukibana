@@ -126,7 +126,11 @@ function parseApp(positionals: string[], fallback: App[]): App[] {
 }
 
 /** A command's arguments: its options, its positional arguments, and the arguments after `--`. */
-interface Parsed { values: Record<string, unknown>; positionals: string[]; passthrough: string[] }
+interface Parsed {
+    values: Record<string, unknown>;
+    positionals: string[];
+    passthrough: string[];
+}
 
 /** Each command, by name: its options, and how it runs. */
 const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Parsed) => void }> = {

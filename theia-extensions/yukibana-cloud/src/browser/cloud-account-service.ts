@@ -9,8 +9,8 @@ import { AuthClientImpl } from './cloud-auth-client';
 export type CloudAccountState =
     | { readonly kind: 'unknown' }
     | { readonly kind: 'logged-out' }
-    | { readonly kind: 'logged-in', readonly account: CloudAccount }
-    | { readonly kind: 'error', readonly reason: string };
+    | { readonly kind: 'logged-in'; readonly account: CloudAccount }
+    | { readonly kind: 'error'; readonly reason: string };
 
 /** Which cloud account this window is using, kept up to date across logins and logouts. */
 @injectable()

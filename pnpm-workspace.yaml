@@ -10,10 +10,10 @@ packages:
   - electron-app
   - tests
 allowBuilds:
-  "@parcel/watcher": true
-  "@theia/ffmpeg": true
-  "@vscode/windows-ca-certs": true
-  "@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c47a7f3626f97aafb4518829394877fdeee7b472#path:/cli": true
+  '@parcel/watcher': true
+  '@theia/ffmpeg': true
+  '@vscode/windows-ca-certs': true
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c47a7f3626f97aafb4518829394877fdeee7b472#path:/cli': true
   drivelist: true
   electron-winstaller: true
   esbuild: true

@@ -18,11 +18,11 @@ registerHooks({
             return { format: 'module', source: 'export default {};', shortCircuit: true };
         }
         return nextLoad(url, context);
-    }
+    },
 });
 
 // '@lumino/dragdrop' needs DragEvent as soon as it is loaded.
-(globalThis as { DragEvent?: unknown }).DragEvent ??= class DragEvent { };
+(globalThis as { DragEvent?: unknown }).DragEvent ??= class DragEvent {};
 
 // For the specs that run in the jsdom environment (`// @vitest-environment
 // jsdom`), what Theia's frontend modules expect when they are loaded: what

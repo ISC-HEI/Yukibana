@@ -232,11 +232,21 @@
     color: var(--theia-descriptionForeground);
 }
 
-.yukibana-welcome-avatar.colour-0 { background: var(--yukibana-welcome-avatar-0); }
-.yukibana-welcome-avatar.colour-1 { background: var(--yukibana-welcome-avatar-1); }
-.yukibana-welcome-avatar.colour-2 { background: var(--yukibana-welcome-avatar-2); }
-.yukibana-welcome-avatar.colour-3 { background: var(--yukibana-welcome-avatar-3); }
-.yukibana-welcome-avatar.colour-4 { background: var(--yukibana-welcome-avatar-4); }
+.yukibana-welcome-avatar.colour-0 {
+    background: var(--yukibana-welcome-avatar-0);
+}
+.yukibana-welcome-avatar.colour-1 {
+    background: var(--yukibana-welcome-avatar-1);
+}
+.yukibana-welcome-avatar.colour-2 {
+    background: var(--yukibana-welcome-avatar-2);
+}
+.yukibana-welcome-avatar.colour-3 {
+    background: var(--yukibana-welcome-avatar-3);
+}
+.yukibana-welcome-avatar.colour-4 {
+    background: var(--yukibana-welcome-avatar-4);
+}
 
 /* Main page */
 

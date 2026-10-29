@@ -21,11 +21,10 @@ export interface DesktopFileOptions {
 // Taken from https://github.com/eclipse-theia/theia-ide/blob/master/theia-extensions/launcher/src/browser/desktopfile-service.ts
 @injectable()
 export class DesktopFileService {
-
     async getState(options: DesktopFileOptions): Promise<DesktopFileState> {
         const params = new URLSearchParams({
             applicationName: options.applicationName,
-            uriScheme: options.uriScheme
+            uriScheme: options.uriScheme,
         });
         const response = await fetch(new Request(`${this.endpoint()}/state?${params}`), { method: 'GET' }).then(r => r.json());
         return response?.state ?? 'needs-prompt';
@@ -35,7 +34,7 @@ export class DesktopFileService {
         fetch(new Request(`${this.endpoint()}`), {
             body: JSON.stringify({ create, ...options }),
             method: 'PUT',
-            headers: new Headers({ 'Content-Type': 'application/json' })
+            headers: new Headers({ 'Content-Type': 'application/json' }),
         });
     }
 

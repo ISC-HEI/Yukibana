@@ -1,33 +1,27 @@
 {
-    "compilerOptions": {
-        "skipLibCheck": true,
-        "declaration": true,
-        "declarationMap": true,
-        // TypeScript 7 turns all strict checks on by default; these are the ones the code meets.
-        "strict": false,
-        "noImplicitAny": true,
-        "noEmitOnError": false,
-        "noImplicitThis": true,
-        "noUnusedLocals": true,
-        "strictNullChecks": true,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "resolveJsonModule": true,
-        // The styles are imported for their side effect, and bundled by Theia.
-        "noUncheckedSideEffectImports": false,
-        "module": "commonjs",
-        "moduleResolution": "bundler",
-        "target": "ES2017",
-        "jsx": "react",
-        "lib": [
-            "ES2017",
-            "ES2020.Promise",
-            "dom"
-        ],
-        "sourceMap": true,
-        "composite": true,
-        "types": [
-            "node"
-        ]
-    }
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    // TypeScript 7 turns all strict checks on by default; these are the ones the code meets.
+    "strict": false,
+    "noImplicitAny": true,
+    "noEmitOnError": false,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    // The styles are imported for their side effect, and bundled by Theia.
+    "noUncheckedSideEffectImports": false,
+    "module": "commonjs",
+    "moduleResolution": "bundler",
+    "target": "ES2017",
+    "jsx": "react",
+    "lib": ["ES2017", "ES2020.Promise", "dom"],
+    "sourceMap": true,
+    "composite": true,
+    "types": ["node"]
+  }
 }

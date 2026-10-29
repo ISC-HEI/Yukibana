@@ -17,9 +17,7 @@ test.describe('Scala extension', () => {
     let app: TheiaApp;
 
     test.beforeAll(async ({ launch }) => {
-        const ws = new Workspace([
-            path.resolve(__dirname, '..', 'resources')
-        ]);
+        const ws = new Workspace([path.resolve(__dirname, '..', 'resources')]);
         app = await launch(ws, PatchedTheiaApp);
     });
 

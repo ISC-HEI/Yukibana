@@ -26,7 +26,6 @@ interface DesktopFileInformation {
 // Taken from https://github.com/eclipse-theia/theia-ide/blob/master/theia-extensions/launcher/src/node/desktopfile-endpoint.ts
 @injectable()
 export class YukibanaDesktopFileServiceEndpoint implements BackendApplicationContribution {
-
     protected static PATH = '/desktopfile';
     protected static STORAGE_FILE_NAME = 'desktopfile.json';
 
@@ -117,7 +116,9 @@ export class YukibanaDesktopFileServiceEndpoint implements BackendApplicationCon
                             if (pngFile) {
                                 unpackedImagePath = path.join(appDir, pngFile);
                             }
-                        } catch { /* ignore */ }
+                        } catch {
+                            /* ignore */
+                        }
                     }
                     if (fs.existsSync(unpackedImagePath)) {
                         fs.copyFileSync(unpackedImagePath, imagePath);

@@ -6,9 +6,9 @@ import { describe, it } from 'vitest';
 import { DEFAULT_CONFIG, loadConfig } from './yukibana-config';
 
 interface ConfigError {
-    key: string[]
+    key: string[];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    value: any
+    value: any;
 }
 
 /* eslint-disable no-null/no-null */
@@ -110,25 +110,17 @@ describe('loadConfig', () => {
                     aiChat: false,
                 },
                 containers: {
-                    'container1': false,
+                    container1: false,
                 },
                 views: {
-                    'view1': false,
+                    view1: false,
                 },
             },
-            openFiles: [
-                'open-file.txt',
-            ],
-            readOnly: [
-                'read-only.txt',
-            ],
+            openFiles: ['open-file.txt'],
+            readOnly: ['read-only.txt'],
             submission: {
-                include: [
-                    'to-include.txt',
-                ],
-                exclude: [
-                    'to-exclude.txt',
-                ],
+                include: ['to-include.txt'],
+                exclude: ['to-exclude.txt'],
                 respectGitignore: false,
                 target: 'custom',
                 filename: 'submission.tar.gz',

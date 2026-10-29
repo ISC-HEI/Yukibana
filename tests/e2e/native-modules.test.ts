@@ -21,7 +21,8 @@ test.describe('Native modules', () => {
     // in Electron because they use Node-API. Not every module loads when the app starts, e.g. the terminal's.
     test('should all load in Electron', ({ app }) => {
         test.skip(app !== 'electron', 'The browser app runs them in Node.js, which they are built for');
-        const modules = fs.readdirSync(path.join(electronApp, 'lib'), { recursive: true, encoding: 'utf8' })
+        const modules = fs
+            .readdirSync(path.join(electronApp, 'lib'), { recursive: true, encoding: 'utf8' })
             .filter(file => file.endsWith('.node'))
             .map(file => path.join(electronApp, 'lib', file));
         expect(modules.length).toBeGreaterThan(0);

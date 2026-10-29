@@ -19,14 +19,13 @@ export namespace LauncherCommands {
     export const CREATE_LAUNCHER: Command = {
         id: 'yukibana.launcher.create',
         label: 'Create CLI Launcher',
-        category: 'Yukibana'
+        category: 'Yukibana',
     };
 }
 
 // Taken from https://github.com/eclipse-theia/theia-ide/blob/master/theia-extensions/launcher/src/browser/create-launcher-contribution.ts
 @injectable()
 export class CreateLauncherCommandContribution implements FrontendApplicationContribution, CommandContribution {
-
     @inject(StorageService)
     protected readonly storageService: StorageService;
 
@@ -60,7 +59,9 @@ export class CreateLauncherCommandContribution implements FrontendApplicationCon
                 return;
             }
             const messageContainer = document.createElement('div');
-            messageContainer.textContent = nls.localizeByDefault(`Would you like to install a shell command that launches the application?\nYou will be able to run ${applicationName} from the command line by typing '${uriScheme}'.`);
+            messageContainer.textContent = nls.localizeByDefault(
+                `Would you like to install a shell command that launches the application?\nYou will be able to run ${applicationName} from the command line by typing '${uriScheme}'.`,
+            );
             messageContainer.setAttribute('style', 'white-space: pre-line');
             const details = document.createElement('p');
             details.textContent = 'Administrator privileges are required, you will need to enter your password next.';
@@ -69,7 +70,7 @@ export class CreateLauncherCommandContribution implements FrontendApplicationCon
                 title: nls.localizeByDefault('Create launcher'),
                 msg: messageContainer,
                 ok: Dialog.YES,
-                cancel: Dialog.NO
+                cancel: Dialog.NO,
             });
             const install = await dialog.open();
             this.launcherService.createLauncher(!!install, uriScheme);
@@ -85,25 +86,27 @@ export class CreateLauncherCommandContribution implements FrontendApplicationCon
                 await this.desktopFileService.createOrUpdateDesktopfile(true, {
                     applicationName,
                     createUrlHandler: true,
-                    uriScheme
+                    uriScheme,
                 });
                 this.logger.info('Desktop file silently updated to match current launcher template.');
                 return;
             }
             const messageContainer = document.createElement('div');
-            messageContainer.textContent = nls.localizeByDefault(`Would you like to create a .desktop file for ${applicationName}?\nThis will make it easier to open ${applicationName} directly\nfrom your applications menu and enables further features.`);
+            messageContainer.textContent = nls.localizeByDefault(
+                `Would you like to create a .desktop file for ${applicationName}?\nThis will make it easier to open ${applicationName} directly\nfrom your applications menu and enables further features.`,
+            );
             messageContainer.setAttribute('style', 'white-space: pre-line');
             const dialog = new ConfirmDialog({
                 title: nls.localizeByDefault('Create .desktop file'),
                 msg: messageContainer,
                 ok: Dialog.YES,
-                cancel: Dialog.NO
+                cancel: Dialog.NO,
             });
             const install = await dialog.open();
             this.desktopFileService.createOrUpdateDesktopfile(!!install, {
                 applicationName,
                 createUrlHandler: true,
-                uriScheme
+                uriScheme,
             });
             this.logger.info('Created or updated .desktop file.');
         });
@@ -119,7 +122,7 @@ export class CreateLauncherCommandContribution implements FrontendApplicationCon
                 }
                 await this.launcherService.createLauncher(true, uriScheme);
                 this.logger.info('CLI launcher created or updated via command.');
-            }
+            },
         });
     }
 
@@ -136,8 +139,8 @@ export class CreateLauncherCommandContribution implements FrontendApplicationCon
             title: nls.localizeByDefault(isUpdate ? 'Update CLI launcher' : 'Create CLI launcher'),
             msg: messageContainer,
             ok: nls.localizeByDefault('Confirm'),
-            cancel: nls.localizeByDefault('Abort')
+            cancel: nls.localizeByDefault('Abort'),
         });
-        return !!await dialog.open();
+        return !!(await dialog.open());
     }
 }

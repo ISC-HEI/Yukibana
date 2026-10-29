@@ -5,10 +5,10 @@ electronDist: ../node_modules/electron/dist
 electronVersion: 42.8.1
 asar: true
 asarUnpack:
-  - "**/lib/backend/native/**"
-  - "**/lib/backend/shell-integrations/**"
-  - "**/lib/prebuilds/**"
-  - "resources/icons/WindowIcon/512-512.png"
+  - '**/lib/backend/native/**'
+  - '**/lib/backend/shell-integrations/**'
+  - '**/lib/prebuilds/**'
+  - 'resources/icons/WindowIcon/512-512.png'
 nodeGypRebuild: false
 npmRebuild: false
 
@@ -23,7 +23,7 @@ files:
   - resources/icons/WindowIcon/512-512.png
   - resources/YukibanaSplash.svg
   - scripts
-  - "!**node_modules/**"
+  - '!**node_modules/**'
 extraResources:
   - from: ../plugins
     to: app/plugins
@@ -34,7 +34,7 @@ win:
     - nsis
   publish:
     provider: generic
-    url: "https://yukibana.isc-vs.ch/download/${version}/windows"
+    url: 'https://yukibana.isc-vs.ch/download/${version}/windows'
     useMultipleRangeRequest: false
 mac:
   icon: resources/icons/MacLauncherIcons/icon.icns
@@ -49,7 +49,7 @@ mac:
     - zip
   publish:
     provider: generic
-    url: "https://yukibana.isc-vs.ch/download/latest/macos"
+    url: 'https://yukibana.isc-vs.ch/download/latest/macos'
 linux:
   icon: resources/icons/LinuxLauncherIcons
   category: Development
@@ -61,7 +61,7 @@ linux:
     - AppImage
   publish:
     provider: generic
-    url: "https://yukibana.isc-vs.ch/download/latest/linux"
+    url: 'https://yukibana.isc-vs.ch/download/latest/linux'
 
 nsis:
   menuCategory: true
