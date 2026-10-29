@@ -51,7 +51,8 @@ so only the ones that changed are recompiled.
   Use `--preview` for an unpacked directory
 - `pnpm download:plugins`: download the plugins listed in `theiaPlugins`, again whenever
   that list changes (done automatically by `start` and `package`; delete `plugins` to download them again)
-- `pnpm lint` / `pnpm lint:fix`: run the linter on the whole project
+- `pnpm lint` / `pnpm lint:fix`: lint the whole project with oxlint
+- `pnpm format` / `pnpm format:check`: format the whole project with oxfmt, or only check it
 - `pnpm test`: run the unit tests (`*.spec.ts`) with Vitest, straight from the sources;
   `pnpm test:watch` reruns them on every change. What a spec imports from another extension
   or library comes from its compiled `lib`, so rebuild that one after changing it (`pnpm install`
