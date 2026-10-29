@@ -54,7 +54,7 @@
     "@theia/bundle-plugin": "~1.76.0",
     "@theia/cli": "~1.76.0",
     "electron": "42.8.1",
-    "electron-builder": "^26.17.0"
+    "electron-builder": "^26.18.0"
   },
   "scripts": {
     "clean": "theia clean",
