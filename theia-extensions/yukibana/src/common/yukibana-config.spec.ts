@@ -74,6 +74,7 @@ describe('loadConfig', () => {
         { key: ['submission', 'respectGitignore'], value: 0 },
         { key: ['submission', 'target'], value: null },
         { key: ['projectId'], value: '' },
+        { key: ['projectId'], value: 'a-project-id' },
     ];
 
     errors.forEach(({ key, value }) => {
@@ -133,7 +134,7 @@ describe('loadConfig', () => {
                 filename: 'submission.tar.gz',
                 maxBytes: 32 * 1024 * 1024,
             },
-            projectId: 'a-project-id',
+            projectId: '01a0b563-aeff-7c42-ae73-5aab2f2b5a03',
         };
         const toLoad = { ...config, extraParameter: 'value' };
         expect(loadConfig(JSON.stringify(toLoad))).to.deep.equal(config);

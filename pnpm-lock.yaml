@@ -581,8 +581,8 @@ importers:
         specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@yukibana/cli':
-        specifier: github:tothambrus11/yukibana-cloud#submission-rules&path:/cli
-        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c47a7f3626f97aafb4518829394877fdeee7b472#path:/cli
+        specifier: github:tothambrus11/yukibana-cloud#main&path:/cli
+        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/99abe7cc32ebb4c93762a695ce05053248bf366d#path:/cli
     devDependencies:
       '@types/micromatch':
         specifier: 4.0.10
@@ -609,8 +609,8 @@ importers:
         specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@yukibana/cli':
-        specifier: github:tothambrus11/yukibana-cloud#submission-rules&path:/cli
-        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c47a7f3626f97aafb4518829394877fdeee7b472#path:/cli
+        specifier: github:tothambrus11/yukibana-cloud#main&path:/cli
+        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/99abe7cc32ebb4c93762a695ce05053248bf366d#path:/cli
       yukibana-common:
         specifier: workspace:*
         version: link:../../packages/yukibana-common
@@ -684,8 +684,8 @@ importers:
         specifier: ~1.75.0
         version: 1.75.0(@theia/electron@1.75.0(electron@42.8.1(supports-color@8.1.1)))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(supports-color@8.1.1)(typescript@5.4.5)
       '@yukibana/cli':
-        specifier: github:tothambrus11/yukibana-cloud#submission-rules&path:/cli
-        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c47a7f3626f97aafb4518829394877fdeee7b472#path:/cli
+        specifier: github:tothambrus11/yukibana-cloud#main&path:/cli
+        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/99abe7cc32ebb4c93762a695ce05053248bf366d#path:/cli
       yukibana-common:
         specifier: workspace:*
         version: link:../../packages/yukibana-common
@@ -2226,8 +2226,8 @@ packages:
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
 
-  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c47a7f3626f97aafb4518829394877fdeee7b472#path:/cli':
-    resolution: {gitHosted: true, integrity: sha512-bwHARgKisesPt9T5E6TtorZDW0MX2aaNzkPdaTG9Z6ycAdVK/8+5c3qbd59+VAup00Sg+Awt5wUfXozoboNszg==, path: /cli, tarball: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c47a7f3626f97aafb4518829394877fdeee7b472}
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/99abe7cc32ebb4c93762a695ce05053248bf366d#path:/cli':
+    resolution: {gitHosted: true, integrity: sha512-JMkGdoLq2SAuP/1vgWD5eHJPacAHdWMalNI4Dau7kkUIU04UauU2rSZ+2Z2KwVwCQvggoHnQuo4igTlrYxRaew==, path: /cli, tarball: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/99abe7cc32ebb4c93762a695ce05053248bf366d}
     version: 0.1.0
     engines: {node: '>=22.15'}
     hasBin: true
@@ -10806,7 +10806,7 @@ snapshots:
 
   '@yarnpkg/lockfile@1.1.0': {}
 
-  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c47a7f3626f97aafb4518829394877fdeee7b472#path:/cli':
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/99abe7cc32ebb4c93762a695ce05053248bf366d#path:/cli':
     dependencies:
       ignore: 7.0.13
       modern-tar: 0.8.6

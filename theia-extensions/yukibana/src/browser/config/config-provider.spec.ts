@@ -177,34 +177,34 @@ describe('ConfigProvider', () => {
 
     it('should load a valid config file', async () => {
         const { provider, fileService } = setup(root);
-        fileService.write(root.resolve('yukibana.json'), '{"projectId": "valid-id"}');
+        fileService.write(root.resolve('yukibana.json'), '{"projectId": "01a0b563-aeff-7c42-ae73-5aab2f2b5a01"}');
         await provider.onStart();
 
         const config = await provider.ready;
         const defaultConfig = DEFAULT_CONFIG;
-        expect(config).to.deep.equal({ ...defaultConfig, projectId: 'valid-id' });
+        expect(config).to.deep.equal({ ...defaultConfig, projectId: '01a0b563-aeff-7c42-ae73-5aab2f2b5a01' });
         expect(config).to.deep.equal(provider.config);
     });
 
     it('should reload if the config has changed', async () => {
         const { provider, fileService } = setup(root);
-        fileService.write(root.resolve('yukibana.json'), '{"projectId": "valid-id"}');
+        fileService.write(root.resolve('yukibana.json'), '{"projectId": "01a0b563-aeff-7c42-ae73-5aab2f2b5a01"}');
         await provider.onStart();
 
         await provider.ready;
         const configChanged = Event.toPromise(provider.onConfigChanged);
-        fileService.write(root.resolve('yukibana.json'), '{"projectId": "new-id"}');
+        fileService.write(root.resolve('yukibana.json'), '{"projectId": "01a0b563-aeff-7c42-ae73-5aab2f2b5a02"}');
         const newConfig = await configChanged;
         const defaultConfig = DEFAULT_CONFIG;
-        expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: 'new-id' });
+        expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: '01a0b563-aeff-7c42-ae73-5aab2f2b5a02' });
         expect(newConfig).to.deep.equal(provider.config);
     });
 
     it('should reload if the workspace root has changed', async () => {
         const root2 = new URI('file:///root2');
         const { provider, fileService, workspaceService } = setup(root);
-        fileService.write(root.resolve('yukibana.json'), '{"projectId": "valid-id"}');
-        fileService.write(root2.resolve('yukibana.json'), '{"projectId": "new-id"}');
+        fileService.write(root.resolve('yukibana.json'), '{"projectId": "01a0b563-aeff-7c42-ae73-5aab2f2b5a01"}');
+        fileService.write(root2.resolve('yukibana.json'), '{"projectId": "01a0b563-aeff-7c42-ae73-5aab2f2b5a02"}');
         await provider.onStart();
 
         await provider.ready;
@@ -212,7 +212,7 @@ describe('ConfigProvider', () => {
         workspaceService.setRoot(root2);
         const newConfig = await configChanged;
         const defaultConfig = DEFAULT_CONFIG;
-        expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: 'new-id' });
+        expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: '01a0b563-aeff-7c42-ae73-5aab2f2b5a02' });
         expect(newConfig).to.deep.equal(provider.config);
     });
 });

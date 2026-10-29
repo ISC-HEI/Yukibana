@@ -13,7 +13,7 @@
     "@theia/filesystem": "~1.75.0",
     "@theia/telemetry": "~1.75.0",
     "@theia/workspace": "~1.75.0",
-    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#submission-rules&path:/cli",
+    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#main&path:/cli",
     "yukibana-common": "workspace:*",
     "yukibana-submission-ext": "workspace:*"
   },
