@@ -126,7 +126,7 @@ describe('loadConfig', () => {
                 filename: 'submission.tar.gz',
                 maxBytes: 32 * 1024 * 1024,
             },
-            projectId: 'a-project-id',
+            projectId: '01a11653-0353-7389-81f4-01837a3ed666',
         };
         const toLoad = { ...config, extraParameter: 'value' };
         expect(loadConfig(JSON.stringify(toLoad))).to.deep.equal(config);

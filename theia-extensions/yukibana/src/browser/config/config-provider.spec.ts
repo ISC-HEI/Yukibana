@@ -21,6 +21,10 @@ const UPDATED: FileChangeType = 0;
 const ADDED: FileChangeType = 1;
 const DELETED: FileChangeType = 2;
 
+/** Project ids, which the config only accepts as uuidv7s. */
+const PROJECT_ID = '01a11653-0353-7389-81f4-01837a3ed666';
+const NEW_PROJECT_ID = '01a11653-0353-7389-81f4-01837a3ed667';
+
 interface MockFileService extends Pick<FileService, 'exists' | 'read' | 'watch' | 'onDidFilesChange'> {
     write(resource: URI, content: string): void;
     delete(resource: URI): void;
@@ -178,34 +182,34 @@ describe('ConfigProvider', () => {
 
     it('should load a valid config file', async () => {
         const { provider, fileService } = setup(root);
-        fileService.write(root.resolve('yukibana.json'), '{"projectId": "valid-id"}');
+        fileService.write(root.resolve('yukibana.json'), `{"projectId": "${PROJECT_ID}"}`);
         await provider.onStart();
 
         const config = await provider.ready;
         const defaultConfig = DEFAULT_CONFIG;
-        expect(config).to.deep.equal({ ...defaultConfig, projectId: 'valid-id' });
+        expect(config).to.deep.equal({ ...defaultConfig, projectId: PROJECT_ID });
         expect(config).to.deep.equal(provider.config);
     });
 
     it('should reload if the config has changed', async () => {
         const { provider, fileService } = setup(root);
-        fileService.write(root.resolve('yukibana.json'), '{"projectId": "valid-id"}');
+        fileService.write(root.resolve('yukibana.json'), `{"projectId": "${PROJECT_ID}"}`);
         await provider.onStart();
 
         await provider.ready;
         const configChanged = Event.toPromise(provider.onConfigChanged);
-        fileService.write(root.resolve('yukibana.json'), '{"projectId": "new-id"}');
+        fileService.write(root.resolve('yukibana.json'), `{"projectId": "${NEW_PROJECT_ID}"}`);
         const newConfig = await configChanged;
         const defaultConfig = DEFAULT_CONFIG;
-        expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: 'new-id' });
+        expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: NEW_PROJECT_ID });
         expect(newConfig).to.deep.equal(provider.config);
     });
 
     it('should reload if the workspace root has changed', async () => {
         const root2 = new URI('file:///root2');
         const { provider, fileService, workspaceService } = setup(root);
-        fileService.write(root.resolve('yukibana.json'), '{"projectId": "valid-id"}');
-        fileService.write(root2.resolve('yukibana.json'), '{"projectId": "new-id"}');
+        fileService.write(root.resolve('yukibana.json'), `{"projectId": "${PROJECT_ID}"}`);
+        fileService.write(root2.resolve('yukibana.json'), `{"projectId": "${NEW_PROJECT_ID}"}`);
         await provider.onStart();
 
         await provider.ready;
@@ -213,7 +217,7 @@ describe('ConfigProvider', () => {
         workspaceService.setRoot(root2);
         const newConfig = await configChanged;
         const defaultConfig = DEFAULT_CONFIG;
-        expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: 'new-id' });
+        expect(newConfig).to.deep.equal({ ...defaultConfig, projectId: NEW_PROJECT_ID });
         expect(newConfig).to.deep.equal(provider.config);
     });
 });
