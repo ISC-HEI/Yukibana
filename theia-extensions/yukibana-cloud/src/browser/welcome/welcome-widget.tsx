@@ -16,20 +16,8 @@ import { CloudAccount, CloudService } from '../../common/cloud-protocol';
 import { OpenWorkspacesServer } from '../../common/open-workspaces-protocol';
 import { CloudAccountService, CloudAccountState } from '../cloud-account-service';
 import { LoginCommand, LogoutCommand, SwitchAccountCommand } from '../command-contribution';
-import {
-    Assignment,
-    avatarColour,
-    calendarDays,
-    CONFIG_FILENAME,
-    dueAssignments,
-    initials,
-    matches,
-    projectIdOf,
-    RecentProject,
-    recentProject,
-    roughly,
-    Urgency,
-} from './welcome-model';
+import { ProjectLocations } from '../project-locations';
+import { Assignment, avatarColour, calendarDays, dueAssignments, initials, matches, RecentProject, recentProject, roughly, Urgency } from './welcome-model';
 
 /**
  * A page of the screen: `recent` lists the folders opened lately, `assignments` what the registry hands out.
@@ -80,6 +68,8 @@ export class WelcomeWidget extends ReactWidget {
     @inject(MessageService) protected readonly messages!: MessageService;
     /** Backend's registry of the workspaces all windows have open. */
     @inject(OpenWorkspacesServer) protected readonly openWorkspaces!: OpenWorkspacesServer;
+    /** Projects on this computer, read for the registry project each recent folder is a copy of. */
+    @inject(ProjectLocations) protected readonly locations!: ProjectLocations;
     /** Log of failures. */
     @inject(ILogger) @named('yukibana:Welcome') protected readonly logger!: ILogger;
 
@@ -197,12 +187,7 @@ export class WelcomeWidget extends ReactWidget {
         if (project.workspaceFile) {
             return undefined;
         }
-        try {
-            return projectIdOf((await this.files.read(project.uri.resolve(CONFIG_FILENAME))).value);
-        } catch {
-            // Most folders have no yukibana.json, and a missing one is no news
-            return undefined;
-        }
+        return this.locations.projectIdAt(project.uri);
     }
 
     /** Loads the assignments `state`'s account can see, keeping the shown ones until the new ones arrive. */

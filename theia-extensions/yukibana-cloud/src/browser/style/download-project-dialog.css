@@ -1,0 +1,25 @@
+/*
+ * SPDX-License-Identifier: MIT
+ *
+ * The dialog asking where a project goes: a location with its Browse button, then the folder name.
+ */
+
+.yukibana-download-project {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 480px;
+}
+
+.yukibana-download-project label {
+    margin-top: 8px;
+}
+
+.yukibana-download-project-location {
+    display: flex;
+    gap: 6px;
+}
+
+.yukibana-download-project-location input {
+    flex: 1;
+}

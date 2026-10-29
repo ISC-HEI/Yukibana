@@ -1,6 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
  */
+import '../../src/browser/style/download-project-dialog.css';
 import '../../src/browser/welcome/style/welcome.css';
 
 import { CommandContribution, MenuContribution } from '@theia/core';
@@ -15,6 +16,7 @@ import { AuthClientImpl } from './cloud-auth-client';
 import { CloudSubmissionTarget } from './cloud-submission-target';
 import { LoginCommandContribution } from './command-contribution';
 import { OpenWorkspacesClientImpl, OpenWorkspacesContribution } from './open-workspaces-client';
+import { ProjectLocations } from './project-locations';
 import { WelcomeContribution } from './welcome/welcome-contribution';
 import { WelcomeWidget } from './welcome/welcome-widget';
 import { YukibanaProjectOpener } from './yukibana-project-opener';
@@ -70,4 +72,5 @@ export default new ContainerModule(bind => {
     bind(CommandContribution).toService(WelcomeContribution);
     bind(MenuContribution).toService(WelcomeContribution);
     bind(YukibanaProjectOpener).toSelf().inRequestScope();
+    bind(ProjectLocations).toSelf().inSingletonScope();
 });

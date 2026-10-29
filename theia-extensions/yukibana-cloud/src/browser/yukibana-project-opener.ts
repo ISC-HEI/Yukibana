@@ -13,14 +13,9 @@ import { CloudService } from '../common/cloud-protocol';
 import { CloudTelemetry } from '../common/cloud-telemetry';
 import { CloudAccountService } from './cloud-account-service';
 import { LoginCommand } from './command-contribution';
-import { ConflictResolutionStrategy, OpenProjectConflictDialog } from './open-project-conflict-dialog';
+import { DownloadProjectDialog } from './download-project-dialog';
 import { OpenProjectNewWindowDialog } from './open-project-window-dialog';
-
-/** Where a project goes: a folder to download the starter into, or one that already holds the project, to open. */
-interface ResolvedConflict {
-    readonly strategy: 'open' | 'download';
-    readonly destination: URI;
-}
+import { fsPathOf, ProjectLocations } from './project-locations';
 
 @injectable()
 export class YukibanaProjectOpener {
@@ -36,6 +31,7 @@ export class YukibanaProjectOpener {
     @inject(TelemetryService) protected readonly telemetry!: TelemetryService;
     @inject(CloudAccountService) protected readonly accounts!: CloudAccountService;
     @inject(CommandService) protected readonly commands!: CommandService;
+    @inject(ProjectLocations) protected readonly locations!: ProjectLocations;
 
     constructor() {
         this.outcome = 'error';
@@ -67,18 +63,17 @@ export class YukibanaProjectOpener {
             }
 
             stage = 'location';
-            const folder = await this.chooseFolder(project);
-            if (!folder) {
-                return;
-            }
-            const target = await this.chooseDestination(project, folder);
-            if (!target) {
+            const destination = await this.askDestination(project);
+            if (!destination) {
+                this.outcome = 'cancelled';
+                this.logger.info('No destination');
                 return;
             }
 
-            if (target.strategy === 'download') {
+            // Looked at again: the folder may have changed since the dialog did, and only a copy of the project is opened as it is
+            if ((await this.locations.stateOf(destination, projectId)) !== 'this-project') {
                 stage = 'download';
-                if (!(await this.downloadStarter(projectId, target.destination))) {
+                if (!(await this.downloadStarter(projectId, destination))) {
                     return;
                 }
             }
@@ -92,7 +87,7 @@ export class YukibanaProjectOpener {
 
             this.outcome = 'opened';
             this.report(this.outcome, stage, start, projectId, newWindow);
-            this.workspaces.open(target.destination, { preserveWindow: !newWindow });
+            this.workspaces.open(destination, { preserveWindow: !newWindow });
         } catch (e) {
             this.logger.error(`Could not open project (stage: ${stage})`, e);
             this.messages.error(localizeMarkdown('yukibana/cloud/openProject/failed', 'Could not open project: {0}', e instanceof Error ? e.message : String(e)));
@@ -142,23 +137,36 @@ export class YukibanaProjectOpener {
         return info;
     }
 
-    protected async chooseFolder(project: Project): Promise<URI | undefined> {
+    /**
+     * Asks where `project` goes, suggesting its default destination, and returns the folder chosen: a free one, or a copy
+     * of the project; `undefined` if the person cancelled.
+     */
+    protected async askDestination(project: Project): Promise<URI | undefined> {
         this.progress?.report({
             message: nls.localize('yukibana/cloud/openProject/choosingLocation', 'Choosing download location...'),
         });
-        const folder = await this.fileDialogs.showOpenDialog({
-            title: nls.localize('yukibana/cloud/openProject/downloadLocation', "Save project '{0}'", project.title),
-            openLabel: nls.localizeByDefault('Select'),
-            canSelectFolders: true,
-            canSelectFiles: false,
-            canSelectMany: false,
-        });
-        // No selection
-        if (!folder) {
-            this.outcome = 'cancelled';
-            this.logger.info('No selection');
-        }
-        return folder;
+        return new DownloadProjectDialog({
+            title: project.title,
+            destination: await this.locations.defaultDestination(project),
+            browse: parent => this.browse(parent),
+            stateOf: folder => this.locations.stateOf(folder, project.projectId),
+            display: fsPathOf,
+        }).open();
+    }
+
+    /** Asks for a folder, starting at `parent`, and returns it; `undefined` if none was chosen. */
+    protected async browse(parent: URI): Promise<URI | undefined> {
+        const start = await this.files.resolve(parent).catch(() => undefined);
+        return this.fileDialogs.showOpenDialog(
+            {
+                title: nls.localize('yukibana/cloud/openProject/browseTitle', "Choose where to put the project's folder"),
+                openLabel: nls.localizeByDefault('Select'),
+                canSelectFolders: true,
+                canSelectFiles: false,
+                canSelectMany: false,
+            },
+            start,
+        );
     }
 
     /**
@@ -180,68 +188,6 @@ export class YukibanaProjectOpener {
             this.messages.warn(localizeMarkdown('yukibana/cloud/openProject/leftOut', 'Some files of the starter were not unpacked: {0}', result.leftOut.join('; ')));
         }
         return true;
-    }
-
-    /**
-     * Returns where `project` goes in `selectedFolder`: a folder named after its slug, or, when that already holds
-     * something, what the person chose instead; `undefined` if they cancelled.
-     */
-    protected async chooseDestination(project: Project, selectedFolder: URI): Promise<ResolvedConflict | undefined> {
-        const destination = selectedFolder.resolve(project.slug);
-        if (await this.isDirectoryEmptyOrMissing(destination)) {
-            return { strategy: 'download', destination };
-        }
-        return this.resolveConflict(project, destination);
-    }
-
-    protected async resolveConflict(project: Project, initialDestination: URI): Promise<ResolvedConflict | undefined> {
-        const initialFolderName: string = initialDestination.path.base;
-        let destination: URI = initialDestination;
-        while (!(await this.isDirectoryEmptyOrMissing(destination))) {
-            const alternative: URI = await this.findAvailableFolderName(destination);
-            const newFolderName = alternative.path.base;
-            const dialog = new OpenProjectConflictDialog(initialFolderName, newFolderName);
-            const conflictResolution = await dialog.open();
-
-            switch (conflictResolution?.strategy) {
-                case ConflictResolutionStrategy.OPEN:
-                    return {
-                        strategy: 'open',
-                        destination: destination,
-                    };
-
-                case ConflictResolutionStrategy.RENAME:
-                    destination = alternative.parent.resolve(conflictResolution.newName);
-                    break;
-
-                case ConflictResolutionStrategy.RELOCATE:
-                    const newFolder = await this.chooseFolder(project);
-                    if (!newFolder) {
-                        return;
-                    }
-                    destination = newFolder.resolve(initialFolderName);
-                    break;
-
-                default:
-                    this.outcome = 'cancelled';
-                    return;
-            }
-        }
-        return {
-            strategy: 'download',
-            destination: destination,
-        };
-    }
-
-    protected async findAvailableFolderName(initialDestination: URI): Promise<URI> {
-        const parent: URI = initialDestination.parent;
-        const initialFolderName: string = initialDestination.path.base;
-        let index: number = 1;
-        let candidate: URI;
-        do {
-            candidate = parent.resolve(`${initialFolderName}-${index++}`);
-        } while (!(await this.isDirectoryEmptyOrMissing(candidate)));
-        return candidate;
     }
 
     /** Offers to log in, and opens the project once that worked. */
@@ -273,16 +219,5 @@ export class YukibanaProjectOpener {
         this.telemetry.report(CloudTelemetry.OpenProjectURI, data, {
             kind: outcome === 'opened' || outcome === 'cancelled' ? 'usage' : 'error',
         });
-    }
-
-    private async isDirectoryEmptyOrMissing(uri: URI): Promise<boolean> {
-        if (!(await this.files.exists(uri))) {
-            return true;
-        }
-        const stat = await this.files.resolve(uri, { resolveMetadata: false });
-        if (!stat.isDirectory) {
-            return false;
-        }
-        return stat.children === undefined || stat.children.length === 0;
     }
 }
