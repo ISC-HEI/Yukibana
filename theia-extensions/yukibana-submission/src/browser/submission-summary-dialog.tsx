@@ -102,11 +102,11 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
             <>
                 <h3>{filesLabel}</h3>
                 <div>
-                    <ul className="yukibana-submission-list">
+                    <ul className='yukibana-submission-list'>
                         {entries.map(e => (
                             <li key={e.path}>
                                 <span>{e.path}</span>
-                                <span className="size">{formatSize(e.size)}</span>
+                                <span className='size'>{formatSize(e.size)}</span>
                             </li>
                         ))}
                     </ul>
@@ -122,7 +122,7 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
             return undefined;
         }
         return (
-            <div className="yukibana-availability unavailable" role="alert">
+            <div className='yukibana-availability unavailable' role='alert'>
                 <h3>{nls.localize('yukibana/submission/problemsHeader', 'This cannot be submitted yet')}</h3>
                 <ul>
                     {problems.map(p => (
@@ -142,7 +142,7 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
         return (
             <details>
                 <summary>{nls.localize('yukibana/submission/summarySkipped', 'Left out ({0})', skipped.length)}</summary>
-                <ul className="yukibana-submission-list">
+                <ul className='yukibana-submission-list'>
                     {skipped.map(p => (
                         <li key={p}>
                             <span>{p}</span>
@@ -156,13 +156,13 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
     protected renderAvailability(): React.ReactNode {
         const a = this.availability;
         if (a === undefined) {
-            return <div className="yukibana-availability checking">{nls.localize('yukibana/submission/checking', 'Checking target availability...')}</div>;
+            return <div className='yukibana-availability checking'>{nls.localize('yukibana/submission/checking', 'Checking target availability...')}</div>;
         }
         if (a.available) {
             if (a.message !== undefined) {
                 return (
                     <div>
-                        <p className="yukibana-availability-message">{a.message}</p>
+                        <p className='yukibana-availability-message'>{a.message}</p>
                     </div>
                 );
             }
@@ -170,16 +170,16 @@ export class SubmissionSummaryDialog extends ReactDialog<boolean> {
         }
         const title = nls.localize('yukibana/submission/unavailabilityHeader', 'There might be an issue');
         return (
-            <div className="yukibana-availability unavailable" role="alert">
+            <div className='yukibana-availability unavailable' role='alert'>
                 <h3>{title}</h3>
-                <div className="yukibana-availability-info">
-                    <p className="yukibana-availability-reason">{a.reason}</p>
+                <div className='yukibana-availability-info'>
+                    <p className='yukibana-availability-reason'>{a.reason}</p>
                     {a.actions?.length ? (
-                        <div className="yukibana-availability-actions">
+                        <div className='yukibana-availability-actions'>
                             {a.actions.map(action => (
                                 <button
                                     key={action.label}
-                                    className="theia-button secondary"
+                                    className='theia-button secondary'
                                     onClick={async () => {
                                         await this.runCommand(action.command);
                                         await this.refreshAvailability();

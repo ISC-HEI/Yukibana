@@ -97,16 +97,16 @@ export class DownloadProjectDialog extends ReactDialog<URI> {
 
     protected render(): React.ReactNode {
         return (
-            <div className="yukibana-download-project">
+            <div className='yukibana-download-project'>
                 <label>{nls.localize('yukibana/cloud/openProject/location', 'Location')}</label>
-                <div className="yukibana-download-project-location">
-                    <input type="text" className="theia-input" value={this.options.display(this.location)} readOnly={true} />
-                    <button type="button" className="theia-button secondary" onClick={this.browse}>
+                <div className='yukibana-download-project-location'>
+                    <input type='text' className='theia-input' value={this.options.display(this.location)} readOnly={true} />
+                    <button type='button' className='theia-button secondary' onClick={this.browse}>
                         {nls.localize('yukibana/cloud/openProject/browse', 'Browse...')}
                     </button>
                 </div>
                 <label>{nls.localize('yukibana/cloud/openProject/folderName', 'Folder name')}</label>
-                <input type="text" className="theia-input" value={this.name} onChange={this.handleNameChange} spellCheck={false} />
+                <input type='text' className='theia-input' value={this.name} onChange={this.handleNameChange} spellCheck={false} />
                 <p>{this.renderDestination()}</p>
             </div>
         );

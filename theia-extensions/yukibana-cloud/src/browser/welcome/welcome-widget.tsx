@@ -315,9 +315,9 @@ export class WelcomeWidget extends ReactWidget {
     /** Returns the sidebar and the page shown. */
     protected render(): React.ReactNode {
         return (
-            <div className="yukibana-welcome-frame">
+            <div className='yukibana-welcome-frame'>
                 {this.renderSidebar()}
-                <main className="yukibana-welcome-main">{this.page === 'recent' ? this.renderRecentPage() : this.renderAssignmentsPage()}</main>
+                <main className='yukibana-welcome-main'>{this.page === 'recent' ? this.renderRecentPage() : this.renderAssignmentsPage()}</main>
             </div>
         );
     }
@@ -325,15 +325,15 @@ export class WelcomeWidget extends ReactWidget {
     /** Returns the product, the pages and the account. */
     protected renderSidebar(): React.ReactNode {
         return (
-            <nav className="yukibana-welcome-sidebar">
-                <div className="yukibana-welcome-brand">
-                    <div className="yukibana-welcome-logo" aria-hidden />
+            <nav className='yukibana-welcome-sidebar'>
+                <div className='yukibana-welcome-brand'>
+                    <div className='yukibana-welcome-logo' aria-hidden />
                     <div>
-                        <div className="yukibana-welcome-product">Yukibana</div>
-                        {this.version && <div className="yukibana-welcome-version">{this.version}</div>}
+                        <div className='yukibana-welcome-product'>Yukibana</div>
+                        {this.version && <div className='yukibana-welcome-version'>{this.version}</div>}
                     </div>
                 </div>
-                <ul className="yukibana-welcome-nav" role="tablist">
+                <ul className='yukibana-welcome-nav' role='tablist'>
                     {this.renderNavItem('recent', 'history', nls.localize('yukibana/cloud/welcome/recent', 'Recent'))}
                     {this.renderNavItem(
                         'assignments',
@@ -342,7 +342,7 @@ export class WelcomeWidget extends ReactWidget {
                         this.loadedAssignments.filter(isToDo).length,
                     )}
                 </ul>
-                <div className="yukibana-welcome-spacer" />
+                <div className='yukibana-welcome-spacer' />
                 {this.renderAccount(this.accounts.state)}
             </nav>
         );
@@ -353,11 +353,11 @@ export class WelcomeWidget extends ReactWidget {
         const selected = this.page === page;
         return (
             <li>
-                <button role="tab" aria-selected={selected} className={`yukibana-welcome-nav-item${selected ? ' selected' : ''}`} onClick={() => this.setPage(page)}>
+                <button role='tab' aria-selected={selected} className={`yukibana-welcome-nav-item${selected ? ' selected' : ''}`} onClick={() => this.setPage(page)}>
                     <span className={codicon(icon)} />
-                    <span className="yukibana-welcome-nav-label">{label}</span>
+                    <span className='yukibana-welcome-nav-label'>{label}</span>
                     {badge > 0 && (
-                        <span className="yukibana-welcome-badge" title={nls.localize('yukibana/cloud/welcome/toDoCount', 'Assignments to hand in')}>
+                        <span className='yukibana-welcome-badge' title={nls.localize('yukibana/cloud/welcome/toDoCount', 'Assignments to hand in')}>
                             {badge}
                         </span>
                     )}
@@ -372,25 +372,25 @@ export class WelcomeWidget extends ReactWidget {
             const name = CloudAccount.displayName(state.account);
             const label = CloudAccount.label(state.account);
             return (
-                <div className="yukibana-welcome-account">
-                    <div className="yukibana-welcome-account-who">
+                <div className='yukibana-welcome-account'>
+                    <div className='yukibana-welcome-account-who'>
                         {this.renderAvatar(name, 'round')}
-                        <div className="yukibana-welcome-account-text">
-                            <div className="yukibana-welcome-account-name" title={name}>
+                        <div className='yukibana-welcome-account-text'>
+                            <div className='yukibana-welcome-account-name' title={name}>
                                 {name}
                             </div>
                             {label !== name && (
-                                <div className="yukibana-welcome-account-detail" title={label}>
+                                <div className='yukibana-welcome-account-detail' title={label}>
                                     {label}
                                 </div>
                             )}
                         </div>
                     </div>
-                    <div className="yukibana-welcome-account-actions">
-                        <button className="yukibana-welcome-link" onClick={() => this.commands.executeCommand(SwitchAccountCommand.id)}>
+                    <div className='yukibana-welcome-account-actions'>
+                        <button className='yukibana-welcome-link' onClick={() => this.commands.executeCommand(SwitchAccountCommand.id)}>
                             {nls.localize('yukibana/cloud/submission/switchAccount', 'Switch account')}
                         </button>
-                        <button className="yukibana-welcome-link" onClick={() => this.commands.executeCommand(LogoutCommand.id)}>
+                        <button className='yukibana-welcome-link' onClick={() => this.commands.executeCommand(LogoutCommand.id)}>
                             {nls.localize('yukibana/cloud/account/logOut', 'Log out')}
                         </button>
                     </div>
@@ -403,19 +403,19 @@ export class WelcomeWidget extends ReactWidget {
             unknown: nls.localize('yukibana/cloud/account/checking', 'Checking your account...'),
         }[state.kind];
         return (
-            <div className="yukibana-welcome-account">
-                <div className="yukibana-welcome-account-who">
-                    <div className="yukibana-welcome-avatar round anonymous">
+            <div className='yukibana-welcome-account'>
+                <div className='yukibana-welcome-account-who'>
+                    <div className='yukibana-welcome-avatar round anonymous'>
                         <span className={codicon('account')} />
                     </div>
-                    <div className="yukibana-welcome-account-text">
-                        <div className="yukibana-welcome-account-detail" title={detail}>
+                    <div className='yukibana-welcome-account-text'>
+                        <div className='yukibana-welcome-account-detail' title={detail}>
                             {detail}
                         </div>
                     </div>
                 </div>
                 {state.kind !== 'unknown' && (
-                    <button className="theia-button main yukibana-welcome-login" onClick={() => this.commands.executeCommand(LoginCommand.id)}>
+                    <button className='theia-button main yukibana-welcome-login' onClick={() => this.commands.executeCommand(LoginCommand.id)}>
                         {nls.localize('yukibana/cloud/account/logIn', 'Log in')}
                     </button>
                 )}
@@ -435,12 +435,12 @@ export class WelcomeWidget extends ReactWidget {
     /** Returns the search field, saying `placeholder` when empty, followed by `actions`. */
     protected renderToolbar(placeholder: string, actions: React.ReactNode): React.ReactNode {
         return (
-            <div className="yukibana-welcome-toolbar">
-                <label className="yukibana-welcome-search">
+            <div className='yukibana-welcome-toolbar'>
+                <label className='yukibana-welcome-search'>
                     <span className={codicon('search')} />
                     <input
-                        className="theia-input"
-                        type="search"
+                        className='theia-input'
+                        type='search'
                         placeholder={placeholder}
                         value={this.query}
                         spellCheck={false}
@@ -457,7 +457,7 @@ export class WelcomeWidget extends ReactWidget {
                         }}
                     />
                 </label>
-                <div className="yukibana-welcome-actions">{actions}</div>
+                <div className='yukibana-welcome-actions'>{actions}</div>
             </div>
         );
     }
@@ -466,10 +466,10 @@ export class WelcomeWidget extends ReactWidget {
     protected renderSection(title: string, assignments: readonly Assignment[]): React.ReactNode {
         return (
             <section>
-                <header className="yukibana-welcome-section-header">
+                <header className='yukibana-welcome-section-header'>
                     <h3>{title}</h3>
                 </header>
-                <ul className="yukibana-welcome-list">{assignments.map(a => this.renderAssignment(a))}</ul>
+                <ul className='yukibana-welcome-list'>{assignments.map(a => this.renderAssignment(a))}</ul>
             </section>
         );
     }
@@ -484,10 +484,10 @@ export class WelcomeWidget extends ReactWidget {
         const recent = this.recent.filter(p => this.matchesRecent(p));
         const actions = (
             <>
-                <button className="theia-button main" onClick={this.newProject}>
+                <button className='theia-button main' onClick={this.newProject}>
                     <span className={codicon('add')} /> {nls.localize('yukibana/cloud/welcome/newProject', 'New Project')}
                 </button>
-                <button className="theia-button secondary" onClick={this.openProject}>
+                <button className='theia-button secondary' onClick={this.openProject}>
                     <span className={codicon('folder-opened')} /> {nls.localize('yukibana/cloud/welcome/open', 'Open')}
                 </button>
             </>
@@ -495,11 +495,11 @@ export class WelcomeWidget extends ReactWidget {
         return (
             <>
                 {this.renderToolbar(nls.localize('yukibana/cloud/welcome/searchProjects', 'Search projects'), actions)}
-                <div className="yukibana-welcome-scroll">
+                <div className='yukibana-welcome-scroll'>
                     {recent.length > 0 ? (
-                        <ul className="yukibana-welcome-list">{recent.map(p => this.renderRecent(p))}</ul>
+                        <ul className='yukibana-welcome-list'>{recent.map(p => this.renderRecent(p))}</ul>
                     ) : (
-                        <p className="yukibana-welcome-empty-line">{nls.localize('yukibana/cloud/welcome/noMatch', 'Nothing matches your search.')}</p>
+                        <p className='yukibana-welcome-empty-line'>{nls.localize('yukibana/cloud/welcome/noMatch', 'Nothing matches your search.')}</p>
                     )}
                 </div>
             </>
@@ -510,11 +510,11 @@ export class WelcomeWidget extends ReactWidget {
     protected renderHero(): React.ReactNode {
         const loggedOut = this.accounts.state.kind === 'logged-out';
         return (
-            <div className="yukibana-welcome-hero">
-                <div className="yukibana-welcome-hero-logo" aria-hidden />
+            <div className='yukibana-welcome-hero'>
+                <div className='yukibana-welcome-hero-logo' aria-hidden />
                 <h1>{nls.localize('yukibana/cloud/welcome/heading', 'Welcome to Yukibana')}</h1>
                 <p>{nls.localize('yukibana/cloud/welcome/heroDetail', 'Create a new project, open one from disk, or get an assignment from your course.')}</p>
-                <div className="yukibana-welcome-tiles">
+                <div className='yukibana-welcome-tiles'>
                     {this.renderTile('add', nls.localize('yukibana/cloud/welcome/newProject', 'New Project'), this.newProject)}
                     {this.renderTile('folder-opened', nls.localize('yukibana/cloud/welcome/open', 'Open'), this.openProject)}
                     {loggedOut
@@ -528,7 +528,7 @@ export class WelcomeWidget extends ReactWidget {
     /** Returns a large button showing `icon` and `label` that calls `onClick`. */
     protected renderTile(icon: string, label: string, onClick: () => unknown): React.ReactNode {
         return (
-            <button className="yukibana-welcome-tile" onClick={onClick}>
+            <button className='yukibana-welcome-tile' onClick={onClick}>
                 <span className={`yukibana-welcome-tile-icon ${codicon(icon)}`} />
                 <span>{label}</span>
             </button>
@@ -556,24 +556,24 @@ export class WelcomeWidget extends ReactWidget {
         const assignment = this.assignmentOf(project);
         return (
             <li key={project.uri.toString()}>
-                <div className="yukibana-welcome-row" title={project.location} {...activate(() => this.openFolder(project.uri))}>
+                <div className='yukibana-welcome-row' title={project.location} {...activate(() => this.openFolder(project.uri))}>
                     {/* A copy of an assignment takes its course's colour, so it matches its row under Assignments */}
                     {this.renderAvatar(project.name, 'square', assignment?.project.courseCode ?? project.name)}
-                    <div className="yukibana-welcome-row-text">
-                        <div className="yukibana-welcome-row-title">
+                    <div className='yukibana-welcome-row-text'>
+                        <div className='yukibana-welcome-row-title'>
                             {project.name}
                             {this.renderOpenChip(project)}
                         </div>
-                        <div className="yukibana-welcome-row-detail">
+                        <div className='yukibana-welcome-row-detail'>
                             {assignment && (
-                                <span className="yukibana-welcome-course">
+                                <span className='yukibana-welcome-course'>
                                     {assignment.project.courseCode} · {assignment.project.title}
                                 </span>
                             )}
                             {project.location}
                         </div>
                     </div>
-                    {assignment && <div className="yukibana-welcome-row-status">{this.renderStatus(assignment)}</div>}
+                    {assignment && <div className='yukibana-welcome-row-status'>{this.renderStatus(assignment)}</div>}
                     <button
                         className={`yukibana-welcome-row-remove ${codicon('close')}`}
                         title={nls.localize('yukibana/cloud/welcome/removeRecent', 'Remove from recent projects')}
@@ -594,7 +594,7 @@ export class WelcomeWidget extends ReactWidget {
         const where = this.whereOpen(project.uri);
         return (
             where && (
-                <span className="yukibana-welcome-chip">
+                <span className='yukibana-welcome-chip'>
                     {where === 'here' ? nls.localize('yukibana/cloud/welcome/thisWindow', 'This window') : nls.localize('yukibana/cloud/welcome/openInWindow', 'Open')}
                 </span>
             )
@@ -611,14 +611,14 @@ export class WelcomeWidget extends ReactWidget {
     /** Returns the Assignments page. */
     protected renderAssignmentsPage(): React.ReactNode {
         const refresh = (
-            <button className="theia-button secondary" onClick={() => this.loadAssignments(this.accounts.state)}>
+            <button className='theia-button secondary' onClick={() => this.loadAssignments(this.accounts.state)}>
                 <span className={codicon('refresh')} /> {nls.localize('yukibana/cloud/welcome/refresh', 'Refresh')}
             </button>
         );
         return (
             <>
                 {this.renderToolbar(nls.localize('yukibana/cloud/welcome/searchAssignments', 'Search assignments'), refresh)}
-                <div className="yukibana-welcome-scroll">{this.renderAssignmentsBody()}</div>
+                <div className='yukibana-welcome-scroll'>{this.renderAssignmentsBody()}</div>
             </>
         );
     }
@@ -632,7 +632,7 @@ export class WelcomeWidget extends ReactWidget {
                 return this.renderEmpty(
                     codicon('mortar-board'),
                     nls.localize('yukibana/cloud/welcome/logInForAssignments', 'Log in to see the assignments of your courses.'),
-                    <button className="theia-button main" onClick={() => this.commands.executeCommand(LoginCommand.id)}>
+                    <button className='theia-button main' onClick={() => this.commands.executeCommand(LoginCommand.id)}>
                         {nls.localize('yukibana/cloud/account/logIn', 'Log in')}
                     </button>,
                 );
@@ -640,7 +640,7 @@ export class WelcomeWidget extends ReactWidget {
                 return this.renderEmpty(
                     codicon('warning'),
                     nls.localize('yukibana/cloud/welcome/assignmentsFailed', 'Could not get your assignments: {0}', this.assignments.reason),
-                    <button className="theia-button secondary" onClick={() => this.loadAssignments(this.accounts.state)}>
+                    <button className='theia-button secondary' onClick={() => this.loadAssignments(this.accounts.state)}>
                         {nls.localize('yukibana/cloud/account/retry', 'Try again')}
                     </button>,
                 );
@@ -651,7 +651,7 @@ export class WelcomeWidget extends ReactWidget {
         }
         const list = this.assignments.list.filter(a => this.matchesAssignment(a));
         if (list.length === 0) {
-            return <p className="yukibana-welcome-empty-line">{nls.localize('yukibana/cloud/welcome/noMatch', 'Nothing matches your search.')}</p>;
+            return <p className='yukibana-welcome-empty-line'>{nls.localize('yukibana/cloud/welcome/noMatch', 'Nothing matches your search.')}</p>;
         }
         const todo = list.filter(isToDo);
         // Staff who hand in to test their own project still find it under Teaching only
@@ -669,7 +669,7 @@ export class WelcomeWidget extends ReactWidget {
     /** Returns a placeholder with the `iconClass` icon, `text` and `action`, if any. */
     protected renderEmpty(iconClass: string, text: string, action?: React.ReactNode): React.ReactNode {
         return (
-            <div className="yukibana-welcome-empty">
+            <div className='yukibana-welcome-empty'>
                 <span className={iconClass} />
                 <p>{text}</p>
                 {action}
@@ -696,19 +696,19 @@ export class WelcomeWidget extends ReactWidget {
                 >
                     {/* Named after the assignment, coloured after the course, so a course's work looks alike */}
                     {this.renderAvatar(project.title, 'square', project.courseCode)}
-                    <div className="yukibana-welcome-row-text">
-                        <div className="yukibana-welcome-row-title">{project.title}</div>
-                        <div className="yukibana-welcome-row-detail">
+                    <div className='yukibana-welcome-row-text'>
+                        <div className='yukibana-welcome-row-title'>{project.title}</div>
+                        <div className='yukibana-welcome-row-detail'>
                             {project.courseCode} · {project.editionLabel}
-                            {project.role !== 'student' && <span className="yukibana-welcome-chip">{this.roleLabel(project.role)}</span>}
+                            {project.role !== 'student' && <span className='yukibana-welcome-chip'>{this.roleLabel(project.role)}</span>}
                             {local && (
-                                <span className="yukibana-welcome-local">
+                                <span className='yukibana-welcome-local'>
                                     <span className={codicon('folder')} /> {local.location}
                                 </span>
                             )}
                         </div>
                     </div>
-                    <div className="yukibana-welcome-row-status">{this.renderStatus(a)}</div>
+                    <div className='yukibana-welcome-row-status'>{this.renderStatus(a)}</div>
                 </div>
             </li>
         );
@@ -722,7 +722,7 @@ export class WelcomeWidget extends ReactWidget {
                 {/* Work handed in before the deadline is not late; only a deadline still ahead says anything then */}
                 {!(a.submitted && a.urgency === 'late') && this.renderDue(a)}
                 {a.submitted && (
-                    <span className="yukibana-welcome-submitted" title={project.myLastSubmittedAt ? new Date(project.myLastSubmittedAt).toLocaleString(nls.locale) : undefined}>
+                    <span className='yukibana-welcome-submitted' title={project.myLastSubmittedAt ? new Date(project.myLastSubmittedAt).toLocaleString(nls.locale) : undefined}>
                         <span className={codicon('pass-filled')} />
                         {project.mySubmissions === 1
                             ? nls.localize('yukibana/cloud/welcome/submittedOnce', 'Handed in')
