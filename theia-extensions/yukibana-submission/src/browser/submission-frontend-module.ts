@@ -13,9 +13,9 @@ import { SubmitCommandContribution } from './submission-frontend-contribution';
 
 export default new ContainerModule(bind => {
     bind(CommandContribution).to(SubmitCommandContribution);
-    bind(SubmissionService).toDynamicValue(
-        ctx => ServiceConnectionProvider.createProxy<SubmissionService>(ctx.container, submissionServicePath)
-    ).inSingletonScope();
+    bind(SubmissionService)
+        .toDynamicValue(ctx => ServiceConnectionProvider.createProxy<SubmissionService>(ctx.container, submissionServicePath))
+        .inSingletonScope();
 
     bindContributionProvider(bind, SubmissionTarget);
     bind(FileSubmissionTarget).toSelf().inSingletonScope();

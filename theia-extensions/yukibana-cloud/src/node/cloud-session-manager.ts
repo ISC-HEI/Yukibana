@@ -43,7 +43,9 @@ export class CloudSessionManager implements SessionStore {
     }
 
     async login(open: OpenLoginUrl): Promise<LoginResult> {
-        this.pending ??= this.doLogin(open).finally(() => { this.pending = undefined; });
+        this.pending ??= this.doLogin(open).finally(() => {
+            this.pending = undefined;
+        });
         return this.pending;
     }
 
@@ -121,7 +123,7 @@ export class CloudSessionManager implements SessionStore {
 
     async load(): Promise<Session | null> {
         // eslint-disable-next-line no-null/no-null
-        return await this.getSession() ?? null;
+        return (await this.getSession()) ?? null;
     }
 
     save(session: Session): Promise<void> {

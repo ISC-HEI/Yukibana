@@ -28,9 +28,10 @@ export class ConfigProvider implements FrontendApplicationContribution {
         @inject(FileService) protected readonly files: FileService,
         @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService,
         @inject(ReadOnlyPolicy) protected readonly readOnlyPolicy: ReadOnlyPolicy,
-        @inject(ILogger) @named('yukibana:ConfigProvider')
-        protected readonly logger: ILogger
-    ) { }
+        @inject(ILogger)
+        @named('yukibana:ConfigProvider')
+        protected readonly logger: ILogger,
+    ) {}
 
     async onStart(): Promise<void> {
         await this.workspaceService.ready;
@@ -46,7 +47,7 @@ export class ConfigProvider implements FrontendApplicationContribution {
             return;
         }
         this._configURI = root.resolve(YUKIBANA_CONFIG_FILENAME);
-        if (!await this.files.exists(this._configURI)) {
+        if (!(await this.files.exists(this._configURI))) {
             this.applyDefault();
             return;
         }
@@ -65,7 +66,7 @@ export class ConfigProvider implements FrontendApplicationContribution {
                 if (e.contains(this._configURI)) {
                     read();
                 }
-            })
+            }),
         );
         await read();
     }

@@ -1,19 +1,17 @@
 {
-    "extends": "../../configs/base.tsconfig",
-    "compilerOptions": {
-        "rootDir": "src",
-        "outDir": "lib",
-        "esModuleInterop": true
+  "extends": "../../configs/base.tsconfig",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib",
+    "esModuleInterop": true
+  },
+  "include": ["src"],
+  "references": [
+    {
+      "path": "../yukibana"
     },
-    "include": [
-        "src"
-    ],
-    "references": [
-        {
-            "path": "../yukibana"
-        },
-        {
-            "path": "../../packages/yukibana-common"
-        }
-    ]
+    {
+      "path": "../../packages/yukibana-common"
+    }
+  ]
 }

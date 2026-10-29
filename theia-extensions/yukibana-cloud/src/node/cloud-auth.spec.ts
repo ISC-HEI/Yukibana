@@ -29,15 +29,22 @@ interface Mocks {
     calls: string[];
 }
 
-function setup(options: { loggedIn: boolean, me?: () => Promise<Me> }): Mocks {
+function setup(options: { loggedIn: boolean; me?: () => Promise<Me> }): Mocks {
     const loginChanged = new Emitter<void>();
     const mocks = { loginChanged, notified: 0, calls: [] as string[] };
     const sessions = {
         isLoggedIn: async () => options.loggedIn,
         onLoginChanged: loginChanged.event,
-        forget: async () => { mocks.calls.push('forget'); },
-        logout: async () => { mocks.calls.push('logout'); },
-        switchAccount: async () => { mocks.calls.push('switchAccount'); return { ok: true }; },
+        forget: async () => {
+            mocks.calls.push('forget');
+        },
+        logout: async () => {
+            mocks.calls.push('logout');
+        },
+        switchAccount: async () => {
+            mocks.calls.push('switchAccount');
+            return { ok: true };
+        },
     };
     const client = {
         me: async () => {
@@ -52,11 +59,18 @@ function setup(options: { loggedIn: boolean, me?: () => Promise<Me> }): Mocks {
         logger: new MockLogger() as ILogger,
     });
     (auth as unknown as { init(): void }).init();
-    const frontend = (): void => { mocks.notified++; };
+    const frontend = (): void => {
+        mocks.notified++;
+    };
     auth.setClient({ openLoginUrl: () => undefined, notifyLoginChanged: frontend } as AuthClient);
     return {
-        auth, frontend, loginChanged, calls: mocks.calls,
-        get notified(): number { return mocks.notified; },
+        auth,
+        frontend,
+        loginChanged,
+        calls: mocks.calls,
+        get notified(): number {
+            return mocks.notified;
+        },
     };
 }
 
@@ -75,28 +89,54 @@ describe('CloudAuthImpl', () => {
 
         it('should forget a session the Auth server refuses to renew, so logging in works again', async () => {
             const refused = new NotLoggedIn('the session has expired and could not be renewed (the Auth server answered 400: invalid_grant); log in again');
-            const mocks = setup({ loggedIn: true, me: async () => { throw refused; } });
+            const mocks = setup({
+                loggedIn: true,
+                me: async () => {
+                    throw refused;
+                },
+            });
             expect(await mocks.auth.whoAmI()).to.equal(undefined);
             expect(mocks.calls).to.deep.equal(['me', 'forget']);
         });
 
         it('should keep a session it could not renew for want of a network', async () => {
             const offline = new NotLoggedIn('the session has expired and could not be renewed (fetch failed); log in again');
-            const mocks = setup({ loggedIn: true, me: async () => { throw offline; } });
-            const error = await mocks.auth.whoAmI().then(() => undefined, e => e);
+            const mocks = setup({
+                loggedIn: true,
+                me: async () => {
+                    throw offline;
+                },
+            });
+            const error = await mocks.auth.whoAmI().then(
+                () => undefined,
+                e => e,
+            );
             expect(error).to.equal(offline);
             expect(mocks.calls).to.deep.equal(['me']);
         });
 
         it('should forget a session the registry refuses', async () => {
-            const mocks = setup({ loggedIn: true, me: async () => { throw new RegistryError(401, 'the registry answered 401'); } });
+            const mocks = setup({
+                loggedIn: true,
+                me: async () => {
+                    throw new RegistryError(401, 'the registry answered 401');
+                },
+            });
             expect(await mocks.auth.whoAmI()).to.equal(undefined);
             expect(mocks.calls).to.deep.equal(['me', 'forget']);
         });
 
         it('should report other errors and keep the session', async () => {
-            const mocks = setup({ loggedIn: true, me: async () => { throw new TypeError('fetch failed'); } });
-            const error = await mocks.auth.whoAmI().then(() => undefined, e => e);
+            const mocks = setup({
+                loggedIn: true,
+                me: async () => {
+                    throw new TypeError('fetch failed');
+                },
+            });
+            const error = await mocks.auth.whoAmI().then(
+                () => undefined,
+                e => e,
+            );
             expect(error).to.be.instanceOf(TypeError);
             expect(mocks.calls).to.deep.equal(['me']);
         });

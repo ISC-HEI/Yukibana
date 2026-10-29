@@ -34,7 +34,7 @@ export class CloudSubmissionTarget implements SubmissionTarget {
                         label: nls.localize('yukibana/cloud/submission/login', 'Log in'),
                         command: LoginCommand.id,
                     },
-                ]
+                ],
             };
         }
 
@@ -93,7 +93,11 @@ export class CloudSubmissionTarget implements SubmissionTarget {
             return nls.localize(
                 'yukibana/cloud/submission/notAllowedStaff',
                 '{0}: you are its {1} in {2} {3}, logged in as {4}. Only enrolled students can submit.',
-                notAllowed, project.role, project.courseCode, project.editionLabel, CloudAccount.label(state.account)
+                notAllowed,
+                project.role,
+                project.courseCode,
+                project.editionLabel,
+                CloudAccount.label(state.account),
             );
         }
         return asAccount(notAllowed, state.account);

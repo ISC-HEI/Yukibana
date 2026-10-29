@@ -22,13 +22,13 @@ const ADDED: FileChangeType = 1;
 const DELETED: FileChangeType = 2;
 
 interface MockFileService extends Pick<FileService, 'exists' | 'read' | 'watch' | 'onDidFilesChange'> {
-    write(resource: URI, content: string): void
-    delete(resource: URI): void
+    write(resource: URI, content: string): void;
+    delete(resource: URI): void;
 }
 
 interface MockWorkspaceService extends Pick<WorkspaceService, 'ready' | 'onWorkspaceChanged' | 'tryGetRoots'> {
-    markReady(): void
-    setRoot(root: URI): void
+    markReady(): void;
+    setRoot(root: URI): void;
 }
 
 function createMockFileService(files: Record<string, string>): MockFileService {
@@ -52,20 +52,20 @@ function createMockFileService(files: Record<string, string>): MockFileService {
                 value: doc,
             };
         },
-        watch: (resource: URI, options: WatchOptions): Disposable => Disposable.create(
-            () => watched.delete(resource.toString())
-        ),
+        watch: (resource: URI, options: WatchOptions): Disposable => Disposable.create(() => watched.delete(resource.toString())),
         onDidFilesChange: changeEmitter.event,
         write: (resource: URI, content: string) => {
             const path = resource.toString();
             const added = files[path] === undefined;
             files[path] = content;
-            changeEmitter.fire(new FileChangesEvent([
-                {
-                    resource: resource,
-                    type: added ? ADDED : UPDATED,
-                }
-            ]));
+            changeEmitter.fire(
+                new FileChangesEvent([
+                    {
+                        resource: resource,
+                        type: added ? ADDED : UPDATED,
+                    },
+                ]),
+            );
         },
         delete: (resource: URI): void => {
             const path = resource.toString();
@@ -73,13 +73,15 @@ function createMockFileService(files: Record<string, string>): MockFileService {
                 return;
             }
             delete files[path];
-            changeEmitter.fire(new FileChangesEvent([
-                {
-                    resource: resource,
-                    type: DELETED,
-                }
-            ]));
-        }
+            changeEmitter.fire(
+                new FileChangesEvent([
+                    {
+                        resource: resource,
+                        type: DELETED,
+                    },
+                ]),
+            );
+        },
     };
 }
 
@@ -87,20 +89,23 @@ function createMockWorkspaceService(initialRoot?: URI): MockWorkspaceService {
     const ready = new Deferred<void>();
     const changeEmitter = new Emitter<FileStat[]>();
     let root: URI | undefined = initialRoot;
-    const getRoots = (): FileStat[] => root ? [
-        {
-            resource: root,
-            name: root.path.base || root.path.toString(),
-            isFile: false,
-            isDirectory: true,
-            isSymbolicLink: false,
-            isReadonly: false,
-            mtime: 0,
-            ctime: 0,
-            size: 0,
-            etag: '',
-        },
-    ] : [];
+    const getRoots = (): FileStat[] =>
+        root
+            ? [
+                  {
+                      resource: root,
+                      name: root.path.base || root.path.toString(),
+                      isFile: false,
+                      isDirectory: true,
+                      isSymbolicLink: false,
+                      isReadonly: false,
+                      mtime: 0,
+                      ctime: 0,
+                      size: 0,
+                      etag: '',
+                  },
+              ]
+            : [];
     return {
         ready: ready.promise,
         markReady: () => ready.resolve(),
@@ -126,12 +131,7 @@ function setup(initialRoot?: URI): MockServices {
     const fileService = createMockFileService({});
     const workspaceService = createMockWorkspaceService();
     const logger = new MockLogger();
-    const provider = new ConfigProvider(
-        fileService as unknown as FileService,
-        workspaceService as unknown as WorkspaceService,
-        readOnlyPolicy,
-        logger,
-    );
+    const provider = new ConfigProvider(fileService as unknown as FileService, workspaceService as unknown as WorkspaceService, readOnlyPolicy, logger);
     if (!!initialRoot) {
         workspaceService.setRoot(initialRoot);
     }

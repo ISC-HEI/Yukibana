@@ -12,7 +12,7 @@ export class AssignmentPaneContribution extends AbstractViewContribution<Assignm
             widgetId: AssignmentPaneWidget.ID,
             widgetName: AssignmentPaneWidget.LABEL,
             defaultWidgetOptions: { area: 'left' },
-            toggleCommandId: 'yukibana.assignmentPane.toggle'
+            toggleCommandId: 'yukibana.assignmentPane.toggle',
         });
     }
 }

@@ -11,12 +11,12 @@ export const AuthClient = Symbol('AuthClient');
 export const CloudService = Symbol('CloudService');
 
 export interface CloudAuth {
-    login(): Promise<LoginResult>
+    login(): Promise<LoginResult>;
     /** Logs in again, ending the current session only once the new one is there. */
-    switchAccount(): Promise<LoginResult>
-    logout(): Promise<void>
+    switchAccount(): Promise<LoginResult>;
+    logout(): Promise<void>;
     /** The account the registry knows the session as, or undefined when nobody is logged in. */
-    whoAmI(): Promise<CloudAccount | undefined>
+    whoAmI(): Promise<CloudAccount | undefined>;
 }
 
 export interface AuthClient {
@@ -40,28 +40,32 @@ export namespace CloudAccount {
     }
 }
 
-export type LoginResult = {
-    readonly ok: true;
-} | {
-    readonly ok: false;
-    readonly reason: string;
-};
+export type LoginResult =
+    | {
+          readonly ok: true;
+      }
+    | {
+          readonly ok: false;
+          readonly reason: string;
+      };
 
-export type SubmissionResult = (
-    { readonly ok: true } & Accepted
-) | {
-    readonly ok: false,
-    readonly reason: string
-};
+export type SubmissionResult =
+    | ({ readonly ok: true } & Accepted)
+    | {
+          readonly ok: false;
+          readonly reason: string;
+      };
 
 /** A starter unpacked, with the entries left out (each `path: reason`), or why nothing was unpacked. */
-export type DownloadResult = {
-    readonly ok: true;
-    readonly leftOut: readonly string[];
-} | {
-    readonly ok: false;
-    readonly reason: string;
-};
+export type DownloadResult =
+    | {
+          readonly ok: true;
+          readonly leftOut: readonly string[];
+      }
+    | {
+          readonly ok: false;
+          readonly reason: string;
+      };
 
 export enum CanSubmitStatus {
     NOT_ALLOWED,
@@ -69,14 +73,11 @@ export enum CanSubmitStatus {
     OPEN,
     LATE,
     CLOSED,
-    UNKNOWN
+    UNKNOWN,
 }
 
 /** A project, or why there is none: the registry answers 404 both for no such project and for one the caller may not see. */
-export type ProjectLookup =
-    | { readonly kind: 'found', readonly project: Project }
-    | { readonly kind: 'not-found' }
-    | { readonly kind: 'not-logged-in' };
+export type ProjectLookup = { readonly kind: 'found'; readonly project: Project } | { readonly kind: 'not-found' } | { readonly kind: 'not-logged-in' };
 
 /**
  * Projects the person can see, or why there are none to show.
@@ -84,9 +85,9 @@ export type ProjectLookup =
  * A student sees the published projects of their editions, staff all of their editions'; the registry decides which.
  */
 export type ProjectListing =
-    | { readonly kind: 'found', readonly projects: readonly Project[] }
+    | { readonly kind: 'found'; readonly projects: readonly Project[] }
     | { readonly kind: 'not-logged-in' }
-    | { readonly kind: 'error', readonly reason: string };
+    | { readonly kind: 'error'; readonly reason: string };
 
 /** Whether the caller may submit, with the project it was decided from when the registry answered. */
 export interface SubmitAvailability {
@@ -99,10 +100,10 @@ export interface CloudService {
      * Sends submission `submissionId`, as the submission service prepared it, to the registry for `projectId`, with
      * the release its folder started from, and returns what the registry answered or why it was not sent.
      */
-    submit(projectId: string, submissionId: string): Promise<SubmissionResult>
-    getProjectInfo(projectId: string): Promise<ProjectLookup>
+    submit(projectId: string, submissionId: string): Promise<SubmissionResult>;
+    getProjectInfo(projectId: string): Promise<ProjectLookup>;
     /** Returns the projects the logged-in person can see; a failure other than being logged out is an `error`. */
-    listProjects(): Promise<ProjectListing>
+    listProjects(): Promise<ProjectListing>;
     /**
      * Unpacks the starter of `projectId` into `destinationURI`, creating it, and returns the entries left out, or why
      * nothing was unpacked.
@@ -111,6 +112,6 @@ export interface CloudService {
      * not a whole `.tar.gz`. A starter that is one folder with a `yukibana.json` in it is unpacked without that folder,
      * whatever its name.
      */
-    downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult>
-    canSubmitProject(projectId: string): Promise<SubmitAvailability>
+    downloadProject(projectId: string, destinationURI: string): Promise<DownloadResult>;
+    canSubmitProject(projectId: string): Promise<SubmitAvailability>;
 }

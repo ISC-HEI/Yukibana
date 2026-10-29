@@ -47,39 +47,33 @@ const ids = (projects: readonly { project: Project }[]) => projects.map(a => a.p
 describe('welcome screen', () => {
     describe('dueAssignments', () => {
         it('should put late work first, then the nearest deadline, then work without one', () => {
-            const list = dueAssignments([
-                project('no-deadline'),
-                project('next-month', { deadline: at(30 * DAY) }),
-                project('tomorrow', { deadline: at(20 * HOUR) }),
-                project('late', { deadline: at(-HOUR), closesAt: at(DAY), late: true }),
-                project('in-three-days', { deadline: at(3 * DAY) }),
-            ], NOW);
+            const list = dueAssignments(
+                [
+                    project('no-deadline'),
+                    project('next-month', { deadline: at(30 * DAY) }),
+                    project('tomorrow', { deadline: at(20 * HOUR) }),
+                    project('late', { deadline: at(-HOUR), closesAt: at(DAY), late: true }),
+                    project('in-three-days', { deadline: at(3 * DAY) }),
+                ],
+                NOW,
+            );
             expect(ids(list)).to.deep.equal(['late', 'tomorrow', 'in-three-days', 'next-month', 'no-deadline']);
             expect(list.map(a => a.urgency)).to.deep.equal(['late', 'soon', 'upcoming', 'later', 'none']);
         });
 
         it('should put work already handed in after work that is not', () => {
-            const list = dueAssignments([
-                project('handed-in', { deadline: at(HOUR), mySubmissions: 2 }),
-                project('to-do', { deadline: at(10 * DAY) }),
-            ], NOW);
+            const list = dueAssignments([project('handed-in', { deadline: at(HOUR), mySubmissions: 2 }), project('to-do', { deadline: at(10 * DAY) })], NOW);
             expect(ids(list)).to.deep.equal(['to-do', 'handed-in']);
             expect(list.map(a => a.submitted)).to.deep.equal([false, true]);
         });
 
         it('should leave out projects whose window has closed', () => {
-            const list = dueAssignments([
-                project('closed', { deadline: at(-2 * DAY), closesAt: at(-DAY) }),
-                project('open'),
-            ], NOW);
+            const list = dueAssignments([project('closed', { deadline: at(-2 * DAY), closesAt: at(-DAY) }), project('open')], NOW);
             expect(ids(list)).to.deep.equal(['open']);
         });
 
         it('should show staff their drafts, after everything published', () => {
-            const list = dueAssignments([
-                project('draft', { availableAfter: null, role: 'owner' }),
-                project('published', { role: 'owner', deadline: at(30 * DAY) }),
-            ], NOW);
+            const list = dueAssignments([project('draft', { availableAfter: null, role: 'owner' }), project('published', { role: 'owner', deadline: at(30 * DAY) })], NOW);
             expect(ids(list)).to.deep.equal(['published', 'draft']);
             expect(list[1].urgency).to.equal('draft');
         });

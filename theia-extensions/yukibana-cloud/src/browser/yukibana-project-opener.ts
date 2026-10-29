@@ -18,8 +18,8 @@ import { OpenProjectNewWindowDialog } from './open-project-window-dialog';
 
 /** Where a project goes: a folder to download the starter into, or one that already holds the project, to open. */
 interface ResolvedConflict {
-    readonly strategy: 'open' | 'download'
-    readonly destination: URI
+    readonly strategy: 'open' | 'download';
+    readonly destination: URI;
 }
 
 @injectable()
@@ -57,7 +57,7 @@ export class YukibanaProjectOpener {
             }
 
             this.progress = await this.messages.showProgress({
-                text: nls.localize('yukibana/cloud/openProject/progressMessage', 'Opening project')
+                text: nls.localize('yukibana/cloud/openProject/progressMessage', 'Opening project'),
             });
 
             stage = 'info';
@@ -78,13 +78,13 @@ export class YukibanaProjectOpener {
 
             if (target.strategy === 'download') {
                 stage = 'download';
-                if (!await this.downloadStarter(projectId, target.destination)) {
+                if (!(await this.downloadStarter(projectId, target.destination))) {
                     return;
                 }
             }
 
             this.progress.report({
-                message: nls.localize('yukibana/cloud/openProject/opening', 'Opening...')
+                message: nls.localize('yukibana/cloud/openProject/opening', 'Opening...'),
             });
 
             stage = 'window';
@@ -117,7 +117,7 @@ export class YukibanaProjectOpener {
 
     protected async getProjectInfo(uri: URI, projectId: string): Promise<Project | undefined> {
         this.progress?.report({
-            message: nls.localize('yukibana/cloud/openProject/gettingInfo', 'Getting info...')
+            message: nls.localize('yukibana/cloud/openProject/gettingInfo', 'Getting info...'),
         });
         const lookup = await this.service.getProjectInfo(projectId);
         if (lookup.kind === 'not-logged-in') {
@@ -136,7 +136,7 @@ export class YukibanaProjectOpener {
         if (!info.starterReady) {
             this.outcome = 'no-starter';
             this.logger.info('Project has no starter');
-            this.messages.error(localizeMarkdown('yukibana/cloud/openProject/noStarter', 'Project \'{0}\' has no starter files to download yet', info.title));
+            this.messages.error(localizeMarkdown('yukibana/cloud/openProject/noStarter', "Project '{0}' has no starter files to download yet", info.title));
             return;
         }
         return info;
@@ -144,10 +144,10 @@ export class YukibanaProjectOpener {
 
     protected async chooseFolder(project: Project): Promise<URI | undefined> {
         this.progress?.report({
-            message: nls.localize('yukibana/cloud/openProject/choosingLocation', 'Choosing download location...')
+            message: nls.localize('yukibana/cloud/openProject/choosingLocation', 'Choosing download location...'),
         });
         const folder = await this.fileDialogs.showOpenDialog({
-            title: nls.localize('yukibana/cloud/openProject/downloadLocation', 'Save project \'{0}\'', project.title),
+            title: nls.localize('yukibana/cloud/openProject/downloadLocation', "Save project '{0}'", project.title),
             openLabel: nls.localizeByDefault('Select'),
             canSelectFolders: true,
             canSelectFiles: false,
@@ -167,7 +167,7 @@ export class YukibanaProjectOpener {
      */
     protected async downloadStarter(projectId: string, destination: URI): Promise<boolean> {
         this.progress?.report({
-            message: nls.localize('yukibana/cloud/openProject/downloading', 'Downloading...')
+            message: nls.localize('yukibana/cloud/openProject/downloading', 'Downloading...'),
         });
         const result = await this.service.downloadProject(projectId, destination.toString());
         if (!result.ok) {
@@ -197,7 +197,7 @@ export class YukibanaProjectOpener {
     protected async resolveConflict(project: Project, initialDestination: URI): Promise<ResolvedConflict | undefined> {
         const initialFolderName: string = initialDestination.path.base;
         let destination: URI = initialDestination;
-        while (!await this.isDirectoryEmptyOrMissing(destination)) {
+        while (!(await this.isDirectoryEmptyOrMissing(destination))) {
             const alternative: URI = await this.findAvailableFolderName(destination);
             const newFolderName = alternative.path.base;
             const dialog = new OpenProjectConflictDialog(initialFolderName, newFolderName);
@@ -240,7 +240,7 @@ export class YukibanaProjectOpener {
         let candidate: URI;
         do {
             candidate = parent.resolve(`${initialFolderName}-${index++}`);
-        } while (!await this.isDirectoryEmptyOrMissing(candidate));
+        } while (!(await this.isDirectoryEmptyOrMissing(candidate)));
         return candidate;
     }
 
@@ -262,7 +262,7 @@ export class YukibanaProjectOpener {
     }
 
     private report(outcome: CloudTelemetry.OpenProjectOutcome, stage: CloudTelemetry.OpenProjectStage, start: number, projectId?: string, newWindow?: boolean): void {
-        const durationMs = (Date.now()) - start;
+        const durationMs = Date.now() - start;
         const data = {
             outcome: outcome,
             stage: stage,
@@ -270,17 +270,13 @@ export class YukibanaProjectOpener {
             projectId: projectId ?? '',
             newWindow: newWindow ?? false,
         } satisfies CloudTelemetry.OpenProjectURIData;
-        this.telemetry.report(
-            CloudTelemetry.OpenProjectURI,
-            data,
-            {
-                kind: (outcome === 'opened' || outcome === 'cancelled') ? 'usage' : 'error',
-            }
-        );
+        this.telemetry.report(CloudTelemetry.OpenProjectURI, data, {
+            kind: outcome === 'opened' || outcome === 'cancelled' ? 'usage' : 'error',
+        });
     }
 
     private async isDirectoryEmptyOrMissing(uri: URI): Promise<boolean> {
-        if (!await this.files.exists(uri)) {
+        if (!(await this.files.exists(uri))) {
             return true;
         }
         const stat = await this.files.resolve(uri, { resolveMetadata: false });

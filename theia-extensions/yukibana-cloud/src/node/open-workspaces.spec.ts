@@ -10,11 +10,16 @@ import { OpenWorkspaces, OpenWorkspacesServerImpl } from './open-workspaces';
  * Returns a window's connection to `open`, whose window counts how often it is brought to the front
  * and answers with `focus()`.
  */
-function connect(open: OpenWorkspaces, focus = async () => { }): { server: OpenWorkspacesServerImpl, focused: () => number } {
+function connect(open: OpenWorkspaces, focus = async () => {}): { server: OpenWorkspacesServerImpl; focused: () => number } {
     let focused = 0;
     const server = new OpenWorkspacesServerImpl();
     Object.assign(server, { open });
-    server.setClient({ focus: () => { focused++; return focus(); } } as OpenWorkspacesClient);
+    server.setClient({
+        focus: () => {
+            focused++;
+            return focus();
+        },
+    } as OpenWorkspacesClient);
     return { server, focused: () => focused };
 }
 

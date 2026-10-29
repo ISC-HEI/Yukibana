@@ -46,13 +46,13 @@ const projectUri = new URI('file:///home/student/projects/warmup');
 interface Mocks {
     handler: YukibanaOpenHandler;
     /** Progress messages reported, and whether the notification was closed. */
-    progress: { messages: string[], cancelled: number, shown: boolean };
+    progress: { messages: string[]; cancelled: number; shown: boolean };
     errors: string[];
     warnings: string[];
     reports: CloudTelemetry.OpenProjectURIData[];
-    opened: { uri: URI, preserveWindow?: boolean }[];
+    opened: { uri: URI; preserveWindow?: boolean }[];
     folderDialogs: number;
-    downloads: { projectId: string, destination: string }[];
+    downloads: { projectId: string; destination: string }[];
     commands: string[];
     opener: TestProjectOpener;
 }
@@ -229,7 +229,7 @@ describe('YukibanaOpenHandler', () => {
             const mocks = setup({
                 loginWorks: true,
                 choice: 'Log in',
-                lookup: async () => lookups++ === 0 ? { kind: 'not-logged-in' } : found(project),
+                lookup: async () => (lookups++ === 0 ? { kind: 'not-logged-in' } : found(project)),
             });
             await mocks.handler.open(openUri(PROJECT_ID));
             await new Promise(resolve => setTimeout(resolve));
@@ -262,7 +262,7 @@ describe('YukibanaOpenHandler', () => {
             const mocks = setup({ lookup: async () => found({ ...project, starterReady: false }) });
             await mocks.handler.open(openUri(PROJECT_ID));
 
-            expect(mocks.errors).to.deep.equal(['Project \'Warm up\' has no starter files to download yet']);
+            expect(mocks.errors).to.deep.equal(["Project 'Warm up' has no starter files to download yet"]);
             expect(mocks.folderDialogs).to.equal(0);
             expect(mocks.downloads).to.have.length(0);
             expect(mocks.progress.cancelled).to.equal(1);
@@ -290,7 +290,11 @@ describe('YukibanaOpenHandler', () => {
         });
 
         it('should close the progress if the download throws', async () => {
-            const mocks = setup({ download: async () => { throw new Error('connection lost'); } });
+            const mocks = setup({
+                download: async () => {
+                    throw new Error('connection lost');
+                },
+            });
             await mocks.handler.open(openUri(PROJECT_ID));
 
             expect(mocks.progress.messages[mocks.progress.messages.length - 1]).to.equal('Downloading...');
@@ -302,7 +306,11 @@ describe('YukibanaOpenHandler', () => {
         });
 
         it('should close the progress if getting the project info throws', async () => {
-            const mocks = setup({ lookup: async () => { throw new Error('backend unavailable'); } });
+            const mocks = setup({
+                lookup: async () => {
+                    throw new Error('backend unavailable');
+                },
+            });
             await mocks.handler.open(openUri(PROJECT_ID));
 
             expect(mocks.progress.cancelled).to.equal(1);

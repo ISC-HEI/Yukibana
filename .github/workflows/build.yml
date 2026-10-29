@@ -8,14 +8,14 @@ on:
     tags:
       - v*
     paths-ignore:
-      - "**/*.md"
-      - "**/*.typ"
+      - '**/*.md'
+      - '**/*.typ'
   pull_request:
     branches:
       - main
     paths-ignore:
-      - "**/*.md"
-      - "**/*.typ"
+      - '**/*.md'
+      - '**/*.typ'
   workflow_dispatch:
 
 concurrency:

@@ -1,9 +1,9 @@
 {
-	"defaultLevel": "warn",
-	"levels": {
-		"plugin-ext:*": "error",
-		"monaco:TextmateRegistry": "error",
-		"plugin-manager": "error",
-		"yukibana:*": "debug"
-	}
+  "defaultLevel": "warn",
+  "levels": {
+    "plugin-ext:*": "error",
+    "monaco:TextmateRegistry": "error",
+    "plugin-manager": "error",
+    "yukibana:*": "debug"
+  }
 }

@@ -12,15 +12,15 @@ export class PatchedTheiaExplorerView extends TheiaExplorerView {
 }
 
 /** A view class. */
-interface ViewFactory<T extends TheiaView> {new(app: TheiaApp): T}
+interface ViewFactory<T extends TheiaView> {
+    new (app: TheiaApp): T;
+}
 
 /** Theia's app, opening `PatchedTheiaExplorerView` for the explorer. */
 export class PatchedTheiaApp extends TheiaApp {
     /** The view class to open instead of each one. */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private readonly viewOverrides = new Map<ViewFactory<any>, ViewFactory<any>>([
-        [TheiaExplorerView, PatchedTheiaExplorerView],
-    ]);
+    private readonly viewOverrides = new Map<ViewFactory<any>, ViewFactory<any>>([[TheiaExplorerView, PatchedTheiaExplorerView]]);
 
     /** Opens a `viewFactory` view, or its override, and returns it. */
     async openView<T extends TheiaView>(viewFactory: ViewFactory<T>): Promise<T> {

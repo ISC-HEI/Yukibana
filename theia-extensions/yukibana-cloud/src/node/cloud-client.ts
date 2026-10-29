@@ -12,18 +12,15 @@ import { CanSubmitStatus, SubmitAvailability } from '../common/cloud-protocol';
  * the wrapped message tells an answer from the Auth server apart from no answer at all.
  */
 export function isRefused(e: unknown): boolean {
-    return (e instanceof RegistryError && e.status === 401)
-        || (e instanceof NotLoggedIn && /the Auth server answered 4\d\d/.test(e.message));
+    return (e instanceof RegistryError && e.status === 401) || (e instanceof NotLoggedIn && /the Auth server answered 4\d\d/.test(e.message));
 }
 
 @injectable()
 export class CloudClient extends YukibanaClient {
-    constructor(
-        @inject(CloudSessionManager) protected readonly cloudService: CloudSessionManager,
-    ) {
+    constructor(@inject(CloudSessionManager) protected readonly cloudService: CloudSessionManager) {
         super({
             url: DEFAULT_REGISTRY,
-            accessToken: tokenProvider(cloudService)
+            accessToken: tokenProvider(cloudService),
         });
     }
 

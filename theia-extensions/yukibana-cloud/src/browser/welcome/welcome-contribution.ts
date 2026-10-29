@@ -8,10 +8,13 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { WelcomeWidget } from './welcome-widget';
 
 /** Command that opens the welcome screen, also in Help > Welcome. */
-export const WelcomeCommand: Command = Command.toLocalizedCommand({
-    id: 'yukibana.welcome',
-    label: 'Welcome',
-}, 'yukibana/cloud/welcome/title');
+export const WelcomeCommand: Command = Command.toLocalizedCommand(
+    {
+        id: 'yukibana.welcome',
+        label: 'Welcome',
+    },
+    'yukibana/cloud/welcome/title',
+);
 
 /** Contribution opening the welcome screen in a window without a project, and from Help > Welcome in any window. */
 @injectable()

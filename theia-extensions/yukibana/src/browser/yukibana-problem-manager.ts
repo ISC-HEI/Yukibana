@@ -17,12 +17,12 @@ import { Marker } from '@theia/markers/lib/common/marker';
 export class YukibanaProblemManager extends ProblemManager {
     constructor(
         @inject(ConfigProvider) protected readonly configProvider: ConfigProvider,
-        @inject(ILogger) @named("yukibana:ProblemManager") protected readonly logger: ILogger
+        @inject(ILogger) @named('yukibana:ProblemManager') protected readonly logger: ILogger,
     ) {
         super();
         configProvider.onConfigChanged(e => this.onConfigChanged());
         configProvider.ready.then(config => {
-            logger.info(`${(config.features.squiggles !== false) ? 'Enabling' : 'Disabling'} problem markers`);
+            logger.info(`${config.features.squiggles !== false ? 'Enabling' : 'Disabling'} problem markers`);
         });
     }
 

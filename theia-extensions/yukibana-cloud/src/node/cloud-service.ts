@@ -26,12 +26,12 @@ export class CloudServiceImpl implements CloudService {
             const result = await this.client.submit(bundle, projectId);
             return {
                 ok: true,
-                ...result
+                ...result,
             };
         } catch (e) {
             return {
                 ok: false,
-                reason: e instanceof Error ? e.message : String(e)
+                reason: e instanceof Error ? e.message : String(e),
             };
         }
     }

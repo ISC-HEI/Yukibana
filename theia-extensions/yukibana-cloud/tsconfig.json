@@ -1,18 +1,16 @@
 {
-    "extends": "../../configs/base.tsconfig",
-    "compilerOptions": {
-        "rootDir": "src",
-        "outDir": "lib"
+  "extends": "../../configs/base.tsconfig",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": ["src"],
+  "references": [
+    {
+      "path": "../yukibana-submission"
     },
-    "include": [
-        "src"
-    ],
-    "references": [
-        {
-            "path": "../yukibana-submission"
-        },
-        {
-            "path": "../../packages/yukibana-common"
-        }
-    ]
+    {
+      "path": "../../packages/yukibana-common"
+    }
+  ]
 }

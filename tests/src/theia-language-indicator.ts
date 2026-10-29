@@ -18,6 +18,6 @@ export class TheiaLanguageIndicator extends TheiaStatusIndicator {
     async getLanguage(): Promise<string> {
         const handle = await this.getElementHandle();
         const span = await handle?.$('span');
-        return await span?.innerText() ?? '';
+        return (await span?.innerText()) ?? '';
     }
-};
+}

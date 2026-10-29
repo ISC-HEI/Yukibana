@@ -15,7 +15,6 @@ export type LauncherEndpointState = 'up-to-date' | 'needs-silent-update' | 'need
 // Taken from https://github.com/eclipse-theia/theia-ide/blob/master/theia-extensions/launcher/src/browser/launcher-service.ts
 @injectable()
 export class LauncherService {
-
     async getState(uriScheme: string): Promise<LauncherEndpointState> {
         const params = new URLSearchParams({ uriScheme });
         const response = await fetch(new Request(`${this.endpoint()}/state?${params}`), { method: 'GET' }).then(r => r.json());
@@ -26,7 +25,7 @@ export class LauncherService {
         await fetch(new Request(`${this.endpoint()}`), {
             body: JSON.stringify({ create, uriScheme }),
             method: 'PUT',
-            headers: new Headers({ 'Content-Type': 'application/json' })
+            headers: new Headers({ 'Content-Type': 'application/json' }),
         });
     }
 

@@ -7,7 +7,7 @@ import { CommonMenus } from '@theia/core/lib/browser';
 
 export const YukibanaCommand: Command = {
     id: 'Yukibana.command',
-    label: 'Say Hello'
+    label: 'Say Hello',
 };
 
 /**
@@ -15,13 +15,12 @@ export const YukibanaCommand: Command = {
  */
 @injectable()
 export class YukibanaCommandContribution implements CommandContribution {
-
     @inject(MessageService)
     protected readonly messageService!: MessageService;
 
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(YukibanaCommand, {
-            execute: () => this.messageService.info('Hello World!')
+            execute: () => this.messageService.info('Hello World!'),
         });
     }
 }
@@ -31,11 +30,10 @@ export class YukibanaCommandContribution implements CommandContribution {
  */
 @injectable()
 export class YukibanaMenuContribution implements MenuContribution {
-
     registerMenus(menus: MenuModelRegistry): void {
         menus.registerMenuAction(CommonMenus.EDIT_FIND, {
             commandId: YukibanaCommand.id,
-            label: YukibanaCommand.label
+            label: YukibanaCommand.label,
         });
     }
 }

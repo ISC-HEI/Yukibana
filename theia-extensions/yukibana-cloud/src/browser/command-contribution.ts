@@ -8,20 +8,29 @@ import { CloudAccount, CloudAuth, LoginResult } from '../common/cloud-protocol';
 import { CloudAccountService } from './cloud-account-service';
 import { AuthClientImpl } from './cloud-auth-client';
 
-export const LoginCommand: Command = Command.toLocalizedCommand({
-    id: 'yukibana.cloudLogin',
-    label: 'Log in to cloud registry',
-}, 'yukibana/cloud/login');
+export const LoginCommand: Command = Command.toLocalizedCommand(
+    {
+        id: 'yukibana.cloudLogin',
+        label: 'Log in to cloud registry',
+    },
+    'yukibana/cloud/login',
+);
 
-export const LogoutCommand: Command = Command.toLocalizedCommand({
-    id: 'yukibana.cloudLogout',
-    label: 'Log out of cloud registry',
-}, 'yukibana/cloud/logout');
+export const LogoutCommand: Command = Command.toLocalizedCommand(
+    {
+        id: 'yukibana.cloudLogout',
+        label: 'Log out of cloud registry',
+    },
+    'yukibana/cloud/logout',
+);
 
-export const SwitchAccountCommand: Command = Command.toLocalizedCommand({
-    id: 'yukibana.cloudSwitchAccount',
-    label: 'Switch cloud registry account',
-}, 'yukibana/cloud/switchAccount');
+export const SwitchAccountCommand: Command = Command.toLocalizedCommand(
+    {
+        id: 'yukibana.cloudSwitchAccount',
+        label: 'Switch cloud registry account',
+    },
+    'yukibana/cloud/switchAccount',
+);
 
 @injectable()
 export class LoginCommandContribution implements CommandContribution {
@@ -55,9 +64,11 @@ export class LoginCommandContribution implements CommandContribution {
 
     private async login(logIn: () => Promise<LoginResult>): Promise<void> {
         const progress = await this.messageService.showProgress({ text: nls.localize('yukibana/cloud/loggingIn', 'Logging in...') });
-        const showCode = this.authClient.onLoginCode(code => progress.report({
-            message: localizeMarkdown('yukibana/cloud/loginCode', 'Continue in your browser; the page there shows the code {0}', code),
-        }));
+        const showCode = this.authClient.onLoginCode(code =>
+            progress.report({
+                message: localizeMarkdown('yukibana/cloud/loginCode', 'Continue in your browser; the page there shows the code {0}', code),
+            }),
+        );
         try {
             const result = await logIn();
             if (!result.ok) {
@@ -65,9 +76,11 @@ export class LoginCommandContribution implements CommandContribution {
                 return;
             }
             const state = await this.accounts.refresh();
-            this.messageService.info(state.kind === 'logged-in'
-                ? localizeMarkdown('yukibana/cloud/loginSuccessfulAs', 'Logged in as {0}', CloudAccount.label(state.account))
-                : nls.localize('yukibana/cloud/loginSuccessful', 'Logged in successfully'));
+            this.messageService.info(
+                state.kind === 'logged-in'
+                    ? localizeMarkdown('yukibana/cloud/loginSuccessfulAs', 'Logged in as {0}', CloudAccount.label(state.account))
+                    : nls.localize('yukibana/cloud/loginSuccessful', 'Logged in successfully'),
+            );
         } finally {
             showCode.dispose();
             progress.cancel();

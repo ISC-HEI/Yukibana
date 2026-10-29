@@ -23,7 +23,7 @@ const account: CloudAccount = {
     platformRole: 'admin',
 };
 
-function setupAccounts(whoAmI: () => Promise<CloudAccount | undefined>): { accounts: CloudAccountService, authClient: AuthClientImpl } {
+function setupAccounts(whoAmI: () => Promise<CloudAccount | undefined>): { accounts: CloudAccountService; authClient: AuthClientImpl } {
     const auth = { whoAmI };
     const authClient = new AuthClientImpl();
     const accounts = new CloudAccountService();
@@ -127,21 +127,29 @@ describe('CloudAccountService', () => {
     });
 
     it('should keep the error if the registry cannot be reached', async () => {
-        const { accounts } = setupAccounts(async () => { throw new Error('fetch failed'); });
+        const { accounts } = setupAccounts(async () => {
+            throw new Error('fetch failed');
+        });
         await accounts.refresh();
         expect(accounts.state).to.deep.equal({ kind: 'error', reason: 'fetch failed' });
     });
 
     it('should share a check already under way', async () => {
         let calls = 0;
-        const { accounts } = setupAccounts(async () => { calls++; return account; });
+        const { accounts } = setupAccounts(async () => {
+            calls++;
+            return account;
+        });
         await Promise.all([accounts.refresh(), accounts.refresh()]);
         expect(calls).to.equal(1);
     });
 
     it('should not share a check that began before a login changed', async () => {
         let calls = 0;
-        const { accounts, authClient } = setupAccounts(async () => { calls++; return account; });
+        const { accounts, authClient } = setupAccounts(async () => {
+            calls++;
+            return account;
+        });
         const before = accounts.refresh();
         authClient.notifyLoginChanged();
         await Promise.all([before, accounts.refresh()]);
@@ -186,7 +194,7 @@ describe('CloudAccountService', () => {
 describe('CloudSubmissionTarget', () => {
     const project = { projectId: 'project', courseCode: 'OS', editionLabel: '2026.Q1', role: 'owner' } as Project;
 
-    function setupTarget(current: CloudAccount | undefined, options: { result?: SubmissionResult, status?: CanSubmitStatus, info?: Project } = {}): CloudSubmissionTarget {
+    function setupTarget(current: CloudAccount | undefined, options: { result?: SubmissionResult; status?: CanSubmitStatus; info?: Project } = {}): CloudSubmissionTarget {
         const { accounts } = setupAccounts(async () => current);
         const target = new CloudSubmissionTarget();
         Object.assign(target, {
