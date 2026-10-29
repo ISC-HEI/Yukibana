@@ -83,7 +83,8 @@
           "telemetry.telemetryLevel": "all",
           "debug.internalConsoleOptions": "neverOpen",
           "debug.openDebug": "neverOpen",
-          "metals.disableReleaseNotes": true
+          "metals.disableReleaseNotes": true,
+          "workbench.startupEditor": "none"
         }
       }
     },

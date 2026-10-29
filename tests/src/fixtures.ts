@@ -34,8 +34,11 @@ export class Workspace extends TheiaWorkspace {
     }
 }
 
-/** Opens the app with `workspace`, closing the one opened before, and returns it as a `factory` once initialized. */
-export type Launch = <T extends TheiaApp = TheiaApp>(workspace?: Workspace, factory?: TheiaAppFactory<T>) => Promise<T>;
+/**
+ * Opens the app with `workspace`, a new one by default, or with none if `'none'`, closing the one opened before, and
+ * returns it as a `factory` once initialized.
+ */
+export type Launch = <T extends TheiaApp = TheiaApp>(workspace?: Workspace | 'none', factory?: TheiaAppFactory<T>) => Promise<T>;
 
 /**
  * Playwright's `test`, with `launch`, which opens the app of the test's project. Each worker has its own backend
@@ -57,19 +60,26 @@ export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launc
          * to start has nothing to close, and its error was already reported by the test that launched it.
          */
         let close = async (): Promise<unknown> => undefined;
-        /** Opens `workspace` in the app, and returns its page. */
-        const open = async (workspace: TheiaWorkspace): Promise<Page> => {
+        /**
+         * Opens the app with `workspace`, or with none if `undefined`, and returns its page. Without one, Theia would
+         * reopen the workspace opened last, so the browser app is asked for an empty window, with Theia's `#!empty`,
+         * and the Electron app, which cannot be, is given no recent workspaces.
+         */
+        const open = async (workspace: TheiaWorkspace | undefined): Promise<Page> => {
             if (app === 'browser') {
                 browser ??= playwright.chromium.launch({ ...launchOptions, headless });
                 backend ??= startBackend(env);
                 const [started, url] = await Promise.all([browser, backend.url]);
                 const tab = started.newPage({ viewport: { width: 1920, height: 1080 } });
                 close = async () => (await tab.catch(() => undefined))?.close();
-                await (await tab).goto(`${url}/#${workspace.pathAsPathComponent}`);
+                await (await tab).goto(`${url}/#${workspace ? workspace.pathAsPathComponent : '!empty'}`);
                 return tab;
             }
+            if (!workspace) {
+                fs.rmSync(path.join(env.THEIA_CONFIG_DIR, 'recentworkspace.json'), { force: true });
+            }
             const electronApp = _electron.launch({
-                args: [appDir('electron'), '--no-sandbox', '--no-cluster', `--plugins=local-dir:${plugins}`, workspace.path],
+                args: [appDir('electron'), '--no-sandbox', '--no-cluster', `--plugins=local-dir:${plugins}`, ...(workspace ? [workspace.path] : [])],
                 env: { ...env, THEIA_ELECTRON_DISABLE_NATIVE_ELEMENTS: '1', THEIA_ELECTRON_NO_EARLY_WINDOW: '1', THEIA_NO_SPLASH: 'true' },
             });
             // The Electron app is single-instance, so one left open would make the next launch, e.g. a retry, quit.
@@ -79,13 +89,15 @@ export const test = base.extend<{ screenshotOnFailure: void }, { app: App, launc
 
         await use(async (workspace = new Workspace(), factory = TheiaApp as TheiaAppFactory<never>) => {
             await close();
-            workspace.initialize();
-            const page = await open(workspace);
+            const opened = workspace === 'none' ? undefined : workspace;
+            opened?.initialize();
+            const page = await open(opened);
             launched.page = page;
             // Shorter than the test timeout, so that an app that does not start fails here, where it can be
             // captured: the tests launch in beforeAll, which test-scoped fixtures like screenshotOnFailure skip.
             page.setDefaultTimeout(45 * 1000);
-            const theiaApp = new factory(page, workspace, app === 'electron');
+            // TheiaApp needs a workspace even for a window without one, where it never opens it
+            const theiaApp = new factory(page, opened ?? new Workspace(), app === 'electron');
             try {
                 await theiaApp.waitForShellAndInitialized();
             } catch (error) {
