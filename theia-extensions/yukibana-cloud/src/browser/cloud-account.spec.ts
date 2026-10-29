@@ -1,25 +1,19 @@
 /**
  * SPDX-License-Identifier: MIT
  */
+// @vitest-environment jsdom
 /* eslint-disable no-null/no-null */ // the registry sends missing account details as null
-import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
-import { enableJSDOM } from '@theia/core/lib/browser/test/jsdom';
-
-const disableJSDom = enableJSDOM();
-FrontendApplicationConfigProvider.set({});
-
 import { ILogger } from '@theia/core';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { Project } from '@yukibana/cli';
 import { expect } from 'chai';
+import { describe, it } from 'vitest';
 import { CanSubmitStatus, CloudAccount, CloudAuth, CloudService, SubmissionResult } from '../common/cloud-protocol';
 import { ACCOUNT_ACTIONS_GROUP, ACCOUNT_INFO_GROUP, accountMenuItems, accountStatusBarEntry } from './cloud-account-menu';
 import { CloudAccountService } from './cloud-account-service';
 import { AuthClientImpl } from './cloud-auth-client';
 import { CloudSubmissionTarget } from './cloud-submission-target';
-
-disableJSDom();
 
 const account: CloudAccount = {
     userId: '095fc917-0000-0000-0000-000000000000',

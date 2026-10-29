@@ -7,22 +7,14 @@
  * SPDX-License-Identifier: MIT
  ********************************************************************************/
 
-import { expect, test } from '@playwright/test';
-import { OSUtil, TheiaApp, TheiaAppLoader } from '@theia/playwright';
+import { OSUtil, TheiaApp } from '@theia/playwright';
+import { expect, test } from '../src/fixtures';
 
 test.describe('Yukibana app', () => {
     let app: TheiaApp;
 
-    test.beforeAll(async ({ playwright, browser }) => {
-        app = await TheiaAppLoader.load({
-            playwright, browser, useElectron: {
-                electronAppPath: "../electron-app"
-            }
-        });
-    });
-
-    test.afterAll(async () => {
-        await app.page.close();
+    test.beforeAll(async ({ launch }) => {
+        app = await launch();
     });
 
     test('should show main content panel', async () => {

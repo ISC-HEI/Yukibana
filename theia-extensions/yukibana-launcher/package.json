@@ -19,10 +19,8 @@
     "typescript": "~5.4.5"
   },
   "scripts": {
-    "prepare": "npm run clean && npm run build",
-    "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "build": "tsc",
-    "watch": "tsc -w"
+    "prepare": "tsc --build",
+    "clean": "rimraf lib tsconfig.tsbuildinfo"
   },
   "theiaExtensions": [
     {

@@ -1,12 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
  */
-import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
-import { enableJSDOM } from '@theia/core/lib/browser/test/jsdom';
-
-const disableJSDom = enableJSDOM();
-FrontendApplicationConfigProvider.set({});
-
+// @vitest-environment jsdom
 import { CommandService, ILogger, MessageService, URI } from '@theia/core';
 import { MockLogger } from '@theia/core/lib/common/test/mock-logger';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
@@ -15,13 +10,12 @@ import { TelemetryService } from '@theia/telemetry/lib/common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { Project } from '@yukibana/cli';
 import { expect } from 'chai';
+import { describe, it } from 'vitest';
 import { CloudService, DownloadResult, ProjectLookup } from '../common/cloud-protocol';
 import { CloudTelemetry } from '../common/cloud-telemetry';
 import { CloudAccountService } from './cloud-account-service';
 import { YukibanaOpenHandler } from './yukibana-url-handler';
 import { YukibanaProjectOpener } from './yukibana-project-opener';
-
-disableJSDom();
 
 class TestProjectOpener extends YukibanaProjectOpener {
     newWindow: boolean | undefined = false;
