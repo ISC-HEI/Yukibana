@@ -521,6 +521,9 @@ importers:
       yukibana-common:
         specifier: workspace:*
         version: link:../../packages/yukibana-common
+      yukibana-ext:
+        specifier: workspace:*
+        version: link:../yukibana
       yukibana-submission-ext:
         specifier: workspace:*
         version: link:../yukibana-submission

@@ -15,6 +15,7 @@
     "@theia/workspace": "~1.76.0",
     "@yukibana/cli": "github:tothambrus11/yukibana-cloud#feat/config-add-mode&path:/cli",
     "yukibana-common": "workspace:*",
+    "yukibana-ext": "workspace:*",
     "yukibana-submission-ext": "workspace:*"
   },
   "devDependencies": {
