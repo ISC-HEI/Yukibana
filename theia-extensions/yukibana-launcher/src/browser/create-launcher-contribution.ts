@@ -60,7 +60,6 @@ export class CreateLauncherCommandContribution implements FrontendApplicationCon
                 return;
             }
             const messageContainer = document.createElement('div');
-            // eslint-disable-next-line max-len
             messageContainer.textContent = nls.localizeByDefault(`Would you like to install a shell command that launches the application?\nYou will be able to run ${applicationName} from the command line by typing '${uriScheme}'.`);
             messageContainer.setAttribute('style', 'white-space: pre-line');
             const details = document.createElement('p');
@@ -92,7 +91,6 @@ export class CreateLauncherCommandContribution implements FrontendApplicationCon
                 return;
             }
             const messageContainer = document.createElement('div');
-            // eslint-disable-next-line max-len
             messageContainer.textContent = nls.localizeByDefault(`Would you like to create a .desktop file for ${applicationName}?\nThis will make it easier to open ${applicationName} directly\nfrom your applications menu and enables further features.`);
             messageContainer.setAttribute('style', 'white-space: pre-line');
             const dialog = new ConfirmDialog({

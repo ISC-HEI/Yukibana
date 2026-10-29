@@ -1,0 +1,2 @@
+# Stores text files with LF, and checks them out with the platform's line ending.
+* text=auto
