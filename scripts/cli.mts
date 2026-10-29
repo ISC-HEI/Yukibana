@@ -29,11 +29,11 @@ const APPS: App[] = ['browser', 'electron'];
 const root = path.resolve(import.meta.dirname, '..');
 /** Theia CLI's script. */
 const theia = createRequire(import.meta.url).resolve('@theia/cli/bin/theia.js');
-/**
- * The extensions' tsc script. The TypeScript hoisted to the root is the older one that @typescript-eslint needs,
- * which fails to parse the extensions.
- */
-const tsc = createRequire(path.join(root, 'packages', 'yukibana-common', 'package.json')).resolve('typescript/bin/tsc');
+/** TypeScript's tsc script, which its package exports only as a bin. */
+const tsc = (() => {
+    const manifest = createRequire(import.meta.url).resolve('typescript/package.json');
+    return path.join(path.dirname(manifest), JSON.parse(fs.readFileSync(manifest, 'utf8')).bin.tsc);
+})();
 
 /** Returns `app`'s folder. */
 const appDir = (app: App): string => path.join(root, `${app}-app`);

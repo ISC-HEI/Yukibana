@@ -3,6 +3,8 @@
         "skipLibCheck": true,
         "declaration": true,
         "declarationMap": true,
+        // TypeScript 7 turns all strict checks on by default; these are the ones the code meets.
+        "strict": false,
         "noImplicitAny": true,
         "noEmitOnError": false,
         "noImplicitThis": true,
@@ -10,10 +12,11 @@
         "strictNullChecks": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "downlevelIteration": true,
         "resolveJsonModule": true,
+        // The styles are imported for their side effect, and bundled by Theia.
+        "noUncheckedSideEffectImports": false,
         "module": "commonjs",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "target": "ES2017",
         "jsx": "react",
         "lib": [
