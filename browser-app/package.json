@@ -52,6 +52,7 @@
           "debug.internalConsoleOptions": "neverOpen",
           "debug.openDebug": "neverOpen",
           "metals.disableReleaseNotes": true,
+          "toolbar.showToolbar": true,
           "workbench.startupEditor": "none"
         }
       }

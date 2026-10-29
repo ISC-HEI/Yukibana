@@ -25,6 +25,10 @@ test.describe('Yukibana app', () => {
         expect(await app.statusBar.isVisible()).toBe(true);
     });
 
+    test('should show the toolbar, with the Submit button', async () => {
+        await expect(app.page.locator('#main-toolbar [data-id="yukibana.submitAssignment"]')).toBeVisible();
+    });
+
     if (!OSUtil.isMacOS) {
         test('should have menu bar items', async () => {
             expect((await app.menuBar.visibleMenuBarItems()).length > 0).toBe(true);
