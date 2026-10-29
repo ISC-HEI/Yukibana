@@ -8,7 +8,7 @@ import { EditorManager, EditorWidget } from '@theia/editor/lib/browser';
 import { editor } from '@theia/monaco-editor-core';
 import { MonacoEditor } from '@theia/monaco/lib/browser/monaco-editor';
 import { TelemetryService } from '@theia/telemetry/lib/common/telemetry-service';
-import { Mode } from '../common/yukibana-config';
+import { Mode } from '@yukibana/cli/config';
 import { TypingTelemetry } from '../common/yukibana-telemetry';
 import { ConfigProvider } from './config/config-provider';
 
