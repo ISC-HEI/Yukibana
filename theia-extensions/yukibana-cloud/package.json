@@ -13,7 +13,7 @@
     "@theia/filesystem": "~1.75.0",
     "@theia/telemetry": "~1.75.0",
     "@theia/workspace": "~1.75.0",
-    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#submission-rules&path:/cli",
+    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#c47a7f3626f97aafb4518829394877fdeee7b472&path:/cli",
     "yukibana-common": "workspace:*",
     "yukibana-submission-ext": "workspace:*"
   },
@@ -26,10 +26,8 @@
     "typescript": "~5.4.5"
   },
   "scripts": {
-    "prepare": "pnpm run clean && pnpm run build",
-    "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "build": "tsc",
-    "watch": "tsc -w"
+    "prepare": "tsc --build",
+    "clean": "rimraf lib tsconfig.tsbuildinfo"
   },
   "theiaExtensions": [
     {

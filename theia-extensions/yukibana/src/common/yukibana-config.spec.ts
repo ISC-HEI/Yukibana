@@ -2,6 +2,7 @@
  * SPDX-License-Identifier: MIT
  */
 import { expect } from 'chai';
+import { describe, it } from 'vitest';
 import { DEFAULT_CONFIG, loadConfig } from './yukibana-config';
 
 interface ConfigError {

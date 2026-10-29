@@ -5,6 +5,7 @@
 import { Path, URI } from '@theia/core';
 import { Project } from '@yukibana/cli';
 import { expect } from 'chai';
+import { describe, it } from 'vitest';
 import { avatarColour, AVATAR_COLOURS, calendarDays, dueAssignments, initials, matches, projectIdOf, recentProject, roughly } from './welcome-model';
 
 /** An hour in milliseconds. */

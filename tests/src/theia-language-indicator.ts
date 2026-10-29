@@ -9,9 +9,12 @@
 
 import { TheiaStatusIndicator } from '@theia/playwright';
 
+/** The status bar's indicator of the current editor's language. */
 export class TheiaLanguageIndicator extends TheiaStatusIndicator {
+    /** The status bar entry's ID. */
     id = 'editor-status-language';
 
+    /** Returns the language's name, or an empty string if the indicator shows none. */
     async getLanguage(): Promise<string> {
         const handle = await this.getElementHandle();
         const span = await handle?.$('span');
