@@ -7,6 +7,7 @@ import type { OxfmtConfig } from 'oxfmt';
 export default {
     tabWidth: 4,
     singleQuote: true,
+    jsxSingleQuote: true,
     printWidth: 180,
     arrowParens: 'avoid',
     // The platform's line ending, which Git checks text files out with (see .gitattributes).
