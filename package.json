@@ -43,7 +43,7 @@
     "eslint-plugin-react": "^7.37.5",
     "ignore-styles": "5.0.1",
     "jsdom": "30.1.2",
-    "tslint": "^5.20.1",
+    "tslint": "^6.1.3",
     "vitest": "5.0.4"
   },
   "theiaPlugins": {
