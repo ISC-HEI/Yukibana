@@ -13,11 +13,11 @@ import { ConfigProvider } from './config/config-provider';
 
 interface EditReason {
     metadata?: {
-        source?: string
-        kind?: string
-        name?: string
-        detailedSource?: string
-    }
+        source?: string;
+        kind?: string;
+        name?: string;
+        detailedSource?: string;
+    };
 }
 
 @injectable()
@@ -37,7 +37,9 @@ export class YukibanaTypingTracker implements FrontendApplicationContribution {
 
     protected attach(widget: EditorWidget): void {
         const monaco = MonacoEditor.get(widget)?.getControl();
-        if (!monaco) { return; }
+        if (!monaco) {
+            return;
+        }
 
         let lastTyped = 0;
         monaco.onDidChangeModelContent(rawEvent => {
@@ -54,19 +56,15 @@ export class YukibanaTypingTracker implements FrontendApplicationContribution {
                 const detailedReason = e.detailedReasons[i];
                 const origin = this.originOfChange(detailedReason);
                 const nChanges = e.detailedReasonsChangeLengths[i];
-                const command = (origin === 'command' || origin === 'unknown')
-                    ? detailedReason.metadata?.detailedSource
-                    : undefined;
+                const command = origin === 'command' || origin === 'unknown' ? detailedReason.metadata?.detailedSource : undefined;
                 for (let j = 0; j < nChanges; j++) {
                     const change = e.changes[changeIdx++];
-                    changes.push(
-                        {
-                            inserted: change.text.length,
-                            removed: change.rangeLength,
-                            origin: origin,
-                            command: command,
-                        }
-                    );
+                    changes.push({
+                        inserted: change.text.length,
+                        removed: change.rangeLength,
+                        origin: origin,
+                        command: command,
+                    });
                 }
             }
             const edit: TypingTelemetry.Edit = {
@@ -75,16 +73,19 @@ export class YukibanaTypingTracker implements FrontendApplicationContribution {
                 file: monaco.getModel()?.uri?.toString(),
             };
             this.report(edit);
-
         });
     }
 
     // Adapted from https://github.com/hexlet-codebattle/codebattle/blob/f030dcca05eb81c87a2bfbc78ec174907969504c/frontend/src/features/game/editor/telemetry.ts
     protected originOfChange(detailedReason: EditReason): TypingTelemetry.EditOrigin {
         const { source, kind, detailedSource } = detailedReason.metadata ?? {};
-        if (source === 'suggest' || source === 'snippet') { return 'completion'; }
+        if (source === 'suggest' || source === 'snippet') {
+            return 'completion';
+        }
         if (source === 'cursor') {
-            if (kind === 'type' || kind === 'compositionType' || kind === 'compositionEnd') { return 'type'; }
+            if (kind === 'type' || kind === 'compositionType' || kind === 'compositionEnd') {
+                return 'type';
+            }
             if (kind === 'executeCommand' || kind === 'executeCommands') {
                 if (detailedSource === 'deleteLeft' || detailedSource === 'deleteWordLeft' || detailedSource === 'deleteRight' || detailedSource === 'deleteWordRight') {
                     return 'delete';
@@ -94,8 +95,12 @@ export class YukibanaTypingTracker implements FrontendApplicationContribution {
                 }
                 return 'command';
             }
-            if (kind === 'cut') { return 'cut'; }
-            if (kind === 'paste') { return 'paste'; }
+            if (kind === 'cut') {
+                return 'cut';
+            }
+            if (kind === 'paste') {
+                return 'paste';
+            }
         }
         return 'unknown';
     }

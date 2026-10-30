@@ -12,7 +12,8 @@ export interface IdentityProviderContribution extends IdentityProvider {
 
 @injectable()
 export class IdentityService implements IdentityProvider {
-    @inject(ContributionProvider) @named(IdentityProviderContribution)
+    @inject(ContributionProvider)
+    @named(IdentityProviderContribution)
     protected readonly providers!: ContributionProvider<IdentityProviderContribution>;
 
     protected getBestProvider(): IdentityProvider {
