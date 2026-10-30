@@ -18,12 +18,12 @@ import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
 import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
 import { YukibanaFilterContribution } from './yukibana-filter-contribution';
 import { bindLayout } from './yukibana-layout-contribution';
+import { YukibanaMessageService } from './yukibana-message-service';
 import { YukibanaProblemContributioun } from './yukibana-problem-contribution';
 import { YukibanaProblemManager } from './yukibana-problem-manager';
 import { YukibanaRemoteFileSystemProvider } from './yukibana-remote-file-system-provider';
 import { SuggestionsContribution } from './yukibana-suggestions-contribution';
 import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
-import { YukibanaMessageService } from '../common/yukibana-message-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bindConfig(bind);
