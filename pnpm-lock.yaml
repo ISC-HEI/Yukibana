@@ -488,8 +488,8 @@ importers:
         specifier: ~1.76.0
         version: 1.76.0(@theia/electron@1.76.0(electron@42.8.1(supports-color@8.1.1)))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@8.1.1)(typescript@7.0.2)
       '@yukibana/cli':
-        specifier: github:tothambrus11/yukibana-cloud#feat/config-add-mode&path:/cli
-        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c925ac9a77797899e0fceaa5e9858124e4bd1941#path:/cli
+        specifier: github:tothambrus11/yukibana-cloud#2bf4344445a23cdd62c948c23946c8952ae3b209&path:/cli
+        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/2bf4344445a23cdd62c948c23946c8952ae3b209#path:/cli
     devDependencies:
       '@types/micromatch':
         specifier: 4.0.10
@@ -516,8 +516,8 @@ importers:
         specifier: ~1.76.0
         version: 1.76.0(@theia/electron@1.76.0(electron@42.8.1(supports-color@8.1.1)))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@8.1.1)(typescript@7.0.2)
       '@yukibana/cli':
-        specifier: github:tothambrus11/yukibana-cloud#feat/config-add-mode&path:/cli
-        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c925ac9a77797899e0fceaa5e9858124e4bd1941#path:/cli
+        specifier: github:tothambrus11/yukibana-cloud#2bf4344445a23cdd62c948c23946c8952ae3b209&path:/cli
+        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/2bf4344445a23cdd62c948c23946c8952ae3b209#path:/cli
       yukibana-common:
         specifier: workspace:*
         version: link:../../packages/yukibana-common
@@ -597,8 +597,8 @@ importers:
         specifier: ~1.76.0
         version: 1.76.0(@theia/electron@1.76.0(electron@42.8.1(supports-color@8.1.1)))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@8.1.1)(typescript@7.0.2)
       '@yukibana/cli':
-        specifier: github:tothambrus11/yukibana-cloud#feat/config-add-mode&path:/cli
-        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c925ac9a77797899e0fceaa5e9858124e4bd1941#path:/cli
+        specifier: github:tothambrus11/yukibana-cloud#2bf4344445a23cdd62c948c23946c8952ae3b209&path:/cli
+        version: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/2bf4344445a23cdd62c948c23946c8952ae3b209#path:/cli
       yukibana-common:
         specifier: workspace:*
         version: link:../../packages/yukibana-common
@@ -2367,8 +2367,8 @@ packages:
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
 
-  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c925ac9a77797899e0fceaa5e9858124e4bd1941#path:/cli':
-    resolution: {gitHosted: true, integrity: sha512-WNRaXnorMadnA9mlIOi4ULveAc1KsGAueKOxRzr6EgGCeK2s+xNp3JTuJajbuGyCs4aX1JIYT72KO8Nnh8ChUw==, path: /cli, tarball: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c925ac9a77797899e0fceaa5e9858124e4bd1941}
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/2bf4344445a23cdd62c948c23946c8952ae3b209#path:/cli':
+    resolution: {gitHosted: true, integrity: sha512-xxkoJy6JdrzAGmTbHcL3UUnSYFuKhf8iYxP+Xy2scofQmZLIgOmdPsuXe+hldx97JCymLSFlgROL6/ttoi6CJQ==, path: /cli, tarball: https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/2bf4344445a23cdd62c948c23946c8952ae3b209}
     version: 0.1.0
     engines: {node: '>=22.15'}
     hasBin: true
@@ -8805,7 +8805,7 @@ snapshots:
 
   '@yarnpkg/lockfile@1.1.0': {}
 
-  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/c925ac9a77797899e0fceaa5e9858124e4bd1941#path:/cli':
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/2bf4344445a23cdd62c948c23946c8952ae3b209#path:/cli':
     dependencies:
       ignore: 7.0.13
       modern-tar: 0.8.6
