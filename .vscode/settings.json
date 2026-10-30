@@ -13,19 +13,19 @@
   ],
   "[typescript]": {
     "editor.tabSize": 4,
-    "editor.defaultFormatter": "vscode.typescript-language-features"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[javascript]": {
     "editor.tabSize": 4,
-    "editor.defaultFormatter": "vscode.typescript-language-features"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[json]": {
     "editor.tabSize": 2,
-    "editor.defaultFormatter": "vscode.json-language-features"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[jsonc]": {
     "editor.tabSize": 2,
-    "editor.defaultFormatter": "vscode.json-language-features"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
@@ -35,8 +35,12 @@
   "editor.rulers": [180],
   "js/ts.preferences.quoteStyle": "single",
   "[typescriptreact]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.defaultFormatter": "oxc.oxc-vscode",
     "js/ts.preferences.quoteStyle": "single",
     "editor.tabSize": 4
+  },
+  "oxc.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
   }
 }

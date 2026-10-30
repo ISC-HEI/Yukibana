@@ -3,7 +3,7 @@
  */
 import { AIIdeActivationServiceImpl } from '@theia/ai-ide/lib/browser/ai-ide-activation-service';
 import { ApplicationShell, ApplicationShellOptions, bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
-import { bindContribution, CommandContribution, FilterContribution, MenuContribution, MessageService } from '@theia/core/lib/common';
+import { bindContribution, bindContributionProvider, CommandContribution, FilterContribution, MenuContribution, MessageService } from '@theia/core/lib/common';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { RemoteFileSystemProvider } from '@theia/filesystem/lib/common/remote-file-system-provider';
 import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
@@ -18,12 +18,13 @@ import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
 import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
 import { YukibanaFilterContribution } from './yukibana-filter-contribution';
 import { bindLayout } from './yukibana-layout-contribution';
+import { DefaultMessageMiddlewareContribution } from './yukibana-message-middleware-contribution';
+import { YukibanaMessageMiddlewareContribution, YukibanaMessageService } from './yukibana-message-service';
 import { YukibanaProblemContributioun } from './yukibana-problem-contribution';
 import { YukibanaProblemManager } from './yukibana-problem-manager';
 import { YukibanaRemoteFileSystemProvider } from './yukibana-remote-file-system-provider';
 import { SuggestionsContribution } from './yukibana-suggestions-contribution';
 import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
-import { YukibanaMessageService } from '../common/yukibana-message-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bindConfig(bind);
@@ -84,6 +85,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     } else {
         bind(ApplicationShellOptions).toConstantValue(shellOptions);
     }
+
+    bindContributionProvider(bind, YukibanaMessageMiddlewareContribution);
+    bind(DefaultMessageMiddlewareContribution).toSelf().inSingletonScope();
+    bind(YukibanaMessageMiddlewareContribution).toService(DefaultMessageMiddlewareContribution);
 
     bind(YukibanaMessageService).toSelf().inSingletonScope();
     if (isBound(MessageService)) {
