@@ -15,7 +15,7 @@
     "@theia/workspace": "~1.76.0",
     "yukibana-common": "workspace:*",
     "yukibana-ext": "workspace:*",
-    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#80b3cc11b3c9d67852822a440b65288c0d5d6060&path:/cli"
+    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#2bf4344445a23cdd62c948c23946c8952ae3b209&path:/cli"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

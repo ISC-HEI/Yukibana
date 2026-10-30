@@ -46,6 +46,9 @@ describe('loadConfig', () => {
                 filename: 'submission.tar.gz',
                 maxBytes: 32 * 1024 * 1024,
             },
+            telemetry: {
+                liveTypingStats: false,
+            },
             projectId: null,
         });
     });
@@ -74,6 +77,8 @@ describe('loadConfig', () => {
         { key: ['submission', 'exclude'], value: {} },
         { key: ['submission', 'respectGitignore'], value: 0 },
         { key: ['submission', 'target'], value: null },
+        { key: ['telemetry'], value: [] },
+        { key: ['telemetry', 'liveTypingStats'], value: 0 },
         { key: ['projectId'], value: '' },
     ];
 
@@ -125,6 +130,9 @@ describe('loadConfig', () => {
                 target: 'custom',
                 filename: 'submission.tar.gz',
                 maxBytes: 32 * 1024 * 1024,
+            },
+            telemetry: {
+                liveTypingStats: true,
             },
             projectId: '01a11653-0353-7389-81f4-01837a3ed666',
         };

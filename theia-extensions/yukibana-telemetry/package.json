@@ -10,7 +10,8 @@
   ],
   "dependencies": {
     "@theia/core": "~1.76.0",
-    "@theia/telemetry": "~1.76.0"
+    "@theia/telemetry": "~1.76.0",
+    "yukibana-ext": "workspace:*"
   },
   "devDependencies": {
     "@types/archiver": "8.0.0",

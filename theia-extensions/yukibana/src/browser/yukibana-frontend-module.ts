@@ -25,6 +25,7 @@ import { YukibanaProblemManager } from './yukibana-problem-manager';
 import { YukibanaRemoteFileSystemProvider } from './yukibana-remote-file-system-provider';
 import { SuggestionsContribution } from './yukibana-suggestions-contribution';
 import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
+import { YukibanaTypingTracker } from './yukibana-typing-tracker';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bindConfig(bind);
@@ -96,4 +97,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     } else {
         bind(MessageService).toService(YukibanaMessageService);
     }
+
+    bind(YukibanaTypingTracker).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(YukibanaTypingTracker);
 });
