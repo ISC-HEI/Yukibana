@@ -26,7 +26,7 @@
     "@theia/test": "catalog:",
     "@theia/toolbar": "catalog:",
     "@theia/workspace": "catalog:",
-    "@yukibana/cli": "github:tothambrus11/yukibana-cloud#19354b75a1f160d535aa08ad8041026507c511b5&path:/cli"
+    "@yukibana/cli": "catalog:"
   },
   "devDependencies": {
     "@types/micromatch": "catalog:",

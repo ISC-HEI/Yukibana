@@ -26,11 +26,11 @@
     "@theia/test": "catalog:",
     "@theia/toolbar": "catalog:",
     "@theia/workspace": "catalog:",
-    "yukibana-cloud-ext": "workspace:*",
-    "yukibana-ext": "workspace:*",
-    "yukibana-submission-ext": "workspace:*",
-    "yukibana-telemetry-ext": "workspace:*",
-    "yukibana-scala-lang-ext": "workspace:*"
+    "yukibana-cloud-ext": "catalog:",
+    "yukibana-ext": "catalog:",
+    "yukibana-submission-ext": "catalog:",
+    "yukibana-telemetry-ext": "catalog:",
+    "yukibana-scala-lang-ext": "catalog:"
   },
   "devDependencies": {
     "@theia/cli": "catalog:"

@@ -11,7 +11,7 @@
   "dependencies": {
     "@theia/core": "catalog:",
     "@theia/telemetry": "catalog:",
-    "yukibana-ext": "workspace:*"
+    "yukibana-ext": "catalog:"
   },
   "devDependencies": {
     "@types/archiver": "catalog:",

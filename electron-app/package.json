@@ -43,13 +43,13 @@
     "@theia/workspace": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "yukibana-cloud-ext": "workspace:*",
-    "yukibana-ext": "workspace:*",
-    "yukibana-launcher-ext": "workspace:*",
-    "yukibana-product-ext": "workspace:*",
-    "yukibana-submission-ext": "workspace:*",
-    "yukibana-telemetry-ext": "workspace:*",
-    "yukibana-scala-lang-ext": "workspace:*"
+    "yukibana-cloud-ext": "catalog:",
+    "yukibana-ext": "catalog:",
+    "yukibana-launcher-ext": "catalog:",
+    "yukibana-product-ext": "catalog:",
+    "yukibana-submission-ext": "catalog:",
+    "yukibana-telemetry-ext": "catalog:",
+    "yukibana-scala-lang-ext": "catalog:"
   },
   "devDependencies": {
     "@theia/bundle-plugin": "catalog:",

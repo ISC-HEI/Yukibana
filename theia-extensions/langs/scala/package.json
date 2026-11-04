@@ -11,7 +11,7 @@
   ],
   "dependencies": {
     "@theia/core": "catalog:",
-    "yukibana-ext": "workspace:*"
+    "yukibana-ext": "catalog:"
   },
   "devDependencies": {
     "rimraf": "catalog:",

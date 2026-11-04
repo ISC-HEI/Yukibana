@@ -67,6 +67,7 @@ catalog:
   '@types/react-dom': ^19.3.0
   '@vitest/coverage-v8': 5.0.5
   '@vscode/sudo-prompt': 9.3.2
+  '@yukibana/cli': 'github:tothambrus11/yukibana-cloud#19354b75a1f160d535aa08ad8041026507c511b5&path:/cli'
   chai: 6.3.0
   fs-extra: ^11.4.1
   ignore-styles: 5.0.1
@@ -79,5 +80,13 @@ catalog:
   rimraf: ^6.1.3
   typescript: 7.0.2
   vitest: 5.0.5
+  yukibana-cloud-ext: workspace:*
+  yukibana-common: workspace:*
+  yukibana-ext: workspace:*
+  yukibana-launcher-ext: workspace:*
+  yukibana-product-ext: workspace:*
+  yukibana-scala-lang-ext: workspace:*
+  yukibana-submission-ext: workspace:*
+  yukibana-telemetry-ext: workspace:*
 catalogMode: strict
 catalogPrune: true
