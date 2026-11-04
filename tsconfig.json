@@ -28,6 +28,9 @@
       "path": "theia-extensions/yukibana-telemetry"
     },
     {
+      "path": "theia-extensions/langs/scala"
+    },
+    {
       "path": "electron-app"
     },
     {

@@ -48,7 +48,8 @@
     "yukibana-launcher-ext": "workspace:*",
     "yukibana-product-ext": "workspace:*",
     "yukibana-submission-ext": "workspace:*",
-    "yukibana-telemetry-ext": "workspace:*"
+    "yukibana-telemetry-ext": "workspace:*",
+    "yukibana-scala-lang-ext": "workspace:*"
   },
   "devDependencies": {
     "@theia/bundle-plugin": "~1.76.0",
