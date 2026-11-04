@@ -13,6 +13,7 @@ import { AssignmentPaneContribution } from './assignment/assignment-pane-contrib
 import { AssignmentPaneWidget } from './assignment/assignment-pane-widget';
 import { AssignmentResolver } from './assignment/assignment-resolver';
 import { bindConfig } from './config/config-contribution';
+import { bindLanguageProviderContributions } from './languages/provider-contributions';
 import { YukibanaAIIdeActivationService } from './yukibana-ai-ide-activation-service';
 import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
 import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
@@ -23,7 +24,6 @@ import { YukibanaMessageMiddlewareContribution, YukibanaMessageService } from '.
 import { YukibanaProblemContributioun } from './yukibana-problem-contribution';
 import { YukibanaProblemManager } from './yukibana-problem-manager';
 import { YukibanaRemoteFileSystemProvider } from './yukibana-remote-file-system-provider';
-import { SuggestionsContribution } from './yukibana-suggestions-contribution';
 import { YukibanaToolbarDefaults } from './yukibana-toolbar-contributions';
 import { YukibanaTypingTracker } from './yukibana-typing-tracker';
 
@@ -45,8 +45,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         bind(ToolbarDefaultsFactory).toConstantValue(YukibanaToolbarDefaults);
     }
 
-    bind(SuggestionsContribution).toSelf().inSingletonScope();
-    bind(FrontendApplicationContribution).toService(SuggestionsContribution);
+    bindLanguageProviderContributions(bind);
 
     bind(YukibanaProblemManager).toSelf().inSingletonScope();
     rebind(ProblemManager).toService(YukibanaProblemManager);

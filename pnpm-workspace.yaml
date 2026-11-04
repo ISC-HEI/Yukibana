@@ -13,7 +13,7 @@ allowBuilds:
   '@parcel/watcher': true
   '@theia/ffmpeg': true
   '@vscode/windows-ca-certs': true
-  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/2bf4344445a23cdd62c948c23946c8952ae3b209#path:/cli': true
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/19354b75a1f160d535aa08ad8041026507c511b5#path:/cli': true
   drivelist: true
   electron-winstaller: true
   esbuild: true

@@ -22,6 +22,7 @@ describe('loadConfig', () => {
                 codeSuggestions: true,
                 squiggles: true,
                 ai: true,
+                codeLenses: true,
             },
             layout: {
                 widgets: {
@@ -59,6 +60,7 @@ describe('loadConfig', () => {
         { key: ['features', 'codeSuggestions'], value: 0 },
         { key: ['features', 'squiggles'], value: 0 },
         { key: ['features', 'ai'], value: 0 },
+        { key: ['features', 'codeLenses'], value: 0 },
         { key: ['layout'], value: [] },
         { key: ['layout', 'widgets'], value: [] },
         { key: ['layout', 'widgets', 'files'], value: 0 },
@@ -103,6 +105,7 @@ describe('loadConfig', () => {
                 codeSuggestions: false,
                 squiggles: false,
                 ai: false,
+                codeLenses: false,
             },
             layout: {
                 widgets: {
