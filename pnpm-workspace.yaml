@@ -25,7 +25,7 @@ allowBuilds:
   # Only needed by `theia test`, which this project doesn't use; skips downloading two Chrome builds.
   puppeteer: false
 
-# electron cannot be in catalog because Theia's CLI checks its version using semver
+# electron cannot be specified as 'catalog:' because Theia's CLI checks its version using semver
 catalog:
   '@playwright/test': ^1.64.1
   '@theia/ai-anthropic': ~1.76.0
@@ -79,3 +79,5 @@ catalog:
   rimraf: ^6.1.3
   typescript: 7.0.2
   vitest: 5.0.5
+catalogMode: strict
+catalogPrune: true
