@@ -10,12 +10,12 @@
     "src"
   ],
   "dependencies": {
-    "@theia/core": "~1.76.0",
+    "@theia/core": "catalog:",
     "yukibana-ext": "workspace:*"
   },
   "devDependencies": {
-    "rimraf": "^6.1.3",
-    "typescript": "7.0.2"
+    "rimraf": "catalog:",
+    "typescript": "catalog:"
   },
   "scripts": {
     "prepare": "tsc --build",
