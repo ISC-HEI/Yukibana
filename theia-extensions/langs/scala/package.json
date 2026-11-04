@@ -1,0 +1,29 @@
+{
+  "name": "yukibana-scala-lang-ext",
+  "keywords": [
+    "theia-extension",
+    "language"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@theia/core": "~1.76.0",
+    "yukibana-ext": "workspace:*"
+  },
+  "devDependencies": {
+    "rimraf": "^6.1.3",
+    "typescript": "7.0.2"
+  },
+  "scripts": {
+    "prepare": "tsc --build",
+    "clean": "rimraf lib tsconfig.tsbuildinfo"
+  },
+  "theiaExtensions": [
+    {
+      "frontend": "lib/browser/scala-frontend-module"
+    }
+  ]
+}

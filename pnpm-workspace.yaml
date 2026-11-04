@@ -6,6 +6,7 @@ nodeLinker: hoisted # Needed for Theia's version check
 packages:
   - packages/*
   - theia-extensions/*
+  - theia-extensions/langs/*
   - browser-app
   - electron-app
   - tests

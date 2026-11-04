@@ -54,12 +54,5 @@
     "ms-vscode.js-debug-companion",
     "vscode.extension-editing",
     "vscode.microsoft-authentication"
-  ],
-  "workspaces": [
-    "packages/*",
-    "theia-extensions/*",
-    "browser-app",
-    "electron-app",
-    "tests"
   ]
 }

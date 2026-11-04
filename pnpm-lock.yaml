@@ -280,6 +280,9 @@ importers:
       yukibana-ext:
         specifier: workspace:*
         version: link:../theia-extensions/yukibana
+      yukibana-scala-lang-ext:
+        specifier: workspace:*
+        version: link:../theia-extensions/langs/scala
       yukibana-submission-ext:
         specifier: workspace:*
         version: link:../theia-extensions/yukibana-submission
@@ -392,6 +395,9 @@ importers:
       yukibana-product-ext:
         specifier: workspace:*
         version: link:../theia-extensions/yukibana-product
+      yukibana-scala-lang-ext:
+        specifier: workspace:*
+        version: link:../theia-extensions/langs/scala
       yukibana-submission-ext:
         specifier: workspace:*
         version: link:../theia-extensions/yukibana-submission
@@ -433,6 +439,22 @@ importers:
       '@theia/playwright':
         specifier: ~1.76.0
         version: 1.76.0
+
+  theia-extensions/langs/scala:
+    dependencies:
+      '@theia/core':
+        specifier: ~1.76.0
+        version: 1.76.0(@theia/electron@1.76.0(electron@42.8.1(supports-color@8.1.1)))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@8.1.1)
+      yukibana-ext:
+        specifier: workspace:*
+        version: link:../../yukibana
+    devDependencies:
+      rimraf:
+        specifier: ^6.1.3
+        version: 6.1.3
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
 
   theia-extensions/yukibana:
     dependencies:

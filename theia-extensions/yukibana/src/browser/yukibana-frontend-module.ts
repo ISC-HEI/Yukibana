@@ -19,7 +19,6 @@ import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
 import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
 import { YukibanaFilterContribution } from './yukibana-filter-contribution';
 import { bindLayout } from './yukibana-layout-contribution';
-import { DefaultMessageMiddlewareContribution } from './yukibana-message-middleware-contribution';
 import { YukibanaMessageMiddlewareContribution, YukibanaMessageService } from './yukibana-message-service';
 import { YukibanaProblemContributioun } from './yukibana-problem-contribution';
 import { YukibanaProblemManager } from './yukibana-problem-manager';
@@ -87,8 +86,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     }
 
     bindContributionProvider(bind, YukibanaMessageMiddlewareContribution);
-    bind(DefaultMessageMiddlewareContribution).toSelf().inSingletonScope();
-    bind(YukibanaMessageMiddlewareContribution).toService(DefaultMessageMiddlewareContribution);
 
     bind(YukibanaMessageService).toSelf().inSingletonScope();
     if (isBound(MessageService)) {
