@@ -139,7 +139,7 @@ function notFoundOrEmpty(dirPath: string): boolean {
 }
 
 /** Returns the new extension name given in `positionals`; exits if none is given or if the extension already exists. */
-function parseNewExtension(positionals: string[]): [string, string] {
+function parseNewExtension(positionals: string[], lang: boolean = false, force: boolean = false): [string, string] {
     if (positionals.length === 0) {
         fail(`Missing required extension name`);
     }
@@ -150,15 +150,11 @@ function parseNewExtension(positionals: string[]): [string, string] {
     if (ext.includes('/')) {
         fail(`Extension name cannot contain '/'`);
     }
-    const extPath = path.join(root, 'theia-extensions', ext);
-    if (!notFoundOrEmpty(extPath)) {
+    const extPath = path.join(root, 'theia-extensions', 'langs', ext);
+    if (!force && !notFoundOrEmpty(extPath)) {
         fail(`Directory ${extPath} already exists`);
     }
     return [ext, extPath];
-}
-
-function initNewExtension(extensionName: string, extensionPath: string): void {
-    initExtension(extensionName, extensionPath);
 }
 
 /** A command's arguments: its options, its positional arguments, and the arguments after `--`. */
@@ -202,10 +198,12 @@ const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Pa
         run: () => exec(root, tsc, ['--build', '--watch']),
     },
     'new:ext': {
-        options: {},
+        options: { lang: { type: 'boolean' }, force: { type: 'boolean', short: 'f' } },
         run: ({ values, positionals }) => {
-            const [extName, extPath] = parseNewExtension(positionals);
-            initNewExtension(extName, extPath);
+            const lang: boolean = !!values.lang;
+            const force: boolean = !!values.force;
+            const [extName, extPath] = parseNewExtension(positionals, lang, force);
+            initExtension(extName, extPath, lang);
         },
     },
 };
