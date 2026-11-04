@@ -42,5 +42,8 @@
   "oxc.enable": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   }
 }
