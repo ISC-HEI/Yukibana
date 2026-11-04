@@ -9,14 +9,14 @@
     "src"
   ],
   "dependencies": {
-    "@theia/core": "~1.76.0",
-    "@vscode/sudo-prompt": "9.3.2",
-    "fs-extra": "^11.4.1"
+    "@theia/core": "catalog:",
+    "@vscode/sudo-prompt": "catalog:",
+    "fs-extra": "catalog:"
   },
   "devDependencies": {
-    "@types/fs-extra": "11.0.4",
-    "rimraf": "^6.1.3",
-    "typescript": "7.0.2"
+    "@types/fs-extra": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:"
   },
   "scripts": {
     "prepare": "tsc --build",

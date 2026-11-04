@@ -24,3 +24,69 @@ allowBuilds:
   node-pty: true
   # Only needed by `theia test`, which this project doesn't use; skips downloading two Chrome builds.
   puppeteer: false
+
+# electron cannot be specified as 'catalog:' because Theia's CLI checks its version using semver
+catalog:
+  '@playwright/test': ^1.64.1
+  '@theia/ai-anthropic': ~1.76.0
+  '@theia/ai-chat': ~1.76.0
+  '@theia/ai-chat-ui': ~1.76.0
+  '@theia/ai-core': ~1.76.0
+  '@theia/ai-ide': ~1.76.0
+  '@theia/bundle-plugin': ~1.76.0
+  '@theia/cli': ~1.76.0
+  '@theia/core': ~1.76.0
+  '@theia/debug': ~1.76.0
+  '@theia/editor': ~1.76.0
+  '@theia/electron': ~1.76.0
+  '@theia/file-search': ~1.76.0
+  '@theia/filesystem': ~1.76.0
+  '@theia/markers': ~1.76.0
+  '@theia/messages': ~1.76.0
+  '@theia/monaco': ~1.76.0
+  '@theia/monaco-editor-core': ^1.108.201
+  '@theia/navigator': ~1.76.0
+  '@theia/outline-view': ~1.76.0
+  '@theia/playwright': ~1.76.0
+  '@theia/plugin-ext': ~1.76.0
+  '@theia/plugin-ext-vscode': ~1.76.0
+  '@theia/preferences': ~1.76.0
+  '@theia/process': ~1.76.0
+  '@theia/scm': ~1.76.0
+  '@theia/search-in-workspace': ~1.76.0
+  '@theia/telemetry': ~1.76.0
+  '@theia/terminal': ~1.76.0
+  '@theia/test': ~1.76.0
+  '@theia/toolbar': ~1.76.0
+  '@theia/workspace': ~1.76.0
+  '@types/archiver': 8.0.0
+  '@types/fs-extra': 11.0.4
+  '@types/micromatch': 4.0.10
+  '@types/node': 26.6.5
+  '@types/react': ^19.3.0
+  '@types/react-dom': ^19.3.0
+  '@vitest/coverage-v8': 5.0.5
+  '@vscode/sudo-prompt': 9.3.2
+  '@yukibana/cli': 'github:tothambrus11/yukibana-cloud#19354b75a1f160d535aa08ad8041026507c511b5&path:/cli'
+  chai: 6.3.0
+  fs-extra: ^11.4.1
+  ignore-styles: 5.0.1
+  jsdom: 30.1.3
+  oxfmt: 0.74.0
+  oxlint: 1.89.0
+  oxlint-tsgolint: 7.0.2004
+  react: ^19.3.1
+  react-dom: ^19.3.1
+  rimraf: ^6.1.3
+  typescript: 7.0.2
+  vitest: 5.0.5
+  yukibana-cloud-ext: workspace:*
+  yukibana-common: workspace:*
+  yukibana-ext: workspace:*
+  yukibana-launcher-ext: workspace:*
+  yukibana-product-ext: workspace:*
+  yukibana-scala-lang-ext: workspace:*
+  yukibana-submission-ext: workspace:*
+  yukibana-telemetry-ext: workspace:*
+catalogMode: strict
+catalogPrune: true
