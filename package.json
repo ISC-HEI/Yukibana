@@ -17,6 +17,7 @@
     "package": "node scripts/cli.mts package",
     "download:plugins": "node scripts/cli.mts download:plugins",
     "watch": "node scripts/cli.mts watch",
+    "new:ext": "node scripts/cli.mts new:ext",
     "clean": "pnpm -r --if-present run clean",
     "postinstall": "theia check:theia-version",
     "lint": "oxlint",

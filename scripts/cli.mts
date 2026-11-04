@@ -19,6 +19,7 @@ import * as fs from 'node:fs';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import { parseArgs, type ParseArgsOptionsConfig } from 'node:util';
+import { initExtension } from './extension.mts';
 
 /** A Theia app, in the folder `<app>-app`. */
 type App = 'browser' | 'electron';
@@ -125,6 +126,41 @@ function parseApp(positionals: string[], fallback: App[]): App[] {
     return [app as App];
 }
 
+function notFoundOrEmpty(dirPath: string): boolean {
+    try {
+        const stat = fs.statSync(dirPath);
+        if (!stat.isDirectory()) {
+            return false;
+        }
+        return fs.readdirSync(dirPath).length === 0;
+    } catch (err) {
+        return err.code === 'ENOENT';
+    }
+}
+
+/** Returns the new extension name given in `positionals`; exits if none is given or if the extension already exists. */
+function parseNewExtension(positionals: string[]): [string, string] {
+    if (positionals.length === 0) {
+        fail(`Missing required extension name`);
+    }
+    const [ext, ...extra] = positionals;
+    if (extra.length !== 0) {
+        fail(`Only expected 1 positional argument, got ${extra.length}`);
+    }
+    if (ext.includes('/')) {
+        fail(`Extension name cannot contain '/'`);
+    }
+    const extPath = path.join(root, 'theia-extensions', ext);
+    if (!notFoundOrEmpty(extPath)) {
+        fail(`Directory ${extPath} already exists`);
+    }
+    return [ext, extPath];
+}
+
+function initNewExtension(extensionName: string, extensionPath: string): void {
+    initExtension(extensionName, extensionPath);
+}
+
 /** A command's arguments: its options, its positional arguments, and the arguments after `--`. */
 interface Parsed {
     values: Record<string, unknown>;
@@ -164,6 +200,13 @@ const commands: Record<string, { options: ParseArgsOptionsConfig; run: (args: Pa
     watch: {
         options: {},
         run: () => exec(root, tsc, ['--build', '--watch']),
+    },
+    'new:ext': {
+        options: {},
+        run: ({ values, positionals }) => {
+            const [extName, extPath] = parseNewExtension(positionals);
+            initNewExtension(extName, extPath);
+        },
     },
 };
 

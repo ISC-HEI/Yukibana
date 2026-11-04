@@ -1,0 +1,12 @@
+{
+  "extends": "../configs/base.tsconfig.json",
+  "include": ["*"],
+  "compilerOptions": {
+    "composite": true,
+    "allowJs": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "module": "esnext"
+  },
+  "references": []
+}
