@@ -1,6 +1,8 @@
 /**
  * SPDX-License-Identifier: MIT
  */
+import { editor } from '@theia/monaco-editor-core';
+
 export namespace TypingTelemetry {
     export const EditPath = 'yukibana/edit';
     export type EditOrigin = 'type' | 'cut' | 'paste' | 'completion' | 'drag-drop' | 'delete' | 'command' | 'unknown';
@@ -29,7 +31,7 @@ export namespace TypingTelemetry {
 }
 
 export namespace LiveTelemetry {
-    export interface Envelope<P extends AnyPayload = AnyPayload> {
+    export interface Envelope<P extends Payload> {
         v: 1;
         seq: number;
         ts: number;
@@ -44,14 +46,14 @@ export namespace LiveTelemetry {
     export interface Hello extends Payload {
         type: 'hello';
         studentId: string;
-        assignmentId: string;
+        projectId: string;
     }
     export interface DocSync extends Payload {
         type: 'doc';
         uri: string;
         version: number;
         full?: string;
-        changes?: unknown[];
+        changes?: editor.IModelContentChange[];
         cursor?: [number, number];
     }
     export interface PasteStats {
@@ -84,16 +86,29 @@ export namespace LiveTelemetry {
     }
 
     // server -> client
+    export interface Welcome extends Payload {
+        type: 'welcome';
+        sessionId: string;
+        serverTime: number;
+        heartbeatMs: number;
+    }
     export interface Subscribe extends Payload {
         type: 'subscribe';
         stream: 'doc';
     }
     export interface Unsubscribe extends Payload {
         type: 'unsubscribe';
+        stream: 'doc';
     }
     export interface Sync extends Payload {
         type: 'sync';
+        uri: string;
     }
 
-    export type AnyPayload = Hello | DocSync | Stats | Event | Problems | Ping | Subscribe | Unsubscribe | Sync;
+    export type ClientToServerPayload = Hello | DocSync | Stats | Event | Problems | Ping;
+    export type ServerToClientPayload = Welcome | Subscribe | Unsubscribe | Sync;
+}
+
+export interface LiveSessionContext {
+    projectId: string;
 }
