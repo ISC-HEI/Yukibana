@@ -29,55 +29,71 @@ export namespace TypingTelemetry {
 }
 
 export namespace LiveTelemetry {
-    export interface Envelope<T extends string, P> {
+    export interface Envelope<P extends AnyPayload = AnyPayload> {
         v: 1;
-        type: T;
-        id: string;
+        seq: number;
         ts: number;
         payload: P;
     }
 
+    export interface Payload {
+        type: string;
+    }
+
     // client -> server
-    export type Hello = Envelope<
-        'hello',
-        {
-            studentId: string;
-            assignmentId: string;
-        }
-    >;
-    export type DocSync = Envelope<
-        'doc',
-        {
-            uri: string;
-            version: number;
-            full?: string;
-            changes?: unknown[];
-            cursor?: [number, number];
-        }
-    >;
+    export interface Hello extends Payload {
+        type: 'hello';
+        studentId: string;
+        assignmentId: string;
+    }
+    export interface DocSync extends Payload {
+        type: 'doc';
+        uri: string;
+        version: number;
+        full?: string;
+        changes?: unknown[];
+        cursor?: [number, number];
+    }
     export interface PasteStats {
         size: number;
         external: boolean;
     }
-    export type Stats = Envelope<
-        'stats',
-        {
-            windowMs: number;
-            idleMs: number;
-            charsInserted: number;
-            charsDeleted: number;
-            pastes: PasteStats[];
-            commands: string[];
-            activeFile?: string;
-            focused: boolean;
-        }
-    >;
-    export type Event = Envelope<'event', { kind: 'run' | 'test' | 'submit' | 'ai-prompt' | 'file-op'; data: unknown }>;
-    export type Problems = Envelope<'problems', { errors: number; warnings: number }>;
-    export type Ping = Envelope<'ping', {}>;
+    export interface Stats extends Payload {
+        type: 'stats';
+        windowMs: number;
+        idleMs: number;
+        charsInserted: number;
+        charsDeleted: number;
+        pastes: PasteStats[];
+        commands: string[];
+        activeFile?: string;
+        focused: boolean;
+    }
+    export interface Event extends Payload {
+        type: 'event';
+        kind: 'run' | 'test' | 'submit' | 'ai-prompt' | 'file-op';
+        data: unknown;
+    }
+    export interface Problems extends Payload {
+        type: 'problems';
+        errors: number;
+        warnings: number;
+    }
+    export interface Ping extends Payload {
+        type: 'ping';
+    }
 
     // server -> client
-    export type Subscribe = Envelope<'subscribe', { stream: 'doc' }>;
-    export type Unsubscribe = Envelope<'unsubscribe', {}>;
-    export type Sync = Envelope<'sync', {}>;
+    export interface Subscribe extends Payload {
+        type: 'subscribe';
+        stream: 'doc';
+    }
+    export interface Unsubscribe extends Payload {
+        type: 'unsubscribe';
+    }
+    export interface Sync extends Payload {
+        type: 'sync';
+    }
+
+    export type AnyPayload = Hello | DocSync | Stats | Event | Problems | Ping | Subscribe | Unsubscribe | Sync;
 }
