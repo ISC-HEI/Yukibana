@@ -1,6 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
  */
+import { Disposable, MaybePromise, RpcServer } from '@theia/core';
 import { editor } from '@theia/monaco-editor-core';
 
 export namespace TypingTelemetry {
@@ -111,4 +112,23 @@ export namespace LiveTelemetry {
 
 export interface LiveSessionContext {
     projectId: string;
+}
+
+export const LiveTelemetrySink = Symbol('LiveTelemetrySink');
+export interface LiveTelemetrySink {
+    start(ctx: LiveSessionContext): MaybePromise<void>;
+    send(payload: LiveTelemetry.ClientToServerPayload): void;
+    onCommand?(listener: (cmd: LiveTelemetry.ServerToClientPayload) => void): Disposable;
+    dispose(): void;
+}
+
+export const LiveTelemetryReporter = Symbol('LiveTelemetryReporter');
+export interface LiveTelemetryReporter extends RpcServer<LiveTelemetryFrontend> {
+    start(ctx: LiveSessionContext): Promise<void>;
+    send(payload: LiveTelemetry.ClientToServerPayload): void;
+}
+
+export const LiveTelemetryFrontend = Symbol('LiveTelemetryFrontend');
+export interface LiveTelemetryFrontend {
+    onCommand(cmd: LiveTelemetry.ServerToClientPayload): void;
 }
