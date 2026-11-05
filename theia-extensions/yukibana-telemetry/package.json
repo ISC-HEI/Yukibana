@@ -11,10 +11,12 @@
   "dependencies": {
     "@theia/core": "catalog:",
     "@theia/telemetry": "catalog:",
+    "ws": "catalog:",
     "yukibana-ext": "catalog:"
   },
   "devDependencies": {
     "@types/archiver": "catalog:",
+    "@types/ws": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:"
   },

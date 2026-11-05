@@ -278,6 +278,9 @@ catalogs:
     '@types/react-dom':
       specifier: ^19.3.0
       version: 19.3.0
+    '@types/ws':
+      specifier: 8.18.2
+      version: 8.18.2
     '@vitest/coverage-v8':
       specifier: 5.0.5
       version: 5.0.5
@@ -323,6 +326,9 @@ catalogs:
     vitest:
       specifier: 5.0.5
       version: 5.0.5
+    ws:
+      specifier: 8.22.0
+      version: 8.22.0
     yukibana-cloud-ext:
       specifier: workspace:*
       version: workspace:*
@@ -841,6 +847,9 @@ importers:
       '@theia/telemetry':
         specifier: 'catalog:'
         version: 1.76.0(@theia/electron@1.76.0(electron@42.8.1(supports-color@8.1.1)))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(debug@4.4.3(supports-color@8.1.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@8.1.1)
+      ws:
+        specifier: 'catalog:'
+        version: 8.22.0
       yukibana-ext:
         specifier: 'catalog:'
         version: link:../yukibana
@@ -848,6 +857,9 @@ importers:
       '@types/archiver':
         specifier: 'catalog:'
         version: 8.0.0
+      '@types/ws':
+        specifier: 'catalog:'
+        version: 8.18.2
       rimraf:
         specifier: 'catalog:'
         version: 6.1.3
