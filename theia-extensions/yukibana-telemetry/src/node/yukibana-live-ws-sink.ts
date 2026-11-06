@@ -4,13 +4,13 @@
 import { Emitter, ILogger } from '@theia/core';
 import { inject, injectable, named } from '@theia/core/shared/inversify';
 import { WebSocket } from 'ws';
-import { LiveSessionContext, LiveTelemetry, LiveTelemetrySink } from 'yukibana-ext/lib/common/yukibana-telemetry';
+import { LiveSessionContext, LiveTelemetry, LiveTelemetrySink, LiveTelemetrySinkHost } from 'yukibana-ext/lib/common/yukibana-telemetry';
+import { LiveTelemetrySinkContribution } from 'yukibana-ext/lib/node/live-telemetry-sink-contribution';
 
 const BATCH_SIZE = 50;
 const MAX_DRAIN_DELAY_MS = 1_000;
 const WS_URL = 'ws://localhost:5432/ws/student';
 
-@injectable()
 export class YukibanaLiveWebsocketTelemetrySink implements LiveTelemetrySink {
     protected queue: LiveTelemetry.Envelope<LiveTelemetry.ClientToServerPayload>[] = [];
     protected timer?: NodeJS.Timeout;
@@ -20,13 +20,16 @@ export class YukibanaLiveWebsocketTelemetrySink implements LiveTelemetrySink {
     protected readonly onCommandEmitter = new Emitter<LiveTelemetry.ServerToClientPayload>();
     readonly onCommand = this.onCommandEmitter.event;
 
-    protected sessionCtx?: LiveSessionContext;
+    constructor(
+        protected readonly logger: ILogger,
+        protected readonly host: LiveTelemetrySinkHost,
+        protected readonly sessionCtx: LiveSessionContext,
+    ) {
+        this.start();
+    }
 
-    @inject(ILogger) @named('yukibana:LiveWebsocketTelemetrySink') protected readonly logger!: ILogger;
-
-    start(ctx: LiveSessionContext): void {
+    protected start(): void {
         this.logger.info('Starting');
-        this.sessionCtx = ctx;
         return this.open();
     }
 
@@ -34,7 +37,7 @@ export class YukibanaLiveWebsocketTelemetrySink implements LiveTelemetrySink {
         this.close();
     }
 
-    open(): void {
+    protected open(): void {
         this.logger.info(`Connecting to ${WS_URL}`);
         this.ws = new WebSocket(WS_URL);
         this.ws.on('error', e => {
@@ -49,13 +52,12 @@ export class YukibanaLiveWebsocketTelemetrySink implements LiveTelemetrySink {
             this.onCommandEmitter.fire(msg.payload);
         });
     }
-    close(): void {
+    protected close(): void {
         this.logger.info('Closing websocket');
         this.ws?.close();
-        this.sessionCtx = undefined;
     }
 
-    sendHello(): void {
+    protected sendHello(): void {
         this.send({
             type: 'hello',
             studentId: '',
@@ -116,5 +118,14 @@ export class YukibanaLiveWebsocketTelemetrySink implements LiveTelemetrySink {
                 events: batch,
             }),
         );
+    }
+}
+
+@injectable()
+export class YukibanaLiveWebsocketTelemetrySinkContribution implements LiveTelemetrySinkContribution {
+    @inject(ILogger) @named('yukibana:LiveWebsocketTelemetrySink') protected readonly logger!: ILogger;
+
+    create(ctx: LiveSessionContext, host: LiveTelemetrySinkHost): LiveTelemetrySink {
+        return new YukibanaLiveWebsocketTelemetrySink(this.logger, host, ctx);
     }
 }

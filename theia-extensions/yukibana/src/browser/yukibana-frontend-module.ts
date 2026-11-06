@@ -7,7 +7,6 @@ import {
     ApplicationShellOptions,
     bindViewContribution,
     FrontendApplicationContribution,
-    RemoteConnectionProvider,
     ServiceConnectionProvider,
     WidgetFactory,
 } from '@theia/core/lib/browser';
@@ -17,15 +16,14 @@ import { RemoteFileSystemProvider } from '@theia/filesystem/lib/common/remote-fi
 import { ProblemContribution } from '@theia/markers/lib/browser/problem/problem-contribution';
 import { ProblemManager } from '@theia/markers/lib/browser/problem/problem-manager';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
-import { LiveTelemetryFrontend, LiveTelemetryReporter } from '../common/yukibana-telemetry';
-import { LIVE_PATH } from '../node/live-telemetry-reporter';
+import { LiveTelemetryService, LiveTelemetryServicePath } from '../common/yukibana-telemetry';
 import { AssignmentPaneContribution } from './assignment/assignment-pane-contribution';
 import { AssignmentPaneWidget } from './assignment/assignment-pane-widget';
 import { AssignmentResolver } from './assignment/assignment-resolver';
 import { bindConfig } from './config/config-contribution';
 import { bindLanguageProviderContributions } from './languages/provider-contributions';
-import { LiveTelemetryContribution } from './live-telemetry-contribution';
-import { LiveTelemetryFrontendImpl } from './live-telemetry-frontend';
+import { LiveTelemetryClientImpl } from './live-telemetry-client';
+import { LiveTelemetryReporter } from './live-telemetry-reporter';
 import { YukibanaAIIdeActivationService } from './yukibana-ai-ide-activation-service';
 import { CleanupFrontendContribution } from './yukibana-cleanup-contribution';
 import { YukibanaCommandContribution, YukibanaMenuContribution } from './yukibana-contribution';
@@ -109,16 +107,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(YukibanaTypingTracker).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(YukibanaTypingTracker);
 
-    bind(LiveTelemetryFrontendImpl).toSelf().inSingletonScope();
-    bind(LiveTelemetryFrontend).toService(LiveTelemetryFrontendImpl);
-    bind(LiveTelemetryReporter)
-        .toDynamicValue(ctx => {
-            const provider = ctx.container.get<ServiceConnectionProvider>(RemoteConnectionProvider);
-            const client = ctx.container.get(LiveTelemetryFrontendImpl);
-            return provider.createProxy<LiveTelemetryReporter>(LIVE_PATH, client);
-        })
+    bind(LiveTelemetryClientImpl).toSelf().inSingletonScope();
+    bind(LiveTelemetryService)
+        .toDynamicValue(ctx => ServiceConnectionProvider.createProxy<LiveTelemetryService>(ctx.container, LiveTelemetryServicePath, ctx.container.get(LiveTelemetryClientImpl)))
         .inSingletonScope();
-
-    bind(LiveTelemetryContribution).toSelf().inSingletonScope();
-    bind(FrontendApplicationContribution).to(LiveTelemetryContribution);
+    bind(LiveTelemetryReporter).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).to(LiveTelemetryReporter);
 });
