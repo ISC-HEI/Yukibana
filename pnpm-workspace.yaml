@@ -14,7 +14,7 @@ allowBuilds:
   '@parcel/watcher': true
   '@theia/ffmpeg': true
   '@vscode/windows-ca-certs': true
-  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/19354b75a1f160d535aa08ad8041026507c511b5#path:/cli': true
+  '@yukibana/cli@https://codeload.github.com/tothambrus11/yukibana-cloud/tar.gz/5ac54db42f6eee76a78a5b44abb6e1e830a107c1#path:/cli': true
   drivelist: true
   electron-winstaller: true
   esbuild: true
@@ -67,7 +67,7 @@ catalog:
   '@types/react-dom': ^19.3.0
   '@vitest/coverage-v8': 5.0.5
   '@vscode/sudo-prompt': 9.3.2
-  '@yukibana/cli': 'github:tothambrus11/yukibana-cloud#19354b75a1f160d535aa08ad8041026507c511b5&path:/cli'
+  '@yukibana/cli': 'github:tothambrus11/yukibana-cloud#5ac54db42f6eee76a78a5b44abb6e1e830a107c1&path:/cli'
   chai: 6.3.0
   fs-extra: ^11.4.1
   ignore-styles: 5.0.1

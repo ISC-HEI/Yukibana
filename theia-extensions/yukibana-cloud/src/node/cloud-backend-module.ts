@@ -14,6 +14,8 @@ import { YukibanaCloudLocalizationContribution } from './cloud-localization-cont
 import { CloudServiceImpl } from './cloud-service';
 import { CloudSessionManager } from './cloud-session-manager';
 import { OpenWorkspaces, OpenWorkspacesServerImpl } from './open-workspaces';
+import { UpdateService, updateServicePath } from '../common/update-protocol';
+import { UpdateServiceImpl } from './update/update-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(CloudSessionManager).toSelf().inSingletonScope();
@@ -38,6 +40,12 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         .inSingletonScope();
 
     bind(CloudClient).toSelf().inSingletonScope();
+
+    bind(UpdateServiceImpl).toSelf().inSingletonScope();
+    bind(UpdateService).toService(UpdateServiceImpl);
+    bind(ConnectionHandler)
+        .toDynamicValue(ctx => new RpcConnectionHandler(updateServicePath, () => ctx.container.get(UpdateService)))
+        .inSingletonScope();
 
     bind(OpenWorkspaces).toSelf().inSingletonScope();
     bind(OpenWorkspacesServerImpl).toSelf().inTransientScope();
