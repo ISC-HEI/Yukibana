@@ -10,10 +10,12 @@ import { Project } from '@yukibana/cli';
 import { expect } from 'chai';
 import { describe, it } from 'vitest';
 import { CanSubmitStatus, CloudAccount, CloudAuth, CloudService, SubmissionResult } from '../common/cloud-protocol';
+import { NO_UPDATE, UpdateState } from '../common/update-protocol';
 import { ACCOUNT_ACTIONS_GROUP, ACCOUNT_INFO_GROUP, accountMenuItems, accountStatusBarEntry } from './cloud-account-menu';
 import { CloudAccountService } from './cloud-account-service';
 import { AuthClientImpl } from './cloud-auth-client';
 import { CloudSubmissionTarget } from './cloud-submission-target';
+import { UpdateCheck } from './update/update-check';
 
 const account: CloudAccount = {
     userId: '095fc917-0000-0000-0000-000000000000',
@@ -194,7 +196,10 @@ describe('CloudAccountService', () => {
 describe('CloudSubmissionTarget', () => {
     const project = { projectId: 'project', courseCode: 'OS', editionLabel: '2026.Q1', role: 'owner' } as Project;
 
-    function setupTarget(current: CloudAccount | undefined, options: { result?: SubmissionResult; status?: CanSubmitStatus; info?: Project } = {}): CloudSubmissionTarget {
+    function setupTarget(
+        current: CloudAccount | undefined,
+        options: { result?: SubmissionResult; status?: CanSubmitStatus; info?: Project; update?: UpdateState } = {},
+    ): CloudSubmissionTarget {
         const { accounts } = setupAccounts(async () => current);
         const target = new CloudSubmissionTarget();
         Object.assign(target, {
@@ -203,9 +208,24 @@ describe('CloudSubmissionTarget', () => {
                 canSubmitProject: async () => ({ status: options.status ?? CanSubmitStatus.OPEN, project: options.info }),
             } as unknown as CloudService,
             accounts,
+            updates: { refresh: async () => options.update ?? NO_UPDATE } satisfies UpdateCheck,
         });
         return target;
     }
+
+    it('should let a student submit without a note when their project has the newest version', async () => {
+        const availability = await setupTarget(account).getAvailability('project');
+        expect(availability).to.deep.equal({ available: true });
+    });
+
+    it('should tell a student who submits late that a newer version of the assignment is waiting', async () => {
+        const update: UpdateState = { rolledBack: false, available: { from: 'a', to: 'b', projectTitle: 'Warm-up', decided: [], pending: [] } };
+        const availability = await setupTarget(account, { status: CanSubmitStatus.LATE, update }).getAvailability('project');
+        expect(availability.available).to.equal(true);
+        if (availability.available) {
+            expect(availability.message).to.match(/^You are late but you can still submit\. Hurry up\. Your teacher published a newer version/);
+        }
+    });
 
     it('should say which account and role is not allowed to submit', async () => {
         const target = setupTarget(account, { status: CanSubmitStatus.NOT_ALLOWED, info: project });

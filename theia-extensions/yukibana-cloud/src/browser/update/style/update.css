@@ -1,0 +1,194 @@
+/* SPDX-License-Identifier: MIT */
+
+/*
+ * Laid out like the source control view: one line per file, a coloured letter, actions on hover. Theia's git colours
+ * are used when the git extension defines them, and the chart colours of every theme otherwise.
+ */
+
+.yukibana-update {
+    overflow: auto;
+}
+
+.yukibana-update-body {
+    padding: 6px 0;
+}
+
+.yukibana-update-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 12px 6px;
+    color: var(--theia-foreground);
+}
+
+.yukibana-update-head-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.yukibana-update .theia-button.yukibana-update-main {
+    display: block;
+    width: calc(100% - 24px);
+    margin: 0 12px 8px;
+}
+
+.yukibana-update-notice {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 12px 8px;
+    color: var(--theia-editorWarning-foreground);
+    font-size: var(--theia-ui-font-size0);
+}
+
+.yukibana-update-empty {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    color: var(--theia-descriptionForeground);
+}
+
+.yukibana-update-group-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px 2px;
+    font-size: var(--theia-ui-font-size0);
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--theia-descriptionForeground);
+}
+
+.yukibana-update-count {
+    min-width: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    text-align: center;
+    font-weight: normal;
+    background: var(--theia-badge-background);
+    color: var(--theia-badge-foreground);
+}
+
+.yukibana-update ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.yukibana-update-row {
+    display: flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 12px 0 16px;
+}
+
+.yukibana-update-row:hover {
+    background: var(--theia-list-hoverBackground);
+}
+
+.yukibana-update-file {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.yukibana-update-file:focus-visible {
+    outline: 1px solid var(--theia-focusBorder);
+}
+
+.yukibana-update-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.yukibana-update-folder {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.9em;
+    color: var(--theia-descriptionForeground);
+}
+
+.yukibana-update-lock {
+    font-size: 12px;
+    color: var(--theia-descriptionForeground);
+}
+
+.yukibana-update-row.gone .yukibana-update-name {
+    text-decoration: line-through;
+}
+
+.yukibana-update-actions {
+    display: none;
+    flex: none;
+}
+
+.yukibana-update-row:hover .yukibana-update-actions,
+.yukibana-update-row:focus-within .yukibana-update-actions {
+    display: flex;
+}
+
+.yukibana-update-action {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--theia-icon-foreground);
+    cursor: pointer;
+}
+
+.yukibana-update-action:hover {
+    background: var(--theia-toolbar-hoverBackground);
+}
+
+.yukibana-update-action:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.yukibana-update-badge {
+    flex: none;
+    width: 14px;
+    margin-left: 6px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.yukibana-update-row.added .yukibana-update-name,
+.yukibana-update-row.added .yukibana-update-badge {
+    color: var(--theia-gitDecoration-addedResourceForeground, var(--theia-charts-green));
+}
+
+.yukibana-update-row.modified .yukibana-update-name,
+.yukibana-update-row.modified .yukibana-update-badge {
+    color: var(--theia-gitDecoration-modifiedResourceForeground, var(--theia-charts-blue));
+}
+
+.yukibana-update-row.deleted .yukibana-update-name,
+.yukibana-update-row.deleted .yukibana-update-badge {
+    color: var(--theia-gitDecoration-deletedResourceForeground, var(--theia-charts-red));
+}
+
+.yukibana-update-row.conflict .yukibana-update-name,
+.yukibana-update-row.conflict .yukibana-update-badge {
+    color: var(--theia-gitDecoration-conflictingResourceForeground, var(--theia-charts-yellow));
+}
+
+/* A file still to merge is the student's next step, so its actions stay in sight */
+.yukibana-update-group.next .yukibana-update-actions {
+    display: flex;
+}
+
+/* What is already done steps back */
+.yukibana-update-group.quiet .yukibana-update-name,
+.yukibana-update-group.quiet .yukibana-update-badge {
+    opacity: 0.75;
+}

@@ -10,7 +10,9 @@
   ],
   "dependencies": {
     "@theia/core": "catalog:",
+    "@theia/editor": "catalog:",
     "@theia/filesystem": "catalog:",
+    "@theia/scm": "catalog:",
     "@theia/telemetry": "catalog:",
     "@theia/workspace": "catalog:",
     "@yukibana/cli": "catalog:",
